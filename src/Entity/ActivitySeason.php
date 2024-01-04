@@ -31,10 +31,10 @@ class ActivitySeason
     #[ORM\Column(type: Types::ARRAY)]
     private array $ranges = [];
 
-    #[ORM\ManyToOne(inversedBy: 'activitySeasons')]
+    #[ORM\ManyToOne(inversedBy: 'activitySeasons', cascade: ['persist', 'remove'])]
     private ?ActivityFee $activityFee = null;
 
-    #[ORM\OneToMany(mappedBy: 'activitySeason', targetEntity: ActivitySchedule::class)]
+    #[ORM\OneToMany(mappedBy: 'activitySeason', targetEntity: ActivitySchedule::class, cascade: ['persist', 'remove'])]
     #[ApiSubresource]
     private Collection $activitySchedules;
 

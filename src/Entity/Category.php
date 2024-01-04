@@ -24,7 +24,7 @@ class Category
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
 
-    #[ORM\OneToMany(mappedBy: 'category', targetEntity: Subcategory::class)]
+    #[ORM\OneToMany(mappedBy: 'category', targetEntity: Subcategory::class, cascade: ['persist', 'remove'])]
     private Collection $subCategories;
 
     #[ORM\ManyToMany(targetEntity: Activity::class, mappedBy: 'categories')]

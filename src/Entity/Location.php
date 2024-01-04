@@ -31,7 +31,7 @@ class Location
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
 
-    #[ORM\OneToMany(mappedBy: 'location', targetEntity: Zone::class)]
+    #[ORM\OneToMany(mappedBy: 'location', targetEntity: Zone::class, cascade: ['persist', 'remove'])]
     #[ApiSubresource]
     private Collection $zones;
 

@@ -39,7 +39,7 @@ class ActivityFee
     #[ORM\ManyToOne(inversedBy: 'activityFees')]
     private ?Activity $activity = null;
 
-    #[ORM\OneToMany(mappedBy: 'activityFee', targetEntity: ActivitySeason::class)]
+    #[ORM\OneToMany(mappedBy: 'activityFee', targetEntity: ActivitySeason::class, cascade: ['persist', 'remove'])]
     #[ApiSubresource]
     private Collection $activitySeasons;
 

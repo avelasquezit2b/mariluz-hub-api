@@ -229,4 +229,5 @@ class Modality
 
         return $this;
     }
+
 }

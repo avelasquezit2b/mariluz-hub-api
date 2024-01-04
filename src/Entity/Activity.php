@@ -86,7 +86,7 @@ class Activity
     #[ORM\ManyToMany(targetEntity: self::class, inversedBy: 'relatedActivities')]
     private Collection $relatedActivities;
 
-    #[ORM\OneToMany(mappedBy: 'activity', targetEntity: Modality::class)]
+    #[ORM\OneToMany(mappedBy: 'activity', targetEntity: Modality::class, cascade: ['persist', 'remove'])]
     #[ApiSubresource]
     private Collection $modalities;
 
@@ -127,7 +127,7 @@ class Activity
     #[ORM\Column(length: 50, nullable: true)]
     private ?string $vennturId = null;
 
-    #[ORM\ManyToOne(inversedBy: 'activities')]
+    #[ORM\ManyToOne(inversedBy: 'activities', cascade: ['persist', 'remove'])]
     private ?Location $location = null;
 
     #[ORM\ManyToMany(targetEntity: Zone::class, inversedBy: 'activities')]

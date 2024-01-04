@@ -22,6 +22,7 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
     itemOperations: ['get', 'delete', 'put'],
     collectionOperations: [
         'get',
+        'delete',
         'post' => [
             'controller' => CreateMediaObjectAction::class,
             'deserialize' => false,
