@@ -53,10 +53,20 @@ class Modality
     #[ORM\ManyToOne(inversedBy: 'modalities')]
     private ?Activity $activity = null;
 
+    #[ORM\Column(type: Types::SMALLINT, nullable: true)]
+    private ?int $quota = null;
+
+    #[ORM\Column(type: Types::SMALLINT, nullable: true)]
+    private ?int $businessQuota = null;
+
+    #[ORM\ManyToMany(targetEntity: Language::class, inversedBy: 'modalities')]
+    private Collection $languages;
+
     public function __construct()
     {
         $this->clientTypes = new ArrayCollection();
         $this->pickups = new ArrayCollection();
+        $this->languages = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -226,6 +236,54 @@ class Modality
     public function setActivity(?Activity $activity): static
     {
         $this->activity = $activity;
+
+        return $this;
+    }
+
+    public function getQuota(): ?int
+    {
+        return $this->quota;
+    }
+
+    public function setQuota(?int $quota): static
+    {
+        $this->quota = $quota;
+
+        return $this;
+    }
+
+    public function getBusinessQuota(): ?int
+    {
+        return $this->businessQuota;
+    }
+
+    public function setBusinessQuota(?int $businessQuota): static
+    {
+        $this->businessQuota = $businessQuota;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Language>
+     */
+    public function getLanguages(): Collection
+    {
+        return $this->languages;
+    }
+
+    public function addLanguage(Language $language): static
+    {
+        if (!$this->languages->contains($language)) {
+            $this->languages->add($language);
+        }
+
+        return $this;
+    }
+
+    public function removeLanguage(Language $language): static
+    {
+        $this->languages->removeElement($language);
 
         return $this;
     }

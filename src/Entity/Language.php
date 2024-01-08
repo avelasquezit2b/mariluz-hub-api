@@ -47,9 +47,13 @@ class Language
     #[ORM\ManyToMany(targetEntity: Activity::class, mappedBy: 'languages')]
     private Collection $activities;
 
+    #[ORM\ManyToMany(targetEntity: Modality::class, mappedBy: 'languages')]
+    private Collection $modalities;
+
     public function __construct()
     {
         $this->activities = new ArrayCollection();
+        $this->modalities = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -103,6 +107,33 @@ class Language
     {
         if ($this->activities->removeElement($activity)) {
             $activity->removeLanguage($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Modality>
+     */
+    public function getModalities(): Collection
+    {
+        return $this->modalities;
+    }
+
+    public function addModality(Modality $modality): static
+    {
+        if (!$this->modalities->contains($modality)) {
+            $this->modalities->add($modality);
+            $modality->addLanguage($this);
+        }
+
+        return $this;
+    }
+
+    public function removeModality(Modality $modality): static
+    {
+        if ($this->modalities->removeElement($modality)) {
+            $modality->removeLanguage($this);
         }
 
         return $this;

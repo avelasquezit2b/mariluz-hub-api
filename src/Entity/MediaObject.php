@@ -82,6 +82,14 @@ class MediaObject
     #[Groups(['media_object:read'])]
     private ?int $position = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['media_object:read'])]
+    private ?string $supplier = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['media_object:read'])]
+    private ?string $description = null;
+
     public function __construct()
     {
 
@@ -148,6 +156,30 @@ class MediaObject
     public function setPosition(?int $position): static
     {
         $this->position = $position;
+
+        return $this;
+    }
+
+    public function getSupplier(): ?string
+    {
+        return $this->supplier;
+    }
+
+    public function setSupplier(?string $supplier): static
+    {
+        $this->supplier = $supplier;
+
+        return $this;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(?string $description): static
+    {
+        $this->description = $description;
 
         return $this;
     }

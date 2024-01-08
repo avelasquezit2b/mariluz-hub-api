@@ -74,9 +74,6 @@ class Activity
     #[ORM\Column]
     private ?bool $isActive = null;
 
-    #[ORM\ManyToMany(targetEntity: Language::class, inversedBy: 'activities')]
-    private Collection $languages;
-
     #[ORM\ManyToMany(targetEntity: Category::class, inversedBy: 'activities')]
     private Collection $categories;
 
@@ -135,7 +132,6 @@ class Activity
 
     public function __construct()
     {
-        $this->languages = new ArrayCollection();
         $this->categories = new ArrayCollection();
         $this->subCategories = new ArrayCollection();
         $this->relatedActivities = new ArrayCollection();
@@ -290,30 +286,6 @@ class Activity
     public function setIsActive(bool $isActive): static
     {
         $this->isActive = $isActive;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Language>
-     */
-    public function getLanguages(): Collection
-    {
-        return $this->languages;
-    }
-
-    public function addLanguage(Language $language): static
-    {
-        if (!$this->languages->contains($language)) {
-            $this->languages->add($language);
-        }
-
-        return $this;
-    }
-
-    public function removeLanguage(Language $language): static
-    {
-        $this->languages->removeElement($language);
 
         return $this;
     }
