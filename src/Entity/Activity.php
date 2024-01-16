@@ -130,6 +130,8 @@ class Activity
     #[ORM\ManyToMany(targetEntity: Zone::class, inversedBy: 'activities')]
     private Collection $zones;
 
+    private $minPrice;
+
     public function __construct()
     {
         $this->categories = new ArrayCollection();
@@ -606,5 +608,12 @@ class Activity
         $this->zones->removeElement($zone);
 
         return $this;
+    }
+
+    public function getMinPrice(): ?float
+    {
+        // var_dump($this->getActivityFees());
+
+        return 30;
     }
 }
