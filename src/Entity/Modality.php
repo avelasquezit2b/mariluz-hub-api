@@ -9,23 +9,45 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: ModalityRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    attributes: [
+        "order" => ["id" => "ASC"],
+        "normalization_context" => ["groups" => ["modalityReduced"]]
+    ],
+    collectionOperations: [
+        "get",
+        "post",
+        // "post" => ["security" => "is_granted('ROLE_ADMIN')"],
+    ],
+    itemOperations: [
+        "get" => ["normalization_context" => ["groups" => "modality"]],
+        "put",
+        "delete",
+        // "put" => ["security" => "is_granted('ROLE_ADMIN') or object.owner == user"],
+        // "delete" => ["security" => "is_granted('ROLE_ADMIN') or object.owner == user"],
+    ],
+)]
 class Modality
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['modalityReduced', 'modality', 'activityReduced', 'activity'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['modalityReduced', 'modality', 'activityReduced', 'activity'])]
     private ?string $title = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['modality', 'activity'])]
     private ?string $description = null;
 
     #[ORM\ManyToMany(targetEntity: ClientType::class, inversedBy: 'modalities')]
+    #[Groups(['modalityReduced', 'modality', 'activityReduced', 'activity'])]
     private Collection $clientTypes;
 
     #[ORM\Column(length: 50)]
@@ -47,6 +69,7 @@ class Modality
     private Collection $pickups;
 
     #[ORM\OneToOne(mappedBy: 'modality', cascade: ['persist', 'remove'])]
+    #[Groups(['modalityReduced', 'modality', 'activityReduced', 'activity'])]
     #[ApiSubresource]
     private ?ActivityFee $activityFee = null;
 
@@ -60,6 +83,7 @@ class Modality
     private ?int $businessQuota = null;
 
     #[ORM\ManyToMany(targetEntity: Language::class, inversedBy: 'modalities')]
+    #[Groups(['modalityReduced', 'modality', 'activityReduced', 'activity'])]
     private Collection $languages;
 
     public function __construct()

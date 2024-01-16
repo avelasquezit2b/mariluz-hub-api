@@ -9,6 +9,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use App\Repository\ActivityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -16,6 +17,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ApiResource(
     attributes: [
         "order" => ["id" => "ASC"],
+        "normalization_context" => ["groups" => ["activityReduced"]]
     ],
     collectionOperations: [
         "get",
@@ -23,7 +25,7 @@ use Doctrine\ORM\Mapping as ORM;
         // "post" => ["security" => "is_granted('ROLE_ADMIN')"],
     ],
     itemOperations: [
-        "get",
+        "get" => ["normalization_context" => ["groups" => "activity"]],
         "put",
         "delete",
         // "put" => ["security" => "is_granted('ROLE_ADMIN') or object.owner == user"],
@@ -36,98 +38,129 @@ class Activity
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['activityReduced', 'activity'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['activityReduced', 'activity'])]
     private ?string $title = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['activityReduced', 'activity'])]
     private ?string $slug = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['activityReduced', 'activity'])]
     private ?string $shortDescription = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['activity'])]
     private ?string $extendedDescription = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['activity'])]
     private ?string $highlights = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['activity'])]
     private ?string $includes = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['activity'])]
     private ?string $notIncludes = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['activity'])]
     private ?string $carry = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['activity'])]
     private ?string $importantInformation = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['activity'])]
     private ?string $cancelationConditions = null;
 
     #[ORM\ManyToOne(inversedBy: 'activities')]
+    #[Groups(['activity'])]
     private ?Supplier $supplier = null;
 
     #[ORM\Column]
+    #[Groups(['activity'])]
     private ?bool $isActive = null;
 
     #[ORM\ManyToMany(targetEntity: Category::class, inversedBy: 'activities')]
+    #[Groups(['activityReduced', 'activity'])]
     private Collection $categories;
 
     #[ORM\ManyToMany(targetEntity: Subcategory::class, inversedBy: 'activities')]
+    #[Groups(['activityReduced', 'activity'])]
     private Collection $subCategories;
 
     #[ORM\ManyToMany(targetEntity: self::class, inversedBy: 'relatedActivities')]
+    #[Groups(['activity'])]
     private Collection $relatedActivities;
 
     #[ORM\OneToMany(mappedBy: 'activity', targetEntity: Modality::class, cascade: ['persist', 'remove'])]
+    #[Groups(['activity'])]
     #[ApiSubresource]
     private Collection $modalities;
 
     #[ORM\OneToMany(mappedBy: 'activity', targetEntity: ActivityFee::class)]
+    #[Groups(['activity'])]
     private Collection $activityFees;
 
     #[ORM\OneToMany(mappedBy: 'activity', targetEntity: MediaObject::class)]
+    #[Groups(['activityReduced', 'activity'])]
     #[ApiSubresource]
     private Collection $media;
 
     #[ORM\Column(length: 25, nullable: true)]
+    #[Groups(['activity'])]
     private ?string $releaseHour = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['activity'])]
     private ?bool $hasSupplierAvailability = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['activity'])]
     private ?bool $hasTransferAvailability = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['activity'])]
     private ?bool $isUnderPetition = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['activity'])]
     private ?bool $hasSendEmailClient = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['activity'])]
     private ?bool $hasSendEmailAgency = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['activity'])]
     private ?bool $hasSendEmailSupplier = null;
 
     #[ORM\Column(length: 50, nullable: true)]
+    #[Groups(['activity'])]
     private ?string $tripadvisorId = null;
 
     #[ORM\Column(length: 50, nullable: true)]
+    #[Groups(['activity'])]
     private ?string $getyourguideId = null;
 
     #[ORM\Column(length: 50, nullable: true)]
+    #[Groups(['activity'])]
     private ?string $vennturId = null;
 
     #[ORM\ManyToOne(inversedBy: 'activities', cascade: ['persist', 'remove'])]
+    #[Groups(['activityReduced', 'activity'])]
     private ?Location $location = null;
 
     #[ORM\ManyToMany(targetEntity: Zone::class, inversedBy: 'activities')]
+    #[Groups(['activityReduced', 'activity'])]
     private Collection $zones;
 
     private $minPrice;

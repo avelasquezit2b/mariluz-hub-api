@@ -8,29 +8,53 @@ use App\Repository\ActivityFeeRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: ActivityFeeRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    attributes: [
+        "order" => ["id" => "ASC"],
+        "normalization_context" => ["groups" => ["activityFeeReduced"]]
+    ],
+    collectionOperations: [
+        "get",
+        "post",
+        // "post" => ["security" => "is_granted('ROLE_ADMIN')"],
+    ],
+    itemOperations: [
+        "get" => ["normalization_context" => ["groups" => "activityFee"]],
+        "put",
+        "delete",
+        // "put" => ["security" => "is_granted('ROLE_ADMIN') or object.owner == user"],
+        // "delete" => ["security" => "is_granted('ROLE_ADMIN') or object.owner == user"],
+    ],
+)]
 class ActivityFee
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['activityFeeReduced', 'activityFee', 'activityReduced', 'activity'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['activityFeeReduced', 'activityFee', 'activityReduced', 'activity'])]
     private ?string $title = null;
 
     #[ORM\Column(length: 25, nullable: true)]
+    #[Groups(['activityFeeReduced', 'activityFee', 'activityReduced', 'activity'])]
     private ?string $duration = null;
 
     #[ORM\Column(length: 25, nullable: true)]
+    #[Groups(['activityFeeReduced', 'activityFee', 'activityReduced', 'activity'])]
     private ?string $price = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['activityFee', 'activity'])]
     private ?bool $hasConsolidatedQuota = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['activityFee', 'activity'])]
     private ?bool $hasOnRequest = null;
 
     #[ORM\OneToOne(inversedBy: 'activityFee', cascade: ['persist', 'remove'])]
@@ -40,6 +64,7 @@ class ActivityFee
     private ?Activity $activity = null;
 
     #[ORM\OneToMany(mappedBy: 'activityFee', targetEntity: ActivitySeason::class, cascade: ['persist', 'remove'])]
+    #[Groups(['activityFee', 'activity'])]
     #[ApiSubresource]
     private Collection $activitySeasons;
 

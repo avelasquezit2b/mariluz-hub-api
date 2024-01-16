@@ -33,11 +33,11 @@ class Language
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['language'])]
+    #[Groups(['language', 'activity'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 50)]
-    #[Groups(['language'])]
+    #[Groups(['language', 'activity'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 50)]
