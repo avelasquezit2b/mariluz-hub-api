@@ -8,29 +8,52 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: CategoryRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    attributes: [
+        "order" => ["id" => "ASC"],
+        "normalization_context" => ["groups" => ["categoryReduced"]]
+    ],
+    collectionOperations: [
+        "get",
+        "post",
+        // "post" => ["security" => "is_granted('ROLE_ADMIN')"],
+    ],
+    itemOperations: [
+        "get" => ["normalization_context" => ["groups" => "category"]],
+        "put",
+        "delete",
+        // "put" => ["security" => "is_granted('ROLE_ADMIN') or object.owner == user"],
+        // "delete" => ["security" => "is_granted('ROLE_ADMIN') or object.owner == user"],
+    ],
+)]
 class Category
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['categoryReduced', 'category', 'activity'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['categoryReduced', 'category', 'activity'])]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['category'])]
     private ?string $description = null;
 
     #[ORM\OneToMany(mappedBy: 'category', targetEntity: Subcategory::class, cascade: ['persist', 'remove'])]
+    #[Groups(['categoryReduced', 'category'])]
     private Collection $subCategories;
 
     #[ORM\ManyToMany(targetEntity: Activity::class, mappedBy: 'categories')]
     private Collection $activities;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['categoryReduced', 'category'])]
     private ?string $slug = null;
 
     public function __construct()

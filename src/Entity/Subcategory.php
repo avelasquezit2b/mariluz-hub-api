@@ -8,29 +8,53 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: SubcategoryRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    attributes: [
+        "order" => ["id" => "ASC"],
+        "normalization_context" => ["groups" => ["subcategoryReduced"]]
+    ],
+    collectionOperations: [
+        "get",
+        "post",
+        // "post" => ["security" => "is_granted('ROLE_ADMIN')"],
+    ],
+    itemOperations: [
+        "get" => ["normalization_context" => ["groups" => "subcategory"]],
+        "put",
+        "delete",
+        // "put" => ["security" => "is_granted('ROLE_ADMIN') or object.owner == user"],
+        // "delete" => ["security" => "is_granted('ROLE_ADMIN') or object.owner == user"],
+    ],
+)]
 class Subcategory
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['subcategoryReduced', 'subcategory', 'categoryReduced', 'category', 'activity'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['subcategoryReduced', 'subcategory', 'categoryReduced', 'category', 'activity'])]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['subcategory', 'category', 'activity'])]
     private ?string $description = null;
 
     #[ORM\ManyToOne(inversedBy: 'subCategories')]
+    #[Groups(['subcategory'])]
     private ?Category $category = null;
 
     #[ORM\ManyToMany(targetEntity: Activity::class, mappedBy: 'subCategories')]
+    #[Groups(['subcategory'])]
     private Collection $activities;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['subcategoryReduced', 'subcategory', 'categoryReduced', 'category', 'activity'])]
     private ?string $slug = null;
 
     public function __construct()

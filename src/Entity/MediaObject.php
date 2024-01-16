@@ -52,7 +52,7 @@ class MediaObject
     private ?int $id = null;
 
     #[ApiProperty(iri: 'https://schema.org/contentUrl')]
-    #[Groups(['media_object:read'])]
+    #[Groups(['media_object:read', 'activity'])]
     public ?string $contentUrl = null;
 
     #[Vich\UploadableField(mapping: "media_object", fileNameProperty: "filePath")]
@@ -63,11 +63,11 @@ class MediaObject
     public ?string $filePath = null;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    #[Groups(['media_object:read'])]
+    #[Groups(['media_object:read', 'activity'])]
     private $name;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    #[Groups(['media_object:read'])]
+    #[Groups(['media_object:read', 'activity'])]
     private $alt;
 
     #[ORM\ManyToOne(inversedBy: 'media')]
@@ -87,7 +87,7 @@ class MediaObject
     private ?string $supplier = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['media_object:read'])]
+    #[Groups(['media_object:read', 'activity'])]
     private ?string $description = null;
 
     public function __construct()
