@@ -9,33 +9,57 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: ActivityScheduleRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    attributes: [
+        "order" => ["id" => "ASC"],
+        "normalization_context" => ["groups" => ["activityScheduleReduced"]]
+    ],
+    collectionOperations: [
+        "get",
+        "post",
+        // "post" => ["security" => "is_granted('ROLE_ADMIN')"],
+    ],
+    itemOperations: [
+        "get" => ["normalization_context" => ["groups" => "activitySchedule"]],
+        "put",
+        "delete",
+        // "put" => ["security" => "is_granted('ROLE_ADMIN') or object.owner == user"],
+        // "delete" => ["security" => "is_granted('ROLE_ADMIN') or object.owner == user"],
+    ],
+)]
 class ActivitySchedule
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['activityScheduleReduced', 'activitySchedule'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 25, nullable: true)]
+    #[Groups(['activityScheduleReduced', 'activitySchedule'])]
     private ?string $startTime = null;
 
     #[ORM\Column(length: 25, nullable: true)]
+    #[Groups(['activityScheduleReduced', 'activitySchedule'])]
     private ?string $endTime = null;
 
     #[ORM\Column(length: 25, nullable: true)]
+    #[Groups(['activityScheduleReduced', 'activitySchedule'])]
     private ?string $duration = null;
 
     #[ORM\ManyToOne(inversedBy: 'activitySchedules')]
     private ?ActivitySeason $activitySeason = null;
 
     #[ORM\OneToMany(mappedBy: 'activitySchedule', targetEntity: ActivityPrice::class, cascade: ['persist', 'remove'])]
+    #[Groups(['activityScheduleReduced', 'activitySchedule', 'activity'])]
     #[ApiSubresource]
     private Collection $activityPrices;
 
     #[ORM\Column(type: Types::ARRAY)]
+    #[Groups(['activityScheduleReduced', 'activitySchedule'])]
     private array $weekDays = [];
 
     public function __construct()

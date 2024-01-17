@@ -9,32 +9,56 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: ActivitySeasonRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    attributes: [
+        "order" => ["id" => "ASC"],
+        "normalization_context" => ["groups" => ["activitySeasonReduced"]]
+    ],
+    collectionOperations: [
+        "get",
+        "post",
+        // "post" => ["security" => "is_granted('ROLE_ADMIN')"],
+    ],
+    itemOperations: [
+        "get" => ["normalization_context" => ["groups" => "activitySeason"]],
+        "put",
+        "delete",
+        // "put" => ["security" => "is_granted('ROLE_ADMIN') or object.owner == user"],
+        // "delete" => ["security" => "is_granted('ROLE_ADMIN') or object.owner == user"],
+    ],
+)]
 class ActivitySeason
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['activitySeasonReduced', 'activitySeason'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['activitySeasonReduced', 'activitySeason'])]
     private ?string $title = null;
 
     #[ORM\Column(type: Types::ARRAY)]
+    #[Groups(['activitySeasonReduced', 'activitySeason'])]
     private array $weekDays = [];
 
     #[ORM\Column]
+    #[Groups(['activitySeasonReduced', 'activitySeason'])]
     private ?bool $appliesToAllSchedules = null;
 
     #[ORM\Column(type: Types::ARRAY)]
+    #[Groups(['activitySeasonReduced', 'activitySeason'])]
     private array $ranges = [];
 
     #[ORM\ManyToOne(inversedBy: 'activitySeasons', cascade: ['persist', 'remove'])]
     private ?ActivityFee $activityFee = null;
 
     #[ORM\OneToMany(mappedBy: 'activitySeason', targetEntity: ActivitySchedule::class, cascade: ['persist', 'remove'])]
+    #[Groups(['activitySeasonReduced', 'activitySeason', 'activityFeeReduced', 'activity'])]
     #[ApiSubresource]
     private Collection $activitySchedules;
 

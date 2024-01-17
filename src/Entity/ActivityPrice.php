@@ -5,26 +5,49 @@ namespace App\Entity;
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\ActivityPriceRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: ActivityPriceRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    attributes: [
+        "order" => ["id" => "ASC"],
+        "normalization_context" => ["groups" => ["activityPriceReduced"]]
+    ],
+    collectionOperations: [
+        "get",
+        "post",
+        // "post" => ["security" => "is_granted('ROLE_ADMIN')"],
+    ],
+    itemOperations: [
+        "get" => ["normalization_context" => ["groups" => "activityPrice"]],
+        "put",
+        "delete",
+        // "put" => ["security" => "is_granted('ROLE_ADMIN') or object.owner == user"],
+        // "delete" => ["security" => "is_granted('ROLE_ADMIN') or object.owner == user"],
+    ],
+)]
 class ActivityPrice
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['activityPriceReduced', 'activityPrice'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 50, nullable: true)]
+    #[Groups(['activityPriceReduced', 'activityPrice', 'activity'])]
     private ?string $price = null;
 
     #[ORM\Column(length: 50, nullable: true)]
+    #[Groups(['activityPriceReduced', 'activityPrice'])]
     private ?string $cost = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['activityPriceReduced', 'activityPrice'])]
     private ?int $quota = null;
 
     #[ORM\ManyToOne(inversedBy: 'activityPrices')]
+    #[Groups(['activityPriceReduced', 'activityPrice', 'activity'])]
     private ?ClientType $clientType = null;
 
     #[ORM\ManyToOne(inversedBy: 'activityPrices')]
