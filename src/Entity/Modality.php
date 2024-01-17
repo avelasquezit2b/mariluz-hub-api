@@ -51,21 +51,26 @@ class Modality
     private Collection $clientTypes;
 
     #[ORM\Column(length: 50)]
+    #[Groups(['modalityReduced', 'modality', 'activityReduced', 'activity'])]
     private ?string $priceType = null;
 
     #[ORM\Column(length: 50, nullable: true)]
     private ?string $basePrice = null;
 
     #[ORM\Column(length: 50, nullable: true)]
-    private ?string $minPrice = null;
+    #[Groups(['modalityReduced', 'modality', 'activityReduced', 'activity'])]
+    private ?string $minPax = null;
 
     #[ORM\Column(length: 50, nullable: true)]
-    private ?string $maxPrice = null;
+    #[Groups(['modalityReduced', 'modality', 'activityReduced', 'activity'])]
+    private ?string $maxPax = null;
 
     #[ORM\Column]
+    #[Groups(['modalityReduced', 'modality', 'activityReduced', 'activity'])]
     private ?bool $hasPickup = null;
 
     #[ORM\ManyToMany(targetEntity: Pickup::class, inversedBy: 'modalities')]
+    #[Groups(['modalityReduced', 'modality', 'activityReduced', 'activity'])]
     private Collection $pickups;
 
     #[ORM\OneToOne(mappedBy: 'modality', cascade: ['persist', 'remove'])]
@@ -77,14 +82,24 @@ class Modality
     private ?Activity $activity = null;
 
     #[ORM\Column(type: Types::SMALLINT, nullable: true)]
+    #[Groups(['modalityReduced', 'modality', 'activityReduced', 'activity'])]
     private ?int $quota = null;
 
     #[ORM\Column(type: Types::SMALLINT, nullable: true)]
+    #[Groups(['modalityReduced', 'modality', 'activityReduced', 'activity'])]
     private ?int $businessQuota = null;
 
     #[ORM\ManyToMany(targetEntity: Language::class, inversedBy: 'modalities')]
     #[Groups(['modalityReduced', 'modality', 'activityReduced', 'activity'])]
     private Collection $languages;
+
+    #[ORM\Column(length: 25, nullable: true)]
+    #[Groups(['modalityReduced', 'modality', 'activityReduced', 'activity'])]
+    private ?string $price = null;
+
+    #[ORM\Column(length: 25, nullable: true)]
+    #[Groups(['modalityReduced', 'modality', 'activityReduced', 'activity'])]
+    private ?string $duration = null;
 
     public function __construct()
     {
@@ -170,26 +185,26 @@ class Modality
         return $this;
     }
 
-    public function getMinPrice(): ?string
+    public function getMinPax(): ?string
     {
-        return $this->minPrice;
+        return $this->minPax;
     }
 
-    public function setMinPrice(?string $minPrice): static
+    public function setMinPax(?string $minPax): static
     {
-        $this->minPrice = $minPrice;
+        $this->minPax = $minPax;
 
         return $this;
     }
 
-    public function getMaxPrice(): ?string
+    public function getMaxPax(): ?string
     {
-        return $this->maxPrice;
+        return $this->maxPax;
     }
 
-    public function setMaxPrice(?string $maxPrice): static
+    public function setMaxPax(?string $maxPax): static
     {
-        $this->maxPrice = $maxPrice;
+        $this->maxPax = $maxPax;
 
         return $this;
     }
@@ -308,6 +323,30 @@ class Modality
     public function removeLanguage(Language $language): static
     {
         $this->languages->removeElement($language);
+
+        return $this;
+    }
+
+    public function getPrice(): ?string
+    {
+        return $this->price;
+    }
+
+    public function setPrice(?string $price): static
+    {
+        $this->price = $price;
+
+        return $this;
+    }
+
+    public function getDuration(): ?string
+    {
+        return $this->duration;
+    }
+
+    public function setDuration(?string $duration): static
+    {
+        $this->duration = $duration;
 
         return $this;
     }
