@@ -63,9 +63,13 @@ class Supplier
     #[ORM\OneToMany(mappedBy: 'supplier', targetEntity: Activity::class)]
     private Collection $activities;
 
+    #[ORM\OneToMany(mappedBy: 'supplier', targetEntity: Hotel::class)]
+    private Collection $hotels;
+
     public function __construct()
     {
         $this->activities = new ArrayCollection();
+        $this->hotels = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -265,6 +269,36 @@ class Supplier
             // set the owning side to null (unless already changed)
             if ($activity->getSupplier() === $this) {
                 $activity->setSupplier(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Hotel>
+     */
+    public function getHotels(): Collection
+    {
+        return $this->hotels;
+    }
+
+    public function addHotel(Hotel $hotel): static
+    {
+        if (!$this->hotels->contains($hotel)) {
+            $this->hotels->add($hotel);
+            $hotel->setSupplier($this);
+        }
+
+        return $this;
+    }
+
+    public function removeHotel(Hotel $hotel): static
+    {
+        if ($this->hotels->removeElement($hotel)) {
+            // set the owning side to null (unless already changed)
+            if ($hotel->getSupplier() === $this) {
+                $hotel->setSupplier(null);
             }
         }
 

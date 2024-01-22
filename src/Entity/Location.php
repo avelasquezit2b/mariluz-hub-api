@@ -62,10 +62,14 @@ class Location
     #[ORM\OneToMany(mappedBy: 'location', targetEntity: Activity::class)]
     private Collection $activities;
 
+    #[ORM\OneToMany(mappedBy: 'location', targetEntity: Hotel::class)]
+    private Collection $hotels;
+
     public function __construct()
     {
         $this->zones = new ArrayCollection();
         $this->activities = new ArrayCollection();
+        $this->hotels = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -175,6 +179,36 @@ class Location
             // set the owning side to null (unless already changed)
             if ($activity->getLocation() === $this) {
                 $activity->setLocation(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Hotel>
+     */
+    public function getHotels(): Collection
+    {
+        return $this->hotels;
+    }
+
+    public function addHotel(Hotel $hotel): static
+    {
+        if (!$this->hotels->contains($hotel)) {
+            $this->hotels->add($hotel);
+            $hotel->setLocation($this);
+        }
+
+        return $this;
+    }
+
+    public function removeHotel(Hotel $hotel): static
+    {
+        if ($this->hotels->removeElement($hotel)) {
+            // set the owning side to null (unless already changed)
+            if ($hotel->getLocation() === $this) {
+                $hotel->setLocation(null);
             }
         }
 

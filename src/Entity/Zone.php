@@ -59,9 +59,13 @@ class Zone
     #[ORM\ManyToMany(targetEntity: Activity::class, mappedBy: 'zones')]
     private Collection $activities;
 
+    #[ORM\ManyToMany(targetEntity: Hotel::class, mappedBy: 'zones')]
+    private Collection $hotels;
+
     public function __construct()
     {
         $this->activities = new ArrayCollection();
+        $this->hotels = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -151,6 +155,33 @@ class Zone
     {
         if ($this->activities->removeElement($activity)) {
             $activity->removeZone($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Hotel>
+     */
+    public function getHotels(): Collection
+    {
+        return $this->hotels;
+    }
+
+    public function addHotel(Hotel $hotel): static
+    {
+        if (!$this->hotels->contains($hotel)) {
+            $this->hotels->add($hotel);
+            $hotel->addZone($this);
+        }
+
+        return $this;
+    }
+
+    public function removeHotel(Hotel $hotel): static
+    {
+        if ($this->hotels->removeElement($hotel)) {
+            $hotel->removeZone($this);
         }
 
         return $this;
