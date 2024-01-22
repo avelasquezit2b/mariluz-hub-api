@@ -43,7 +43,7 @@ class ActivitySeason
     private ?string $title = null;
 
     #[ORM\Column(type: Types::ARRAY)]
-    #[Groups(['activitySeasonReduced', 'activitySeason'])]
+    #[Groups(['activitySeasonReduced', 'activitySeason', 'activity'])]
     private array $weekDays = [];
 
     #[ORM\Column]
@@ -51,7 +51,7 @@ class ActivitySeason
     private ?bool $appliesToAllSchedules = null;
 
     #[ORM\Column(type: Types::ARRAY)]
-    #[Groups(['activitySeasonReduced', 'activitySeason'])]
+    #[Groups(['activitySeasonReduced', 'activitySeason', 'activity'])]
     private array $ranges = [];
 
     #[ORM\ManyToOne(inversedBy: 'activitySeasons', cascade: ['persist', 'remove'])]

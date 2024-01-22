@@ -58,6 +58,7 @@ class ActivityFee
     private ?bool $hasOnRequest = null;
 
     #[ORM\OneToOne(inversedBy: 'activityFee', cascade: ['persist', 'remove'])]
+    #[Groups(['activityFee', 'activity'])]
     private ?Modality $modality = null;
 
     #[ORM\ManyToOne(inversedBy: 'activityFees')]
