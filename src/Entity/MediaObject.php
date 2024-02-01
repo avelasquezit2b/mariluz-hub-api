@@ -49,11 +49,11 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
 class MediaObject
 {
     #[ORM\Id, ORM\Column, ORM\GeneratedValue]
-    #[Groups(['media_object:read', 'activity'])]
+    #[Groups(['media_object:read', 'activity', 'hotel', 'roomType'])]
     private ?int $id = null;
 
     #[ApiProperty(iri: 'https://schema.org/contentUrl')]
-    #[Groups(['media_object:read', 'activity'])]
+    #[Groups(['media_object:read', 'activity', 'hotel', 'roomType'])]
     public ?string $contentUrl = null;
 
     #[Vich\UploadableField(mapping: "media_object", fileNameProperty: "filePath")]
@@ -64,11 +64,11 @@ class MediaObject
     public ?string $filePath = null;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    #[Groups(['media_object:read', 'activity'])]
+    #[Groups(['media_object:read', 'activity', 'hotel', 'roomType'])]
     private $name;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    #[Groups(['media_object:read', 'activity'])]
+    #[Groups(['media_object:read', 'activity', 'hotel', 'roomType'])]
     private $alt;
 
     #[ORM\ManyToOne(inversedBy: 'media')]
@@ -76,11 +76,11 @@ class MediaObject
     private ?Activity $activity = null;
 
     #[ORM\Column(length: 25)]
-    #[Groups(['media_object:read'])]
+    #[Groups(['media_object:read', 'activity', 'hotel', 'roomType'])]
     private ?string $type = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['media_object:read'])]
+    #[Groups(['media_object:read', 'activity', 'hotel', 'roomType'])]
     private ?int $position = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -88,8 +88,16 @@ class MediaObject
     private ?string $supplier = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['media_object:read', 'activity'])]
+    #[Groups(['media_object:read', 'activity', 'hotel', 'roomType'])]
     private ?string $description = null;
+
+    #[ORM\ManyToOne(inversedBy: 'media')]
+    #[Groups(['media_object:read'])]
+    private ?Hotel $hotel = null;
+
+    #[ORM\ManyToOne(inversedBy: 'media')]
+    #[Groups(['media_object:read'])]
+    private ?RoomType $roomType = null;
 
     public function __construct()
     {
@@ -181,6 +189,30 @@ class MediaObject
     public function setDescription(?string $description): static
     {
         $this->description = $description;
+
+        return $this;
+    }
+
+    public function getHotel(): ?Hotel
+    {
+        return $this->hotel;
+    }
+
+    public function setHotel(?Hotel $hotel): static
+    {
+        $this->hotel = $hotel;
+
+        return $this;
+    }
+
+    public function getRoomType(): ?RoomType
+    {
+        return $this->roomType;
+    }
+
+    public function setRoomType(?RoomType $roomType): static
+    {
+        $this->roomType = $roomType;
 
         return $this;
     }

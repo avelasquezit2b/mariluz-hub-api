@@ -35,19 +35,19 @@ class ActivitySchedule
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['activityScheduleReduced', 'activitySchedule'])]
+    #[Groups(['activityScheduleReduced', 'activitySchedule', 'activity'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 25, nullable: true)]
-    #[Groups(['activityScheduleReduced', 'activitySchedule'])]
+    #[Groups(['activityScheduleReduced', 'activitySchedule', 'activity'])]
     private ?string $startTime = null;
 
     #[ORM\Column(length: 25, nullable: true)]
-    #[Groups(['activityScheduleReduced', 'activitySchedule'])]
+    #[Groups(['activityScheduleReduced', 'activitySchedule', 'activity'])]
     private ?string $endTime = null;
 
     #[ORM\Column(length: 25, nullable: true)]
-    #[Groups(['activityScheduleReduced', 'activitySchedule'])]
+    #[Groups(['activityScheduleReduced', 'activitySchedule', 'activity'])]
     private ?string $duration = null;
 
     #[ORM\ManyToOne(inversedBy: 'activitySchedules')]
@@ -59,8 +59,12 @@ class ActivitySchedule
     private Collection $activityPrices;
 
     #[ORM\Column(type: Types::ARRAY)]
-    #[Groups(['activityScheduleReduced', 'activitySchedule'])]
+    #[Groups(['activityScheduleReduced', 'activitySchedule', 'activity'])]
     private array $weekDays = [];
+
+    #[ORM\Column(nullable: true)]
+    #[Groups(['activityScheduleReduced', 'activitySchedule', 'activity'])]
+    private ?int $quota = null;
 
     public function __construct()
     {
@@ -158,6 +162,18 @@ class ActivitySchedule
     public function setWeekDays(array $weekDays): static
     {
         $this->weekDays = $weekDays;
+
+        return $this;
+    }
+
+    public function getQuota(): ?int
+    {
+        return $this->quota;
+    }
+
+    public function setQuota(?int $quota): static
+    {
+        $this->quota = $quota;
 
         return $this;
     }

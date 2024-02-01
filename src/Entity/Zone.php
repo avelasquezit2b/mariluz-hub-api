@@ -34,23 +34,23 @@ class Zone
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['zoneReduced', 'zone', 'activityReduced', 'activity'])]
+    #[Groups(['zoneReduced', 'zone', 'activityReduced', 'activity', 'hotelReduced', 'hotel'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['zoneReduced', 'zone', 'activityReduced', 'activity'])]
+    #[Groups(['zoneReduced', 'zone', 'activityReduced', 'activity', 'hotelReduced', 'hotel'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 50, nullable: true)]
-    #[Groups(['zone', 'activity'])]
+    #[Groups(['zone', 'activity', 'hotel'])]
     private ?string $latitude = null;
 
     #[ORM\Column(length: 50, nullable: true)]
-    #[Groups(['zone', 'activity'])]
+    #[Groups(['zone', 'activity', 'hotel'])]
     private ?string $longitude = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups(['zone', 'activity'])]
+    #[Groups(['zone', 'activity', 'hotel'])]
     private ?string $description = null;
 
     #[ORM\ManyToOne(inversedBy: 'zones')]

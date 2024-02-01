@@ -8,215 +8,301 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: HotelServicesRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    attributes: [
+        "order" => ["id" => "ASC"],
+        "normalization_context" => ["groups" => ["hotelServicesReduced"]]
+    ],
+    collectionOperations: [
+        "get",
+        "post",
+        // "post" => ["security" => "is_granted('ROLE_ADMIN')"],
+    ],
+    itemOperations: [
+        "get" => ["normalization_context" => ["groups" => "hotelServices"]],
+        "put",
+        "delete",
+        // "put" => ["security" => "is_granted('ROLE_ADMIN') or object.owner == user"],
+        // "delete" => ["security" => "is_granted('ROLE_ADMIN') or object.owner == user"],
+    ],
+)]
 class HotelServices
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['hotelServicesReduced', 'hotelServices', 'hotel'])]
     private ?int $id = null;
 
     #[ORM\ManyToMany(targetEntity: PensionType::class, inversedBy: 'hotelServices')]
+    #[Groups(['hotelServicesReduced', 'hotelServices', 'hotel'])]
     private Collection $pensionTypes;
 
     #[ORM\Column(length: 25, nullable: true)]
+    #[Groups(['hotelServicesReduced', 'hotelServices', 'hotel'])]
     private ?string $breakfastStartTime = null;
 
     #[ORM\Column(length: 25, nullable: true)]
+    #[Groups(['hotelServicesReduced', 'hotelServices', 'hotel'])]
     private ?string $breakfastEndTime = null;
 
     #[ORM\Column(length: 25, nullable: true)]
+    #[Groups(['hotelServicesReduced', 'hotelServices', 'hotel'])]
     private ?string $lunchStartTime = null;
 
     #[ORM\Column(length: 25, nullable: true)]
+    #[Groups(['hotelServicesReduced', 'hotelServices', 'hotel'])]
     private ?string $lunchEndTime = null;
 
     #[ORM\Column(length: 25, nullable: true)]
+    #[Groups(['hotelServicesReduced', 'hotelServices', 'hotel'])]
     private ?string $brunchStartTime = null;
 
     #[ORM\Column(length: 25, nullable: true)]
+    #[Groups(['hotelServicesReduced', 'hotelServices', 'hotel'])]
     private ?string $brunchEndTime = null;
 
     #[ORM\Column(length: 25, nullable: true)]
+    #[Groups(['hotelServicesReduced', 'hotelServices', 'hotel'])]
     private ?string $dinnerStartTime = null;
 
     #[ORM\Column(length: 25, nullable: true)]
+    #[Groups(['hotelServicesReduced', 'hotelServices', 'hotel'])]
     private ?string $dinnerEndTime = null;
 
     #[ORM\Column(length: 25, nullable: true)]
+    #[Groups(['hotelServicesReduced', 'hotelServices', 'hotel'])]
     private ?string $barStartTime = null;
 
     #[ORM\Column(length: 25, nullable: true)]
+    #[Groups(['hotelServicesReduced', 'hotelServices', 'hotel'])]
     private ?string $barEndTime = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['hotelServicesReduced', 'hotelServices', 'hotel'])]
     private ?string $generalObservations = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['hotelServicesReduced', 'hotelServices', 'hotel'])]
     private ?bool $hasFullTimeReception = true;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['hotelServicesReduced', 'hotelServices', 'hotel'])]
     private ?bool $hasHeating = true;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['hotelServicesReduced', 'hotelServices', 'hotel'])]
     private ?bool $hasAirConditioner = true;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['hotelServicesReduced', 'hotelServices', 'hotel'])]
     private ?bool $hasWiFi = true;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['hotelServicesReduced', 'hotelServices', 'hotel'])]
     private ?bool $hasElevator = true;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['hotelServicesReduced', 'hotelServices', 'hotel'])]
     private ?bool $isAdaptedReducedMobility = true;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['hotelServicesReduced', 'hotelServices', 'hotel'])]
     private ?bool $isPetsAllowed = true;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['hotelServicesReduced', 'hotelServices', 'hotel'])]
     private ?bool $hasCradles = true;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['hotelServicesReduced', 'hotelServices', 'hotel'])]
     private ?bool $hasParking = true;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['hotelServicesReduced', 'hotelServices', 'hotel'])]
     private ?bool $hasSpaAccess = true;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['hotelServicesReduced', 'hotelServices', 'hotel'])]
     private ?bool $hasGym = true;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['hotelServicesReduced', 'hotelServices', 'hotel'])]
     private ?bool $hasRestaurant = true;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['hotelServicesReduced', 'hotelServices', 'hotel'])]
     private ?bool $hasBar = true;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['hotelServicesReduced', 'hotelServices', 'hotel'])]
     private ?bool $hasPoolBar = true;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['hotelServicesReduced', 'hotelServices', 'hotel'])]
     private ?bool $hasBuffetBreakfast = true;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['hotelServicesReduced', 'hotelServices', 'hotel'])]
     private ?bool $hasRoomService = true;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['hotelServicesReduced', 'hotelServices', 'hotel'])]
     private ?bool $hasBuffetMeal = true;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['hotelServicesReduced', 'hotelServices', 'hotel'])]
     private ?bool $hasBuffetDinner = true;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['hotelServicesReduced', 'hotelServices', 'hotel'])]
     private ?bool $hasGlutenFreeFoods = true;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['hotelServicesReduced', 'hotelServices', 'hotel'])]
     private ?bool $hasThemedRestaurants = true;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['hotelServicesReduced', 'hotelServices', 'hotel'])]
     private ?bool $hasChillOut = true;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['hotelServicesReduced', 'hotelServices', 'hotel'])]
     private ?bool $hasBeachClub = true;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['hotelServicesReduced', 'hotelServices', 'hotel'])]
     private ?bool $hasMassages = true;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['hotelServicesReduced', 'hotelServices', 'hotel'])]
     private ?bool $hasSauna = true;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['hotelServicesReduced', 'hotelServices', 'hotel'])]
     private ?bool $hasJacuzzi = true;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['hotelServicesReduced', 'hotelServices', 'hotel'])]
     private ?bool $hasTurkishBath = true;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['hotelServicesReduced', 'hotelServices', 'hotel'])]
     private ?bool $hasGameRoom = true;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['hotelServicesReduced', 'hotelServices', 'hotel'])]
     private ?bool $hasHairdresser = true;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['hotelServicesReduced', 'hotelServices', 'hotel'])]
     private ?bool $hasStoresAtHotel = true;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['hotelServicesReduced', 'hotelServices', 'hotel'])]
     private ?bool $hasSunLoungers = true;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['hotelServicesReduced', 'hotelServices', 'hotel'])]
     private ?bool $hasSuperMarket = true;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['hotelServicesReduced', 'hotelServices', 'hotel'])]
     private ?bool $hasTerrace = true;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['hotelServicesReduced', 'hotelServices', 'hotel'])]
     private ?bool $hasTennisCourt = true;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['hotelServicesReduced', 'hotelServices', 'hotel'])]
     private ?bool $hasPaddleCourt = true;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['hotelServicesReduced', 'hotelServices', 'hotel'])]
     private ?bool $hasSoccerField = true;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['hotelServicesReduced', 'hotelServices', 'hotel'])]
     private ?bool $hasBasketballCourt = true;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['hotelServicesReduced', 'hotelServices', 'hotel'])]
     private ?bool $hasOutdoorSwimmingPool = true;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['hotelServicesReduced', 'hotelServices', 'hotel'])]
     private ?bool $hasChildrenPool = true;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['hotelServicesReduced', 'hotelServices', 'hotel'])]
     private ?bool $hasChildrenClub = true;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['hotelServicesReduced', 'hotelServices', 'hotel'])]
     private ?bool $hasChildrenAnimation = true;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['hotelServicesReduced', 'hotelServices', 'hotel'])]
     private ?bool $hasAdultAnimation = true;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['hotelServicesReduced', 'hotelServices', 'hotel'])]
     private ?bool $hasRoomTv = true;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['hotelServicesReduced', 'hotelServices', 'hotel'])]
     private ?bool $hasRoomPhone = true;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['hotelServicesReduced', 'hotelServices', 'hotel'])]
     private ?bool $hasRoomTerrace = true;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['hotelServicesReduced', 'hotelServices', 'hotel'])]
     private ?bool $hasRoomHairDryer = true;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['hotelServicesReduced', 'hotelServices', 'hotel'])]
     private ?bool $hasRoomHeating = true;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['hotelServicesReduced', 'hotelServices', 'hotel'])]
     private ?bool $hasRoomAirConditioner = true;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['hotelServicesReduced', 'hotelServices', 'hotel'])]
     private ?bool $hasRoomSafeDepositBox = true;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['hotelServicesReduced', 'hotelServices', 'hotel'])]
     private ?bool $hasRoomDesk = true;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['hotelServicesReduced', 'hotelServices', 'hotel'])]
     private ?bool $hasRoomWiFi = true;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['hotelServicesReduced', 'hotelServices', 'hotel'])]
     private ?bool $hasRoomWC = true;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['hotelServicesReduced', 'hotelServices', 'hotel'])]
     private ?bool $hasRoomShower = true;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['hotelServicesReduced', 'hotelServices', 'hotel'])]
     private ?bool $hasRoomBathtub = true;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['hotelServicesReduced', 'hotelServices', 'hotel'])]
     private ?bool $hasRoomBidet = true;
 
     #[ORM\OneToOne(mappedBy: 'services', cascade: ['persist', 'remove'])]
+    #[Groups(['hotelServicesReduced', 'hotelServices'])]
     private ?Hotel $hotel = null;
 
     public function __construct()

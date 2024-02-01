@@ -31,7 +31,7 @@ class ActivityPrice
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['activityPriceReduced', 'activityPrice'])]
+    #[Groups(['activityPriceReduced', 'activityPrice', 'activity'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 50, nullable: true)]
@@ -39,11 +39,11 @@ class ActivityPrice
     private ?string $price = null;
 
     #[ORM\Column(length: 50, nullable: true)]
-    #[Groups(['activityPriceReduced', 'activityPrice'])]
+    #[Groups(['activityPriceReduced', 'activityPrice', 'activity'])]
     private ?string $cost = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['activityPriceReduced', 'activityPrice'])]
+    #[Groups(['activityPriceReduced', 'activityPrice', 'activity'])]
     private ?int $quota = null;
 
     #[ORM\ManyToOne(inversedBy: 'activityPrices')]

@@ -35,7 +35,7 @@ class ActivitySeason
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['activitySeasonReduced', 'activitySeason'])]
+    #[Groups(['activitySeasonReduced', 'activitySeason', 'activity'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -47,7 +47,7 @@ class ActivitySeason
     private array $weekDays = [];
 
     #[ORM\Column]
-    #[Groups(['activitySeasonReduced', 'activitySeason'])]
+    #[Groups(['activitySeasonReduced', 'activitySeason', 'activity'])]
     private ?bool $appliesToAllSchedules = null;
 
     #[ORM\Column(type: Types::ARRAY)]

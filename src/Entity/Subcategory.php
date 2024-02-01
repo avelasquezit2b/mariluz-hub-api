@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use App\Repository\SubcategoryRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -12,6 +14,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: SubcategoryRepository::class)]
 #[ApiResource(
+    paginationEnabled: false,
     attributes: [
         "order" => ["id" => "ASC"],
         "normalization_context" => ["groups" => ["subcategoryReduced"]]
@@ -29,6 +32,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
         // "delete" => ["security" => "is_granted('ROLE_ADMIN') or object.owner == user"],
     ],
 )]
+#[ApiFilter(SearchFilter::class, properties: ['category.id' => 'exact'])]
 class Subcategory
 {
     #[ORM\Id]

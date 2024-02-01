@@ -47,11 +47,11 @@ class Modality
     private ?string $description = null;
 
     #[ORM\ManyToMany(targetEntity: ClientType::class, inversedBy: 'modalities')]
-    #[Groups(['modalityReduced', 'modality', 'activityReduced', 'activity'])]
+    #[Groups(['modalityReduced', 'modality', 'activity'])]
     private Collection $clientTypes;
 
     #[ORM\Column(length: 50)]
-    #[Groups(['modalityReduced', 'modality', 'activityReduced', 'activity'])]
+    #[Groups(['modalityReduced', 'modality', 'activity'])]
     private ?string $priceType = null;
 
     #[ORM\Column(length: 50, nullable: true)]
@@ -70,7 +70,7 @@ class Modality
     private ?bool $hasPickup = null;
 
     #[ORM\ManyToMany(targetEntity: Pickup::class, inversedBy: 'modalities')]
-    #[Groups(['modalityReduced', 'modality', 'activityReduced', 'activity'])]
+    #[Groups(['modalityReduced', 'modality', 'activity'])]
     private Collection $pickups;
 
     #[ORM\OneToOne(mappedBy: 'modality', cascade: ['persist', 'remove'])]
@@ -101,11 +101,17 @@ class Modality
     #[Groups(['modalityReduced', 'modality', 'activityReduced', 'activity'])]
     private ?string $duration = null;
 
+    #[ORM\ManyToMany(targetEntity: PickupSchedule::class, inversedBy: 'modalities')]
+    #[Groups(['modalityReduced', 'modality', 'activity'])]
+    #[ORM\OrderBy(["startTime" => "ASC"])]
+    private Collection $pickupSchedules;
+
     public function __construct()
     {
         $this->clientTypes = new ArrayCollection();
         $this->pickups = new ArrayCollection();
         $this->languages = new ArrayCollection();
+        $this->pickupSchedules = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -351,4 +357,27 @@ class Modality
         return $this;
     }
 
+    /**
+     * @return Collection<int, PickupSchedule>
+     */
+    public function getPickupSchedules(): Collection
+    {
+        return $this->pickupSchedules;
+    }
+
+    public function addPickupSchedule(PickupSchedule $pickupSchedule): static
+    {
+        if (!$this->pickupSchedules->contains($pickupSchedule)) {
+            $this->pickupSchedules->add($pickupSchedule);
+        }
+
+        return $this;
+    }
+
+    public function removePickupSchedule(PickupSchedule $pickupSchedule): static
+    {
+        $this->pickupSchedules->removeElement($pickupSchedule);
+
+        return $this;
+    }
 }
