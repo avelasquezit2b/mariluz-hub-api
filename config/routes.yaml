@@ -20,3 +20,8 @@ api_verify_email:
   path: '/verify/email'
   methods:  [POST]
   controller: App\Controller\RegistrationController::verifyUserEmail
+
+api_send_email:
+  path: '/send/email'
+  methods:  [POST]
+  controller: App\Controller\EmailController::sendEmail

@@ -35,27 +35,27 @@ class Location
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['locationReduced', 'location', 'activityReduced', 'activity'])]
+    #[Groups(['locationReduced', 'location', 'activityReduced', 'activity', 'hotel'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['locationReduced', 'location', 'activityReduced', 'activity'])]
+    #[Groups(['locationReduced', 'location', 'activityReduced', 'activity', 'hotel'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 50, nullable: true)]
-    #[Groups(['location', 'activity'])]
+    #[Groups(['location', 'activity', 'hotel'])]
     private ?string $latitude = null;
 
     #[ORM\Column(length: 50, nullable: true)]
-    #[Groups(['location', 'activity'])]
+    #[Groups(['location', 'activity', 'hotel'])]
     private ?string $longitude = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups(['location', 'activity'])]
+    #[Groups(['location', 'activity', 'hotel'])]
     private ?string $description = null;
 
     #[ORM\OneToMany(mappedBy: 'location', targetEntity: Zone::class, cascade: ['persist', 'remove'])]
-    #[Groups(['locationReduced', 'location', 'activityReduced', 'activity'])]
+    #[Groups(['locationReduced', 'location', 'activityReduced', 'activity', 'hotel'])]
     #[ApiSubresource]
     private Collection $zones;
 
