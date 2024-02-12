@@ -51,7 +51,7 @@ class Hotel
     private ?Supplier $supplier = null;
 
     #[ORM\Column(length: 25, nullable: true)]
-    #[Groups(['hotel'])]
+    #[Groups(['hotelReduced', 'hotel'])]
     private ?string $rating = null;
 
     #[ORM\Column(length: 25, nullable: true)]
@@ -63,11 +63,11 @@ class Hotel
     private ?string $checkOut = null;
 
     #[ORM\ManyToOne(inversedBy: 'hotels')]
-    #[Groups(['hotel'])]
+    #[Groups(['hotelReduced', 'hotel'])]
     private ?Location $location = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['hotel'])]
+    #[Groups(['hotelReduced', 'hotel'])]
     private ?string $address = null;
 
     #[ORM\Column(length: 50, nullable: true)]
@@ -102,7 +102,7 @@ class Hotel
     #[Groups(['hotel'])]
     private ?string $cancelationConditions = null;
 
-    #[ORM\OneToMany(mappedBy: 'hotel', targetEntity: RoomType::class)]
+    #[ORM\OneToMany(mappedBy: 'hotel', targetEntity: RoomType::class, cascade: ['remove'])]
     #[ApiSubresource]
     #[Groups(['hotel'])]
     private Collection $roomTypes;
@@ -111,8 +111,7 @@ class Hotel
     #[Groups(['hotel'])]
     private ?bool $isActive = null;
 
-    #[ORM\OneToOne(inversedBy: 'hotel', cascade: ['persist', 'remove'])]
-    #[ApiSubresource]
+    #[ORM\OneToOne(inversedBy: 'hotel', cascade: ['remove'])]
     #[Groups(['hotel'])]
     private ?HotelServices $services = null;
 
@@ -120,11 +119,30 @@ class Hotel
     #[Groups(['hotel'])]
     private Collection $relatedHotels;
 
+    #[ORM\OneToMany(mappedBy: 'hotel', targetEntity: MediaObject::class, cascade: ['remove'])]
+    #[Groups(['hotel'])]
+    private Collection $media;
+
+    #[ORM\Column(nullable: true)]
+    #[Groups(['hotel'])]
+    private ?int $adultsFrom = null;
+
+    #[ORM\OneToMany(mappedBy: 'hotel', targetEntity: HotelFee::class, cascade: ['remove'])]
+    // #[Groups(['hotel'])]
+    #[ApiSubresource]
+    private Collection $hotelFees;
+
+    #[ORM\OneToMany(mappedBy: 'hotel', targetEntity: HotelBooking::class)]
+    private Collection $hotelBookings;
+
     public function __construct()
     {
         $this->zones = new ArrayCollection();
         $this->roomTypes = new ArrayCollection();
         $this->relatedHotels = new ArrayCollection();
+        $this->media = new ArrayCollection();
+        $this->hotelFees = new ArrayCollection();
+        $this->hotelBookings = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -410,6 +428,108 @@ class Hotel
     public function removeRelatedHotel(self $relatedHotel): static
     {
         $this->relatedHotels->removeElement($relatedHotel);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, MediaObject>
+     */
+    public function getMedia(): Collection
+    {
+        return $this->media;
+    }
+
+    public function addMedium(MediaObject $medium): static
+    {
+        if (!$this->media->contains($medium)) {
+            $this->media->add($medium);
+            $medium->setHotel($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMedium(MediaObject $medium): static
+    {
+        if ($this->media->removeElement($medium)) {
+            // set the owning side to null (unless already changed)
+            if ($medium->getHotel() === $this) {
+                $medium->setHotel(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getAdultsFrom(): ?int
+    {
+        return $this->adultsFrom;
+    }
+
+    public function setAdultsFrom(?int $adultsFrom): static
+    {
+        $this->adultsFrom = $adultsFrom;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, HotelFee>
+     */
+    public function getHotelFees(): Collection
+    {
+        return $this->hotelFees;
+    }
+
+    public function addHotelFee(HotelFee $hotelFee): static
+    {
+        if (!$this->hotelFees->contains($hotelFee)) {
+            $this->hotelFees->add($hotelFee);
+            $hotelFee->setHotel($this);
+        }
+
+        return $this;
+    }
+
+    public function removeHotelFee(HotelFee $hotelFee): static
+    {
+        if ($this->hotelFees->removeElement($hotelFee)) {
+            // set the owning side to null (unless already changed)
+            if ($hotelFee->getHotel() === $this) {
+                $hotelFee->setHotel(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, HotelBooking>
+     */
+    public function getHotelBookings(): Collection
+    {
+        return $this->hotelBookings;
+    }
+
+    public function addHotelBooking(HotelBooking $hotelBooking): static
+    {
+        if (!$this->hotelBookings->contains($hotelBooking)) {
+            $this->hotelBookings->add($hotelBooking);
+            $hotelBooking->setHotel($this);
+        }
+
+        return $this;
+    }
+
+    public function removeHotelBooking(HotelBooking $hotelBooking): static
+    {
+        if ($this->hotelBookings->removeElement($hotelBooking)) {
+            // set the owning side to null (unless already changed)
+            if ($hotelBooking->getHotel() === $this) {
+                $hotelBooking->setHotel(null);
+            }
+        }
 
         return $this;
     }

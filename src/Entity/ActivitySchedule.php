@@ -35,36 +35,45 @@ class ActivitySchedule
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['activityScheduleReduced', 'activitySchedule'])]
+    #[Groups(['activityScheduleReduced', 'activitySchedule', 'activityFeeReduced'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 25, nullable: true)]
-    #[Groups(['activityScheduleReduced', 'activitySchedule'])]
+    #[Groups(['activityScheduleReduced', 'activitySchedule', 'activityFeeReduced', 'activityAvailabilityReduced'])]
     private ?string $startTime = null;
 
     #[ORM\Column(length: 25, nullable: true)]
-    #[Groups(['activityScheduleReduced', 'activitySchedule'])]
+    #[Groups(['activityScheduleReduced', 'activitySchedule', 'activityFeeReduced'])]
     private ?string $endTime = null;
 
     #[ORM\Column(length: 25, nullable: true)]
-    #[Groups(['activityScheduleReduced', 'activitySchedule'])]
+    #[Groups(['activityScheduleReduced', 'activitySchedule', 'activityFeeReduced'])]
     private ?string $duration = null;
 
     #[ORM\ManyToOne(inversedBy: 'activitySchedules')]
+    #[Groups(['activityAvailabilityReduced'])]
     private ?ActivitySeason $activitySeason = null;
 
-    #[ORM\OneToMany(mappedBy: 'activitySchedule', targetEntity: ActivityPrice::class, cascade: ['persist', 'remove'])]
-    #[Groups(['activityScheduleReduced', 'activitySchedule', 'activity'])]
+    #[ORM\OneToMany(mappedBy: 'activitySchedule', targetEntity: ActivityPrice::class, cascade: ['remove'])]
+    #[Groups(['activityScheduleReduced', 'activitySchedule', 'activityFeeReduced'])]
     #[ApiSubresource]
     private Collection $activityPrices;
 
     #[ORM\Column(type: Types::ARRAY)]
-    #[Groups(['activityScheduleReduced', 'activitySchedule'])]
+    #[Groups(['activityScheduleReduced', 'activitySchedule', 'activityFeeReduced'])]
     private array $weekDays = [];
+
+    #[ORM\Column(nullable: true)]
+    #[Groups(['activityScheduleReduced', 'activitySchedule', 'activityFeeReduced'])]
+    private ?int $quota = null;
+
+    #[ORM\OneToMany(mappedBy: 'activitySchedule', targetEntity: ActivityAvailability::class)]
+    private Collection $activityAvailabilities;
 
     public function __construct()
     {
         $this->activityPrices = new ArrayCollection();
+        $this->activityAvailabilities = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -158,6 +167,48 @@ class ActivitySchedule
     public function setWeekDays(array $weekDays): static
     {
         $this->weekDays = $weekDays;
+
+        return $this;
+    }
+
+    public function getQuota(): ?int
+    {
+        return $this->quota;
+    }
+
+    public function setQuota(?int $quota): static
+    {
+        $this->quota = $quota;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ActivityAvailability>
+     */
+    public function getActivityAvailabilities(): Collection
+    {
+        return $this->activityAvailabilities;
+    }
+
+    public function addActivityAvailability(ActivityAvailability $activityAvailability): static
+    {
+        if (!$this->activityAvailabilities->contains($activityAvailability)) {
+            $this->activityAvailabilities->add($activityAvailability);
+            $activityAvailability->setActivitySchedule($this);
+        }
+
+        return $this;
+    }
+
+    public function removeActivityAvailability(ActivityAvailability $activityAvailability): static
+    {
+        if ($this->activityAvailabilities->removeElement($activityAvailability)) {
+            // set the owning side to null (unless already changed)
+            if ($activityAvailability->getActivitySchedule() === $this) {
+                $activityAvailability->setActivitySchedule(null);
+            }
+        }
 
         return $this;
     }

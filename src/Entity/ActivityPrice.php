@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\ActivityPriceRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -31,27 +33,33 @@ class ActivityPrice
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['activityPriceReduced', 'activityPrice'])]
+    #[Groups(['activityPriceReduced', 'activityPrice', 'activityFeeReduced'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 50, nullable: true)]
-    #[Groups(['activityPriceReduced', 'activityPrice', 'activity'])]
+    #[Groups(['activityPriceReduced', 'activityPrice', 'activityFeeReduced'])]
     private ?string $price = null;
 
     #[ORM\Column(length: 50, nullable: true)]
-    #[Groups(['activityPriceReduced', 'activityPrice'])]
+    #[Groups(['activityPriceReduced', 'activityPrice', 'activityFeeReduced'])]
     private ?string $cost = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['activityPriceReduced', 'activityPrice'])]
+    #[Groups(['activityPriceReduced', 'activityPrice', 'activityFeeReduced'])]
     private ?int $quota = null;
 
     #[ORM\ManyToOne(inversedBy: 'activityPrices')]
-    #[Groups(['activityPriceReduced', 'activityPrice', 'activity'])]
+    #[Groups(['activityPriceReduced', 'activityPrice', 'activityFeeReduced'])]
     private ?ClientType $clientType = null;
 
     #[ORM\ManyToOne(inversedBy: 'activityPrices')]
+    #[Groups(['activityAvailabilityReduced'])]
     private ?ActivitySchedule $activitySchedule = null;
+
+    public function __construct()
+    {
+        $this->activityAvailabilities = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {

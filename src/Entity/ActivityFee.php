@@ -50,22 +50,22 @@ class ActivityFee
     private ?string $price = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['activityFee', 'activity'])]
+    #[Groups(['activityFeeReduced', 'activityFee', 'activity'])]
     private ?bool $hasConsolidatedQuota = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['activityFee', 'activity'])]
+    #[Groups(['activityFeeReduced', 'activityFee', 'activity'])]
     private ?bool $hasOnRequest = null;
 
     #[ORM\OneToOne(inversedBy: 'activityFee', cascade: ['persist', 'remove'])]
-    #[Groups(['activityFee', 'activity'])]
+    #[Groups(['activityFeeReduced', 'activityFee', 'activity', 'activityAvailabilityReduced'])]
     private ?Modality $modality = null;
 
     #[ORM\ManyToOne(inversedBy: 'activityFees')]
     private ?Activity $activity = null;
 
     #[ORM\OneToMany(mappedBy: 'activityFee', targetEntity: ActivitySeason::class, cascade: ['persist', 'remove'])]
-    #[Groups(['activityFee', 'activity'])]
+    #[Groups(['activityFeeReduced', 'activityFee', 'activity'])]
     #[ApiSubresource]
     private Collection $activitySeasons;
 

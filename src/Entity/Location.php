@@ -35,11 +35,11 @@ class Location
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['locationReduced', 'location', 'activityReduced', 'activity', 'hotel'])]
+    #[Groups(['locationReduced', 'location', 'activityReduced', 'activity', 'hotelReduced', 'hotel'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['locationReduced', 'location', 'activityReduced', 'activity', 'hotel'])]
+    #[Groups(['locationReduced', 'location', 'activityReduced', 'activity', 'hotelReduced', 'hotel'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 50, nullable: true)]
@@ -55,7 +55,7 @@ class Location
     private ?string $description = null;
 
     #[ORM\OneToMany(mappedBy: 'location', targetEntity: Zone::class, cascade: ['persist', 'remove'])]
-    #[Groups(['locationReduced', 'location', 'activityReduced', 'activity', 'hotel'])]
+    #[Groups(['locationReduced', 'location', 'activityReduced', 'activity', 'hotelReduced', 'hotel'])]
     #[ApiSubresource]
     private Collection $zones;
 

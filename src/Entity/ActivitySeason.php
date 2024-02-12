@@ -35,30 +35,31 @@ class ActivitySeason
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['activitySeasonReduced', 'activitySeason'])]
+    #[Groups(['activitySeasonReduced', 'activitySeason', 'activityFeeReduced'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['activitySeasonReduced', 'activitySeason'])]
+    #[Groups(['activitySeasonReduced', 'activitySeason', 'activityFeeReduced'])]
     private ?string $title = null;
 
     #[ORM\Column(type: Types::ARRAY)]
-    #[Groups(['activitySeasonReduced', 'activitySeason', 'activity'])]
+    #[Groups(['activitySeasonReduced', 'activitySeason', 'activityFeeReduced'])]
     private array $weekDays = [];
 
     #[ORM\Column]
-    #[Groups(['activitySeasonReduced', 'activitySeason'])]
+    #[Groups(['activitySeasonReduced', 'activitySeason', 'activityFeeReduced'])]
     private ?bool $appliesToAllSchedules = null;
 
     #[ORM\Column(type: Types::ARRAY)]
-    #[Groups(['activitySeasonReduced', 'activitySeason', 'activity'])]
+    #[Groups(['activitySeasonReduced', 'activitySeason', 'activityFeeReduced'])]
     private array $ranges = [];
 
     #[ORM\ManyToOne(inversedBy: 'activitySeasons', cascade: ['persist', 'remove'])]
+    #[Groups(['activityAvailabilityReduced'])]
     private ?ActivityFee $activityFee = null;
 
     #[ORM\OneToMany(mappedBy: 'activitySeason', targetEntity: ActivitySchedule::class, cascade: ['persist', 'remove'])]
-    #[Groups(['activitySeasonReduced', 'activitySeason', 'activityFeeReduced', 'activity'])]
+    #[Groups(['activitySeasonReduced', 'activitySeason', 'activityFeeReduced'])]
     #[ApiSubresource]
     private Collection $activitySchedules;
 

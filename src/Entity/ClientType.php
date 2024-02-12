@@ -38,7 +38,7 @@ class ClientType
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['clientTypeReduced', 'clientType', 'activity'])]
+    #[Groups(['clientTypeReduced', 'clientType', 'activity', 'activityFeeReduced'])]
     private ?string $title = null;
 
     #[ORM\Column(length: 25)]

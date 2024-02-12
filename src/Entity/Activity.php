@@ -103,15 +103,16 @@ class Activity
 
     #[ORM\OneToMany(mappedBy: 'activity', targetEntity: Modality::class, cascade: ['persist', 'remove'])]
     #[Groups(['activity'])]
-    #[ApiSubresource]
     private Collection $modalities;
 
     #[ORM\OneToMany(mappedBy: 'activity', targetEntity: ActivityFee::class)]
-    #[Groups(['activity'])]
+    // #[Groups(['activity'])]
+    #[ApiSubresource]
     private Collection $activityFees;
 
-    #[ORM\OneToMany(mappedBy: 'activity', targetEntity: MediaObject::class)]
+    #[ORM\OneToMany(mappedBy: 'activity', targetEntity: MediaObject::class, cascade: ['remove'])]
     #[Groups(['activityReduced', 'activity'])]
+    #[ORM\OrderBy(["position" => "ASC"])]
     #[ApiSubresource]
     private Collection $media;
 
@@ -155,7 +156,7 @@ class Activity
     #[Groups(['activity'])]
     private ?string $vennturId = null;
 
-    #[ORM\ManyToOne(inversedBy: 'activities', cascade: ['persist', 'remove'])]
+    #[ORM\ManyToOne(inversedBy: 'activities', cascade: ['persist'])]
     #[Groups(['activityReduced', 'activity'])]
     private ?Location $location = null;
 
