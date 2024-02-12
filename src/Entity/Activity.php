@@ -103,11 +103,11 @@ class Activity
 
     #[ORM\OneToMany(mappedBy: 'activity', targetEntity: Modality::class, cascade: ['persist', 'remove'])]
     #[Groups(['activity'])]
-    #[ApiSubresource]
     private Collection $modalities;
 
     #[ORM\OneToMany(mappedBy: 'activity', targetEntity: ActivityFee::class)]
     // #[Groups(['activity'])]
+    #[ApiSubresource]
     private Collection $activityFees;
 
     #[ORM\OneToMany(mappedBy: 'activity', targetEntity: MediaObject::class, cascade: ['remove'])]

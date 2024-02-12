@@ -34,19 +34,19 @@ class PensionType
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['pensionTypeReduced', 'pensionType', 'hotel'])]
+    #[Groups(['pensionTypeReduced', 'pensionType', 'hotel', 'hotelFeeReduced'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['pensionTypeReduced', 'pensionType', 'hotel'])]
+    #[Groups(['pensionTypeReduced', 'pensionType', 'hotel', 'hotelFeeReduced', 'hotelAvailability'])]
     private ?string $title = null;
 
     #[ORM\Column(length: 25, nullable: true)]
-    #[Groups(['pensionTypeReduced', 'pensionType', 'hotel'])]
+    #[Groups(['pensionTypeReduced', 'pensionType', 'hotel', 'hotelFeeReduced', 'hotelAvailability'])]
     private ?string $code = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups(['pensionTypeReduced', 'pensionType', 'hotel'])]
+    #[Groups(['pensionTypeReduced', 'pensionType', 'hotel', 'hotelFeeReduced', 'hotelAvailability'])]
     private ?string $description = null;
 
     #[ORM\ManyToMany(targetEntity: HotelServices::class, mappedBy: 'pensionTypes')]
@@ -54,7 +54,7 @@ class PensionType
     private Collection $hotelServices;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['pensionTypeReduced', 'pensionType', 'hotel'])]
+    #[Groups(['pensionTypeReduced', 'pensionType', 'hotel', 'hotelFeeReduced', 'hotelAvailability'])]
     private ?string $customTitle = null;
 
     #[ORM\OneToMany(mappedBy: 'pensionType', targetEntity: PensionTypePrice::class)]

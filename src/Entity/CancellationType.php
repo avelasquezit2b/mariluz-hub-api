@@ -34,19 +34,19 @@ class CancellationType
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['cancellationTypeReduced', 'cancellationType', 'hotel'])]
+    #[Groups(['cancellationTypeReduced', 'cancellationType', 'hotel', 'hotelFeeReduced'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['cancellationTypeReduced', 'cancellationType', 'hotel'])]
+    #[Groups(['cancellationTypeReduced', 'cancellationType', 'hotel', 'hotelFeeReduced', 'hotelAvailability'])]
     private ?string $title = null;
 
     #[ORM\Column(length: 25, nullable: true)]
-    #[Groups(['cancellationTypeReduced', 'cancellationType', 'hotel'])]
+    #[Groups(['cancellationTypeReduced', 'cancellationType', 'hotel', 'hotelFeeReduced', 'hotelAvailability'])]
     private ?string $code = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups(['cancellationTypeReduced', 'cancellationType', 'hotel'])]
+    #[Groups(['cancellationTypeReduced', 'cancellationType', 'hotel', 'hotelAvailability'])]
     private ?string $description = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -57,14 +57,13 @@ class CancellationType
     #[Groups(['cancellationTypeReduced', 'cancellationType'])]
     private Collection $hotelFees;
 
-    #[ORM\OneToMany(mappedBy: 'cancellationType', targetEntity: HotelCondition::class)]
-    #[Groups(['cancellationTypeReduced', 'cancellationType'])]
-    private Collection $hotelConditions;
+    #[ORM\OneToMany(mappedBy: 'cancellationType', targetEntity: PensionTypePrice::class)]
+    private Collection $pensionTypePrices;
 
     public function __construct()
     {
         $this->hotelFees = new ArrayCollection();
-        $this->hotelConditions = new ArrayCollection();
+        $this->pensionTypePrices = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -148,29 +147,29 @@ class CancellationType
     }
 
     /**
-     * @return Collection<int, HotelCondition>
+     * @return Collection<int, PensionTypePrice>
      */
-    public function getHotelConditions(): Collection
+    public function getPensionTypePrices(): Collection
     {
-        return $this->hotelConditions;
+        return $this->pensionTypePrices;
     }
 
-    public function addHotelCondition(HotelCondition $hotelCondition): static
+    public function addPensionTypePrice(PensionTypePrice $pensionTypePrice): static
     {
-        if (!$this->hotelConditions->contains($hotelCondition)) {
-            $this->hotelConditions->add($hotelCondition);
-            $hotelCondition->setCancellationType($this);
+        if (!$this->pensionTypePrices->contains($pensionTypePrice)) {
+            $this->pensionTypePrices->add($pensionTypePrice);
+            $pensionTypePrice->setCancellationType($this);
         }
 
         return $this;
     }
 
-    public function removeHotelCondition(HotelCondition $hotelCondition): static
+    public function removePensionTypePrice(PensionTypePrice $pensionTypePrice): static
     {
-        if ($this->hotelConditions->removeElement($hotelCondition)) {
+        if ($this->pensionTypePrices->removeElement($pensionTypePrice)) {
             // set the owning side to null (unless already changed)
-            if ($hotelCondition->getCancellationType() === $this) {
-                $hotelCondition->setCancellationType(null);
+            if ($pensionTypePrice->getCancellationType() === $this) {
+                $pensionTypePrice->setCancellationType(null);
             }
         }
 

@@ -33,16 +33,12 @@ class HotelCondition
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['hotelConditionReduced', 'hotelCondition', 'hotel'])]
+    #[Groups(['hotelConditionReduced', 'hotelCondition', 'hotelFeeReduced'])]
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'hotelConditions')]
-    #[Groups(['hotelConditionReduced', 'hotelCondition', 'hotel'])]
+    #[Groups(['hotelConditionReduced', 'hotelCondition', 'hotelFeeReduced'])]
     private ?CancellationType $cancellationType = null;
-
-    #[ORM\OneToMany(mappedBy: 'hotelCondition', targetEntity: RoomCondition::class, cascade: ['remove'])]
-    #[Groups(['hotelConditionReduced', 'hotelCondition', 'hotel'])]
-    private Collection $roomConditions;
 
     #[ORM\ManyToOne(inversedBy: 'hotelConditions')]
     #[Groups(['hotelConditionReduced', 'hotelCondition'])]
@@ -66,36 +62,6 @@ class HotelCondition
     public function setCancellationType(?CancellationType $cancellationType): static
     {
         $this->cancellationType = $cancellationType;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, RoomCondition>
-     */
-    public function getRoomConditions(): Collection
-    {
-        return $this->roomConditions;
-    }
-
-    public function addRoomCondition(RoomCondition $roomCondition): static
-    {
-        if (!$this->roomConditions->contains($roomCondition)) {
-            $this->roomConditions->add($roomCondition);
-            $roomCondition->setHotelCondition($this);
-        }
-
-        return $this;
-    }
-
-    public function removeRoomCondition(RoomCondition $roomCondition): static
-    {
-        if ($this->roomConditions->removeElement($roomCondition)) {
-            // set the owning side to null (unless already changed)
-            if ($roomCondition->getHotelCondition() === $this) {
-                $roomCondition->setHotelCondition(null);
-            }
-        }
 
         return $this;
     }

@@ -112,7 +112,6 @@ class Hotel
     private ?bool $isActive = null;
 
     #[ORM\OneToOne(inversedBy: 'hotel', cascade: ['remove'])]
-    #[ApiSubresource]
     #[Groups(['hotel'])]
     private ?HotelServices $services = null;
 
@@ -128,9 +127,13 @@ class Hotel
     #[Groups(['hotel'])]
     private ?int $adultsFrom = null;
 
-    #[ORM\OneToMany(mappedBy: 'hotel', targetEntity: HotelFee::class)]
-    #[Groups(['hotel'])]
+    #[ORM\OneToMany(mappedBy: 'hotel', targetEntity: HotelFee::class, cascade: ['remove'])]
+    // #[Groups(['hotel'])]
+    #[ApiSubresource]
     private Collection $hotelFees;
+
+    #[ORM\OneToMany(mappedBy: 'hotel', targetEntity: HotelBooking::class)]
+    private Collection $hotelBookings;
 
     public function __construct()
     {
@@ -139,6 +142,7 @@ class Hotel
         $this->relatedHotels = new ArrayCollection();
         $this->media = new ArrayCollection();
         $this->hotelFees = new ArrayCollection();
+        $this->hotelBookings = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -494,6 +498,36 @@ class Hotel
             // set the owning side to null (unless already changed)
             if ($hotelFee->getHotel() === $this) {
                 $hotelFee->setHotel(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, HotelBooking>
+     */
+    public function getHotelBookings(): Collection
+    {
+        return $this->hotelBookings;
+    }
+
+    public function addHotelBooking(HotelBooking $hotelBooking): static
+    {
+        if (!$this->hotelBookings->contains($hotelBooking)) {
+            $this->hotelBookings->add($hotelBooking);
+            $hotelBooking->setHotel($this);
+        }
+
+        return $this;
+    }
+
+    public function removeHotelBooking(HotelBooking $hotelBooking): static
+    {
+        if ($this->hotelBookings->removeElement($hotelBooking)) {
+            // set the owning side to null (unless already changed)
+            if ($hotelBooking->getHotel() === $this) {
+                $hotelBooking->setHotel(null);
             }
         }
 

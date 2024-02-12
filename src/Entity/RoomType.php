@@ -37,11 +37,11 @@ class RoomType
     private ?int $id = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['roomTypeReduced', 'roomType', 'hotel'])]
+    #[Groups(['roomTypeReduced', 'roomType', 'hotel', 'hotelAvailability','hotelAvailabilityReduced'])]
     private ?string $title = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['roomTypeReduced', 'roomType', 'hotel'])]
+    #[Groups(['roomTypeReduced', 'roomType', 'hotel', 'hotelAvailability'])]
     private ?string $description = null;
 
     #[ORM\ManyToOne(inversedBy: 'roomTypes')]
@@ -52,32 +52,32 @@ class RoomType
     #[Groups(['roomTypeReduced', 'roomType', 'hotel'])]
     private ?OccupancyType $occupancyType = null;
 
-    #[ORM\OneToMany(mappedBy: 'roomType', targetEntity: RoomCondition::class)]
-    #[Groups(['roomTypeReduced', 'roomType', 'hotel'])]
+    #[ORM\OneToMany(mappedBy: 'roomType', targetEntity: RoomCondition::class, cascade: ['remove'])]
+    // #[Groups(['roomTypeReduced', 'roomType', 'hotel'])]
     private Collection $roomConditions;
 
     #[ORM\OneToMany(mappedBy: 'roomType', targetEntity: MediaObject::class, cascade: ['remove'])]
-    #[Groups(['roomTypeReduced', 'roomType', 'hotel'])]
+    #[Groups(['roomTypeReduced', 'roomType', 'hotel', 'hotelAvailability'])]
     private Collection $media;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['roomTypeReduced', 'roomType', 'hotel'])]
+    #[Groups(['roomTypeReduced', 'roomType', 'hotel', 'hotelAvailability'])]
     private ?int $minAdultsCapacity = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['roomTypeReduced', 'roomType', 'hotel'])]
+    #[Groups(['roomTypeReduced', 'roomType', 'hotel', 'hotelAvailability'])]
     private ?int $maxAdultsCapacity = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['roomTypeReduced', 'roomType', 'hotel'])]
+    #[Groups(['roomTypeReduced', 'roomType', 'hotel', 'hotelAvailability'])]
     private ?int $minKidsCapacity = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['roomTypeReduced', 'roomType', 'hotel'])]
+    #[Groups(['roomTypeReduced', 'roomType', 'hotel', 'hotelAvailability'])]
     private ?int $maxKidsCapacity = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['roomTypeReduced', 'roomType', 'hotel'])]
+    #[Groups(['roomTypeReduced', 'roomType', 'hotel', 'hotelAvailability'])]
     private ?int $totalCapacity = null;
 
     public function __construct()

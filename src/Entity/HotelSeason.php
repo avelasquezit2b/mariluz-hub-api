@@ -34,28 +34,28 @@ class HotelSeason
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['hotelSeasonReduced', 'hotelSeason', 'hotel'])]
+    #[Groups(['hotelSeasonReduced', 'hotelSeason', 'hotelFeeReduced'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['hotelSeasonReduced', 'hotelSeason', 'hotel'])]
+    #[Groups(['hotelSeasonReduced', 'hotelSeason', 'hotelFeeReduced'])]
     private ?string $title = null;
 
     #[ORM\Column(type: Types::ARRAY, nullable: true)]
-    #[Groups(['hotelSeasonReduced', 'hotelSeason', 'hotel'])]
+    #[Groups(['hotelSeasonReduced', 'hotelSeason', 'hotelFeeReduced'])]
     private ?array $ranges = null;
 
     #[ORM\ManyToOne(inversedBy: 'hotelSeasons')]
     #[Groups(['hotelSeasonReduced', 'hotelSeason'])]
     private ?HotelFee $hotelFee = null;
 
-    #[ORM\OneToMany(mappedBy: 'hotelSeason', targetEntity: HotelCondition::class, cascade: ['remove'])]
-    #[Groups(['hotelSeasonReduced', 'hotelSeason', 'hotel'])]
-    private Collection $hotelConditions;
+    #[ORM\OneToMany(mappedBy: 'hotelSeason', targetEntity: RoomCondition::class, cascade: ['remove'])]
+    #[Groups(['hotelSeasonReduced', 'hotelSeason', 'hotelFeeReduced'])]
+    private Collection $roomConditions;
 
     public function __construct()
     {
-        $this->hotelConditions = new ArrayCollection();
+        $this->roomConditions = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -100,29 +100,29 @@ class HotelSeason
     }
 
     /**
-     * @return Collection<int, HotelCondition>
+     * @return Collection<int, RoomCondition>
      */
-    public function getHotelConditions(): Collection
+    public function getRoomConditions(): Collection
     {
-        return $this->hotelConditions;
+        return $this->roomConditions;
     }
 
-    public function addHotelCondition(HotelCondition $hotelCondition): static
+    public function addRoomCondition(RoomCondition $roomCondition): static
     {
-        if (!$this->hotelConditions->contains($hotelCondition)) {
-            $this->hotelConditions->add($hotelCondition);
-            $hotelCondition->setHotelSeason($this);
+        if (!$this->roomConditions->contains($roomCondition)) {
+            $this->roomConditions->add($roomCondition);
+            $roomCondition->setHotelSeason($this);
         }
 
         return $this;
     }
 
-    public function removeHotelCondition(HotelCondition $hotelCondition): static
+    public function removeRoomCondition(RoomCondition $roomCondition): static
     {
-        if ($this->hotelConditions->removeElement($hotelCondition)) {
+        if ($this->roomConditions->removeElement($roomCondition)) {
             // set the owning side to null (unless already changed)
-            if ($hotelCondition->getHotelSeason() === $this) {
-                $hotelCondition->setHotelSeason(null);
+            if ($roomCondition->getHotelSeason() === $this) {
+                $roomCondition->setHotelSeason(null);
             }
         }
 

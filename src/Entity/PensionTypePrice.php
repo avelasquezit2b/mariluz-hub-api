@@ -31,24 +31,28 @@ class PensionTypePrice
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['pensionTypePricesReduced', 'pensionTypePrices', 'hotel'])]
+    #[Groups(['pensionTypePricesReduced', 'pensionTypePrices', 'hotelFeeReduced'])]
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'pensionTypePrices')]
-    #[Groups(['pensionTypePricesReduced', 'pensionTypePrices', 'hotel'])]
+    #[Groups(['pensionTypePricesReduced', 'pensionTypePrices', 'hotelFeeReduced', 'hotelAvailability'])]
     private ?PensionType $pensionType = null;
 
     #[ORM\Column(length: 50, nullable: true)]
-    #[Groups(['pensionTypePricesReduced', 'pensionTypePrices', 'hotel'])]
+    #[Groups(['pensionTypePricesReduced', 'pensionTypePrices', 'hotelFeeReduced', 'hotelAvailability'])]
     private ?string $price = null;
 
     #[ORM\Column(length: 50, nullable: true)]
-    #[Groups(['pensionTypePricesReduced', 'pensionTypePrices', 'hotel'])]
+    #[Groups(['pensionTypePricesReduced', 'pensionTypePrices', 'hotelFeeReduced'])]
     private ?string $cost = null;
 
     #[ORM\ManyToOne(inversedBy: 'pensionTypePrices')]
     #[Groups(['pensionTypePricesReduced', 'pensionTypePrices'])]
     private ?RoomCondition $roomCondition = null;
+
+    #[ORM\ManyToOne(inversedBy: 'pensionTypePrices')]
+    #[Groups(['pensionTypePricesReduced', 'pensionTypePrices', 'hotelFeeReduced', 'hotelAvailability'])]
+    private ?CancellationType $cancellationType = null;
 
     public function getId(): ?int
     {
@@ -99,6 +103,18 @@ class PensionTypePrice
     public function setRoomCondition(?RoomCondition $roomCondition): static
     {
         $this->roomCondition = $roomCondition;
+
+        return $this;
+    }
+
+    public function getCancellationType(): ?CancellationType
+    {
+        return $this->cancellationType;
+    }
+
+    public function setCancellationType(?CancellationType $cancellationType): static
+    {
+        $this->cancellationType = $cancellationType;
 
         return $this;
     }

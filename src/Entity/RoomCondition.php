@@ -34,45 +34,49 @@ class RoomCondition
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['roomConditionReduced', 'roomCondition', 'hotel'])]
+    #[Groups(['roomConditionReduced', 'roomCondition', 'hotelFeeReduced'])]
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'roomConditions')]
-    #[Groups(['roomConditionReduced', 'roomCondition'])]
+    #[Groups(['roomConditionReduced', 'roomCondition', 'hotelAvailability', 'hotelAvailabilityReduced'])]
     private ?RoomType $roomType = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['roomConditionReduced', 'roomCondition', 'hotel'])]
+    #[Groups(['roomConditionReduced', 'roomCondition', 'hotelFeeReduced'])]
     private ?int $quota = null;
 
-    #[ORM\ManyToOne(inversedBy: 'roomConditions')]
-    #[Groups(['roomConditionReduced', 'roomCondition'])]
-    private ?HotelCondition $hotelCondition = null;
-
     #[ORM\OneToMany(mappedBy: 'roomCondition', targetEntity: PensionTypePrice::class, cascade: ['remove'])]
-    #[Groups(['roomConditionReduced', 'roomCondition', 'hotel'])]
+    #[Groups(['roomConditionReduced', 'roomCondition', 'hotelFeeReduced', 'hotelAvailability'])]
     private Collection $pensionTypePrices;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['roomConditionReduced', 'roomCondition', 'hotel'])]
+    #[Groups(['roomConditionReduced', 'roomCondition', 'hotelFeeReduced', 'hotelAvailability'])]
     private ?int $minStay = null;
 
     #[ORM\Column(length: 25, nullable: true)]
-    #[Groups(['roomConditionReduced', 'roomCondition', 'hotel'])]
+    #[Groups(['roomConditionReduced', 'roomCondition', 'hotelFeeReduced', 'hotelAvailability'])]
     private ?string $individualSupplement = null;
 
     #[ORM\Column(type: Types::ARRAY, nullable: true)]
-    #[Groups(['roomConditionReduced', 'roomCondition', 'hotel'])]
+    #[Groups(['roomConditionReduced', 'roomCondition', 'hotelFeeReduced', 'hotelAvailability'])]
     private ?array $extras = null;
 
     #[ORM\OneToMany(mappedBy: 'roomCondition', targetEntity: RoomDiscount::class, cascade: ['remove'])]
-    #[Groups(['roomConditionReduced', 'roomCondition', 'hotel'])]
+    #[Groups(['roomConditionReduced', 'roomCondition', 'hotelFeeReduced', 'hotelAvailability'])]
     private Collection $roomDiscounts;
+
+    #[ORM\ManyToOne(inversedBy: 'roomConditions')]
+    #[Groups(['roomConditionReduced', 'roomCondition', 'hotelFeeReduced'])]
+    private ?HotelSeason $hotelSeason = null;
+
+    #[ORM\OneToMany(mappedBy: 'roomCondition', targetEntity: HotelAvailability::class, cascade: ['remove'])]
+    private Collection $hotelAvailabilities;
 
     public function __construct()
     {
         $this->pensionTypePrices = new ArrayCollection();
         $this->roomDiscounts = new ArrayCollection();
+        $this->hotelAvailabilities = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -100,18 +104,6 @@ class RoomCondition
     public function setQuota(?int $quota): static
     {
         $this->quota = $quota;
-
-        return $this;
-    }
-
-    public function getHotelCondition(): ?HotelCondition
-    {
-        return $this->hotelCondition;
-    }
-
-    public function setHotelCondition(?HotelCondition $hotelCondition): static
-    {
-        $this->hotelCondition = $hotelCondition;
 
         return $this;
     }
@@ -206,6 +198,48 @@ class RoomCondition
             // set the owning side to null (unless already changed)
             if ($roomDiscount->getRoomCondition() === $this) {
                 $roomDiscount->setRoomCondition(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getHotelSeason(): ?HotelSeason
+    {
+        return $this->hotelSeason;
+    }
+
+    public function setHotelSeason(?HotelSeason $hotelSeason): static
+    {
+        $this->hotelSeason = $hotelSeason;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, HotelAvailability>
+     */
+    public function getHotelAvailabilities(): Collection
+    {
+        return $this->hotelAvailabilities;
+    }
+
+    public function addHotelAvailability(HotelAvailability $hotelAvailability): static
+    {
+        if (!$this->hotelAvailabilities->contains($hotelAvailability)) {
+            $this->hotelAvailabilities->add($hotelAvailability);
+            $hotelAvailability->setRoomCondition($this);
+        }
+
+        return $this;
+    }
+
+    public function removeHotelAvailability(HotelAvailability $hotelAvailability): static
+    {
+        if ($this->hotelAvailabilities->removeElement($hotelAvailability)) {
+            // set the owning side to null (unless already changed)
+            if ($hotelAvailability->getRoomCondition() === $this) {
+                $hotelAvailability->setRoomCondition(null);
             }
         }
 

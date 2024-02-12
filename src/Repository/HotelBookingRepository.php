@@ -2,27 +2,27 @@
 
 namespace App\Repository;
 
-use App\Entity\HotelCondition;
+use App\Entity\HotelBooking;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<HotelCondition>
+ * @extends ServiceEntityRepository<HotelBooking>
  *
- * @method HotelCondition|null find($id, $lockMode = null, $lockVersion = null)
- * @method HotelCondition|null findOneBy(array $criteria, array $orderBy = null)
- * @method HotelCondition[]    findAll()
- * @method HotelCondition[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method HotelBooking|null find($id, $lockMode = null, $lockVersion = null)
+ * @method HotelBooking|null findOneBy(array $criteria, array $orderBy = null)
+ * @method HotelBooking[]    findAll()
+ * @method HotelBooking[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class HotelConditionRepository extends ServiceEntityRepository
+class HotelBookingRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, HotelCondition::class);
+        parent::__construct($registry, HotelBooking::class);
     }
 
 //    /**
-//     * @return HotelCondition[] Returns an array of HotelCondition objects
+//     * @return HotelBooking[] Returns an array of HotelBooking objects
 //     */
 //    public function findByExampleField($value): array
 //    {
@@ -36,7 +36,7 @@ class HotelConditionRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?HotelCondition
+//    public function findOneBySomeField($value): ?HotelBooking
 //    {
 //        return $this->createQueryBuilder('h')
 //            ->andWhere('h.exampleField = :val')

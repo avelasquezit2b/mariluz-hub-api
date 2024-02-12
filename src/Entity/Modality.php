@@ -39,7 +39,7 @@ class Modality
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['modalityReduced', 'modality', 'activityReduced', 'activity'])]
+    #[Groups(['modalityReduced', 'modality', 'activityReduced', 'activity', 'activityAvailabilityReduced'])]
     private ?string $title = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
@@ -74,8 +74,8 @@ class Modality
     private Collection $pickups;
 
     #[ORM\OneToOne(mappedBy: 'modality', cascade: ['persist', 'remove'])]
-    #[Groups(['modalityReduced', 'modality', 'activityReduced', 'activity'])]
-    #[ApiSubresource]
+    // #[Groups(['modalityReduced', 'modality', 'activityReduced', 'activity'])]
+    // #[ApiSubresource]
     private ?ActivityFee $activityFee = null;
 
     #[ORM\ManyToOne(inversedBy: 'modalities')]

@@ -33,30 +33,30 @@ class HotelFee
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['hotelFeeReduced', 'hotelFee', 'hotel'])]
+    #[Groups(['hotelFeeReduced', 'hotelFee'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['hotelFeeReduced', 'hotelFee', 'hotel'])]
+    #[Groups(['hotelFeeReduced', 'hotelFee'])]
     private ?string $title = null;
 
     #[ORM\ManyToMany(targetEntity: OccupancyType::class, inversedBy: 'hotelFees')]
     private Collection $OccupancyType;
 
     #[ORM\ManyToMany(targetEntity: CancellationType::class, inversedBy: 'hotelFees')]
-    #[Groups(['hotelFee', 'hotel'])]
+    #[Groups(['hotelFeeReduced', 'hotelFee'])]
     private Collection $cancellationTypes;
 
-    #[ORM\OneToMany(mappedBy: 'hotelFee', targetEntity: HotelSeason::class)]
-    #[Groups(['hotelFee', 'hotel'])]
+    #[ORM\OneToMany(mappedBy: 'hotelFee', targetEntity: HotelSeason::class, cascade: ['remove'])]
+    #[Groups(['hotelFeeReduced', 'hotelFee'])]
     private Collection $hotelSeasons;
 
     #[ORM\ManyToMany(targetEntity: PensionType::class, inversedBy: 'hotelFees')]
-    #[Groups(['hotelFee', 'hotel'])]
+    #[Groups(['hotelFeeReduced', 'hotelFee'])]
     private Collection $pensionTypes;
 
     #[ORM\ManyToOne(inversedBy: 'hotelFees')]
-    #[Groups(['hotelFeeReduced', 'hotelFee'])]
+    // #[Groups(['hotelFeeReduced', 'hotelFee'])]
     private ?Hotel $hotel = null;
 
     public function __construct()

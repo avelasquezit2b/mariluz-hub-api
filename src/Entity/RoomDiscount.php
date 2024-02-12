@@ -31,27 +31,27 @@ class RoomDiscount
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['roomDiscountReduced', 'roomDiscount', 'hotel'])]
+    #[Groups(['roomDiscountReduced', 'roomDiscount', 'hotelFeeReduced'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 25, nullable: true)]
-    #[Groups(['roomDiscountReduced', 'roomDiscount', 'hotel'])]
+    #[Groups(['roomDiscountReduced', 'roomDiscount', 'hotelFeeReduced', 'hotelAvailability'])]
     private ?string $type = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['roomDiscountReduced', 'roomDiscount', 'hotel'])]
+    #[Groups(['roomDiscountReduced', 'roomDiscount', 'hotelFeeReduced', 'hotelAvailability'])]
     private ?int $ageFrom = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['roomDiscountReduced', 'roomDiscount', 'hotel'])]
+    #[Groups(['roomDiscountReduced', 'roomDiscount', 'hotelFeeReduced', 'hotelAvailability'])]
     private ?int $ageTo = null;
 
     #[ORM\Column(length: 25, nullable: true)]
-    #[Groups(['roomDiscountReduced', 'roomDiscount', 'hotel'])]
+    #[Groups(['roomDiscountReduced', 'roomDiscount', 'hotelFeeReduced', 'hotelAvailability'])]
     private ?string $discount = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['roomDiscountReduced', 'roomDiscount', 'hotel'])]
+    #[Groups(['roomDiscountReduced', 'roomDiscount', 'hotelFeeReduced', 'hotelAvailability'])]
     private ?int $number = null;
 
     #[ORM\ManyToOne(inversedBy: 'roomDiscounts')]
