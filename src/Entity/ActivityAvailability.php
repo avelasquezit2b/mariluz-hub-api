@@ -15,6 +15,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: ActivityAvailabilityRepository::class)]
 #[ApiResource(
+    paginationEnabled: false,
     attributes: [
         // "order" => ["activityPrices.activitySchedule.startTime" => "ASC"],
         "normalization_context" => ["groups" => ["activityAvailabilityReduced"]]

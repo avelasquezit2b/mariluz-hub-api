@@ -2,7 +2,9 @@
 
 namespace App\Controller;
 
+use App\Entity\HotelBooking;
 use App\Repository\HotelRepository;
+use App\Repository\HotelAvailabilityRepository;
 use App\Repository\HotelBookingRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -13,6 +15,7 @@ use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 
 class BookingController extends AbstractController
@@ -21,8 +24,78 @@ class BookingController extends AbstractController
     {
     }
 
+    #[Route('/hotel_prebooking', name: 'api_hotel_prebooking')]
+    public function prebooking(Request $request, EntityManagerInterface $entityManager, HotelBookingRepository $hotelBookingRepository, HotelAvailabilityRepository $hotelAvailabilityRepository, HotelRepository $hotelRepository): Response
+    {
+        $requestDecode = json_decode($request->getContent());
+
+        try {
+            $formattedRooms = [];
+            $hotelAvailabilities = [];
+            foreach ($requestDecode->rooms as $room) {
+                $formattedRoom = [
+                    'adults' => $room->adults,
+                    'kids' => $room->kids,
+                    'babies' => $room->babies,
+                    'pensionType' => $room->pensionType->pensionType->title,
+                    'cancellationType' => $room->pensionType->cancellationType->title,
+                    'pensionTypePriceId' => $room->pensionType->id,
+                    'price' => $room->pensionType->price,
+                    'availabilities' => $room->roomType->availabilities,
+                    'roomType' => $room->roomType->roomCondition->roomType->title
+                ];
+                array_push($formattedRooms, $formattedRoom);
+                foreach ($room->roomType->availabilities as $availability) {
+                    $hotelAvailability = $hotelAvailabilityRepository->find($availability);
+                    array_push($hotelAvailabilities, $hotelAvailability);
+                    if ($hotelAvailability->quota > 0) {
+                        $hotelAvailability->setQuota($hotelAvailability->getQuota()-1);
+                        $entityManager->persist($hotelAvailability);
+                    } else {
+                        throw new BadRequestHttpException('No hay disponibilidad para las fechas seleccionadas'); 
+                    }
+                }
+            }
+
+            $hotelBooking = new HotelBooking();
+            $hotelBooking->setCheckIn(new \DateTime($requestDecode->checkIn));
+            $hotelBooking->setCheckOut(new \DateTime($requestDecode->checkOut));
+            $hotelBooking->setEmail($requestDecode->email);
+            $hotelBooking->setHasAcceptance($requestDecode->hasAcceptance);
+            $hotel = $hotelRepository->find($requestDecode->hotel);
+            $hotelBooking->setHotel($hotel);
+            $hotelBooking->setName($requestDecode->name);
+            $hotelBooking->setObservations($requestDecode->observations);
+            $hotelBooking->setPaymentMethod($requestDecode->paymentMethod);
+            $hotelBooking->setPaymentMethod($requestDecode->paymentMethod);
+            $hotelBooking->setPhone($requestDecode->phone);
+            $hotelBooking->setPromoCode($requestDecode->promoCode);
+            $hotelBooking->setRooms($formattedRooms);
+            $hotelBooking->setStatus('preBooked');
+            $hotelBooking->setTotalPrice($requestDecode->totalPrice);
+
+            foreach ($hotelAvailabilities as $hotelAvailability) {
+                $hotelAvailability->addHotelBooking($hotelBooking);
+                $entityManager->persist($hotelAvailability);
+            }
+
+            $entityManager->persist($hotelBooking);
+            $entityManager->flush();
+
+            return $this->json([
+                'response'  => $hotelBooking
+            ]);
+
+
+        } catch (SoapFault $e) {
+            return $this->json([
+                'response'  => $e
+            ]);
+        }
+    }
+
     #[Route('/hotel_booking', name: 'api_hotel_booking')]
-    public function booking(Request $request, MailerInterface $mailer, EntityManagerInterface $entityManager, HotelBookingRepository $hotelBookingRepository, HotelRepository $hotelRepository): Response
+    public function booking(Request $request, MailerInterface $mailer, EntityManagerInterface $entityManager, HotelBookingRepository $hotelBookingRepository, HotelAvailabilityRepository $hotelAvailabilityRepository, HotelRepository $hotelRepository): Response
     {
         $request = file_get_contents('php://input');
         parse_str($request, $output);
@@ -37,6 +110,14 @@ class BookingController extends AbstractController
                 $hotelBooking->setStatus('booked');
             } else {
                 $hotelBooking->setStatus('paymentError - ' . $requestData['Ds_Response']);
+                foreach ($hotelBooking->getRooms() as $room) {
+                    foreach ($room['availabilities'] as $availability) {
+                        $hotelAvailability = $hotelAvailabilityRepository->find($availability);
+                        $hotelAvailability->setQuota($hotelAvailability->getQuota()+1);
+                        $hotelAvailability->removeHotelBooking($hotelBooking);
+                        $entityManager->persist($hotelAvailability);
+                    }
+                }
             }
 
             $entityManager->persist($hotelBooking);

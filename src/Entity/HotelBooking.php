@@ -4,12 +4,15 @@ namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\HotelBookingRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: HotelBookingRepository::class)]
 #[ApiResource(
+    paginationEnabled: false,
     attributes: [
         "order" => ["id" => "ASC"],
         "normalization_context" => ["groups" => ["hotelBookingReduced"]]
@@ -73,7 +76,7 @@ class HotelBooking
 
     #[ORM\Column(type: Types::ARRAY, nullable: true)]
     #[Groups(['hotelBooking'])]
-    private ?array $rooms = null;
+    public ?array $rooms = null;
 
     #[ORM\Column(nullable: true)]
     #[Groups(['hotelBooking'])]
@@ -86,6 +89,14 @@ class HotelBooking
     #[ORM\ManyToOne(inversedBy: 'hotelBookings')]
     #[Groups(['hotelBookingReduced', 'hotelBooking'])]
     private ?Hotel $hotel = null;
+
+    #[ORM\ManyToMany(targetEntity: HotelAvailability::class, mappedBy: 'hotelBookings')]
+    private Collection $hotelAvailabilities;
+
+    public function __construct()
+    {
+        $this->hotelAvailabilities = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -244,6 +255,33 @@ class HotelBooking
     public function setHotel(?Hotel $hotel): static
     {
         $this->hotel = $hotel;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, HotelAvailability>
+     */
+    public function getHotelAvailabilities(): Collection
+    {
+        return $this->hotelAvailabilities;
+    }
+
+    public function addHotelAvailability(HotelAvailability $hotelAvailability): static
+    {
+        if (!$this->hotelAvailabilities->contains($hotelAvailability)) {
+            $this->hotelAvailabilities->add($hotelAvailability);
+            $hotelAvailability->addHotelBooking($this);
+        }
+
+        return $this;
+    }
+
+    public function removeHotelAvailability(HotelAvailability $hotelAvailability): static
+    {
+        if ($this->hotelAvailabilities->removeElement($hotelAvailability)) {
+            $hotelAvailability->removeHotelBooking($this);
+        }
 
         return $this;
     }

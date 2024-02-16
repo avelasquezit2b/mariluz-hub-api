@@ -6,14 +6,19 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\DateFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\RangeFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter;
 use App\Repository\HotelAvailabilityRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: HotelAvailabilityRepository::class)]
 #[ApiResource(
+    paginationEnabled: false,
     attributes: [
         // "order" => ["activityPrices.activitySchedule.startTime" => "ASC"],
         "normalization_context" => ["groups" => ["hotelAvailabilityReduced"]]
@@ -33,6 +38,8 @@ use Symfony\Component\Serializer\Annotation\Groups;
 )]
 #[ApiFilter(DateFilter::class, properties: ['date'])]
 #[ApiFilter(SearchFilter::class, properties: ['roomCondition.hotelSeason.hotelFee.hotel' => 'exact'])]
+#[ApiFilter(RangeFilter::class, properties: ['quota'])]
+#[ApiFilter(BooleanFilter::class, properties: ['isAvailable'])]
 class HotelAvailability
 {
     #[ORM\Id]
@@ -47,7 +54,7 @@ class HotelAvailability
 
     #[ORM\Column]
     #[Groups(['hotelAvailabilityReduced', 'hotelAvailability'])]
-    private ?int $quota = null;
+    public ?int $quota = null;
 
     #[ORM\Column]
     #[Groups(['hotelAvailabilityReduced', 'hotelAvailability'])]
@@ -56,6 +63,19 @@ class HotelAvailability
     #[ORM\ManyToOne(inversedBy: 'hotelAvailabilities')]
     #[Groups(['hotelAvailabilityReduced', 'hotelAvailability'])]
     private ?RoomCondition $roomCondition = null;
+
+    #[ORM\Column]
+    #[Groups(['hotelAvailabilityReduced', 'hotelAvailability'])]
+    private ?int $maxQuota = null;
+
+    #[ORM\ManyToMany(targetEntity: HotelBooking::class, inversedBy: 'hotelAvailabilities')]
+    #[Groups(['hotelAvailabilityReduced', 'hotelAvailability'])]
+    private Collection $hotelBookings;
+
+    public function __construct()
+    {
+        $this->hotelBookings = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -106,6 +126,42 @@ class HotelAvailability
     public function setRoomCondition(?RoomCondition $roomCondition): static
     {
         $this->roomCondition = $roomCondition;
+
+        return $this;
+    }
+
+    public function getMaxQuota(): ?int
+    {
+        return $this->maxQuota;
+    }
+
+    public function setMaxQuota(int $maxQuota): static
+    {
+        $this->maxQuota = $maxQuota;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, HotelBooking>
+     */
+    public function getHotelBookings(): Collection
+    {
+        return $this->hotelBookings;
+    }
+
+    public function addHotelBooking(HotelBooking $hotelBooking): static
+    {
+        if (!$this->hotelBookings->contains($hotelBooking)) {
+            $this->hotelBookings->add($hotelBooking);
+        }
+
+        return $this;
+    }
+
+    public function removeHotelBooking(HotelBooking $hotelBooking): static
+    {
+        $this->hotelBookings->removeElement($hotelBooking);
 
         return $this;
     }

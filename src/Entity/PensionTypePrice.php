@@ -31,7 +31,7 @@ class PensionTypePrice
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['pensionTypePricesReduced', 'pensionTypePrices', 'hotelFeeReduced'])]
+    #[Groups(['pensionTypePricesReduced', 'pensionTypePrices', 'hotelFeeReduced', 'hotelAvailability'])]
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'pensionTypePrices')]
