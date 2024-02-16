@@ -2,35 +2,59 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\ProductListModuleRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ProductListModuleRepository::class)]
+#[ApiResource(
+    attributes: [
+        "order" => ["id" => "ASC"],
+        "normalization_context" => ["groups" => ["productListReduced"]]
+    ],
+    collectionOperations: [
+        "get",
+        "post",
+    ],
+    itemOperations: [
+        "get" => ["normalization_context" => ["groups" => "productList"]],
+        "put",
+        "delete",
+    ],
+)]
 class ProductListModule
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['productListReduced', 'productList'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['productListReduced', 'productList'])]
     private ?string $title = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['productListReduced', 'productList'])]
     private ?string $subtitle = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['productListReduced', 'productList'])]
     private ?string $productType = null;
 
     #[ORM\ManyToMany(targetEntity: Hotel::class, inversedBy: 'productListModules')]
+    #[Groups(['productListReduced', 'productList'])]
     private Collection $hotels;
 
     #[ORM\ManyToMany(targetEntity: Activity::class, inversedBy: 'productListModules')]
+    #[Groups(['productListReduced', 'productList'])]
     private Collection $activities;
 
     #[ORM\ManyToOne(inversedBy: 'productListModules')]
+    #[Groups(['productListReduced', 'productList'])]
     private ?Theme $theme = null;
 
     public function __construct()

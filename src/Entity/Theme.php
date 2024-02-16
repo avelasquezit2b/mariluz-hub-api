@@ -2,33 +2,56 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\ThemeRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ThemeRepository::class)]
+#[ApiResource(
+    attributes: [
+        "order" => ["id" => "ASC"],
+        "normalization_context" => ["groups" => ["themeReduced"]]
+    ],
+    collectionOperations: [
+        "get",
+        "post",
+    ],
+    itemOperations: [
+        "get" => ["normalization_context" => ["groups" => "theme"]],
+        "put",
+        "delete",
+    ],
+)]
 class Theme
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['themeReduced', 'theme'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['themeReduced', 'theme'])]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['themeReduced', 'theme'])]
     private ?string $description = null;
 
     #[ORM\OneToMany(mappedBy: 'theme', targetEntity: ProductListModule::class)]
+    #[Groups(['themeReduced', 'theme'])]
     private Collection $productListModules;
 
     #[ORM\ManyToMany(targetEntity: ThemeListModule::class, mappedBy: 'themes')]
+    #[Groups(['themeReduced', 'theme'])]
     private Collection $themeListModules;
 
     #[ORM\OneToMany(mappedBy: 'theme', targetEntity: MediaObject::class)]
+    #[Groups(['themeReduced', 'theme'])]
     private Collection $media;
 
     public function __construct()

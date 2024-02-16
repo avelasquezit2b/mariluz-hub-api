@@ -2,29 +2,51 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\HeroSlideRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: HeroSlideRepository::class)]
+#[ApiResource(
+    attributes: [
+        "order" => ["id" => "ASC"],
+        "normalization_context" => ["groups" => ["heroSlideReduced"]]
+    ],
+    collectionOperations: [
+        "get",
+        "post",
+    ],
+    itemOperations: [
+        "get" => ["normalization_context" => ["groups" => "heroSlide"]],
+        "put",
+        "delete",
+    ],
+)]
 class HeroSlide
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['heroSlideReduced', 'heroSlide'])]
     private ?int $id = null;
 
     #[ORM\OneToMany(mappedBy: 'heroSlide', targetEntity: MediaObject::class)]
+    #[Groups(['heroSlideReduced', 'heroSlide'])]
     private Collection $media;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['heroSlideReduced', 'heroSlide'])]
     private ?string $title = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['heroSlideReduced', 'heroSlide'])]
     private ?string $subtitle = null;
 
     #[ORM\ManyToOne(inversedBy: 'heroSlides')]
+    #[Groups(['heroSlideReduced', 'heroSlide'])]
     private ?HeroModule $heroModule = null;
 
     public function __construct()
