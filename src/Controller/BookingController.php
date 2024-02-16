@@ -12,6 +12,8 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+
 
 class BookingController extends AbstractController
 {
@@ -28,7 +30,7 @@ class BookingController extends AbstractController
         try {
             $requestData = str_replace("?", "", utf8_decode(base64_decode($output['Ds_MerchantParameters'])));
             $requestData = json_decode($requestData, true);
-            $hotelBooking = $hotelBookingRepository->find(intval(ltrim($requestData['Ds_Order'], "0")));
+            $hotelBooking = $hotelBookingRepository->find($requestData->id);
 
             // $bookingHub->setLocator($bookingOfi->BookingResult->BookingCode);
             if ($requestData['Ds_Response'] < 100) {
@@ -36,40 +38,38 @@ class BookingController extends AbstractController
             } else {
                 $hotelBooking->setStatus('paymentError - ' . $requestData['Ds_Response']);
             }
-   
+
             $entityManager->persist($hotelBooking);
             $entityManager->flush();
 
-            // $hotel = $hotelBooking->getHotel();
+            $email = (new TemplatedEmail())
+                ->from('adriarias@it2b.es')
+                ->to('adriarias@it2b.es')
+                ->subject('Gracias por tu reserva')
+                ->context([
+                    "name" => $hotelBooking->getName(),
+                    "bookingEmail" => $hotelBooking->getEmail(),
+                    "phone" => $hotelBooking->getPhone(),
+                    "id" => $hotelBooking->getId(),
+                    "product" => $hotelBooking->getHotel(),
+                    "rooms" => $hotelBooking->getRooms(),
+                    "totalPrice" => $hotelBooking->getTotalPrice(),
+                    "startDate" => date_format($hotelBooking->getCheckIn(),"d/m/Y"),
+                    "endDate" => date_format($hotelBooking->getCheckOut(),"d/m/Y"),
+                    "paymentMethod" => $hotelBooking->getPaymentMethod(),
+                    "date" => date("d-m-Y"),
+                ])
+                ->htmlTemplate('email/thank_you.html.twig');
 
-            // $email =
-            //     (new TemplatedEmail())
-            //     ->from(new Address('web@viajeskontiki.es', 'Viajes Kontiki'))
-            //     ->to($bookingHub->getData()['bookingEmail'])
-            //     ->bcc('adriarias@it2b.es')
-            //     ->subject('Gracias por tu reserva')
-            //     ->context([
-            //         "bookingName" => $bookingHub->getData()['passengerName-0'] . ' ' . $bookingHub->getData()['passengerSurname-0'],
-            //         "bookingLocator" => $bookingHub->getLocator(),
-            //         "bookingDate" => $bookingHub->getDate()->format('d-m-Y'),
-            //         "bookingImage" => 'https://hub.kontiki.api.aititubi.es/' . $bookingHub->getData()['image'],
-            //         "bookingCircuit" => $circuitHub->getName(),
-            //         "bookingStart" => $bookingHub->getStartDate()->format('d-m-Y'),
-            //         "bookingEnd" => $bookingHub->getEndDate()->format('d-m-Y'),
-            //         "bookingPassengersRooms" => $bookingHub->getAdults() . $adultsString . ' en ' . $bookingHub->getData()['rooms'] .  $habitacionesString,
-            //         "bookingPrice" => $bookingHub->getPrice(),
-            //         "bookingCancellationPolicies" => $bookingHub->getData()['cancellationPolicies'],
-            //         // "message" => $request->message
-            //     ])
-            //     ->htmlTemplate('communications/thank_you.html.twig');
-
-            // if ($bookingHub->getStatus() == 'confirmed') {
-            //     $mailer->send($email);
-            // }
+            if ($hotelBooking->getStatus() == 'booked') {
+                $mailer->send($email);
+            }
 
             return $this->json([
-                'response'  => $requestData['Ds_Response']
+                'response'  => $email
             ]);
+
+
         } catch (SoapFault $e) {
             return $this->json([
                 'response'  => $e
