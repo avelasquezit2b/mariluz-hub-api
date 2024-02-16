@@ -34,7 +34,7 @@ class PensionType
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['pensionTypeReduced', 'pensionType', 'hotel', 'hotelFeeReduced'])]
+    #[Groups(['pensionTypeReduced', 'pensionType', 'hotel', 'hotelFeeReduced', 'hotelAvailability'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255, nullable: true)]

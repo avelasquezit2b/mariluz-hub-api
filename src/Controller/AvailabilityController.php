@@ -42,6 +42,7 @@ class AvailabilityController extends AbstractController
                     $activityAvailability = new ActivityAvailability();
                     $activityAvailability->setDate(\DateTime::createFromFormat('U', ($currentDate)));
                     $activityAvailability->setQuota($requestDecode->schedule->quota);
+                    // $activityAvailability->setMaxQuota($requestDecode->schedule->quota);
                     $activityAvailability->setActivitySchedule($activitySchedule);
 
                     $entityManager->persist($activityAvailability);
@@ -76,6 +77,7 @@ class AvailabilityController extends AbstractController
                 $hotelAvailability = new HotelAvailability();
                 $hotelAvailability->setDate(\DateTime::createFromFormat('U', ($currentDate)));
                 $hotelAvailability->setQuota($requestDecode->room->quota);
+                $hotelAvailability->setMaxQuota($requestDecode->room->quota);
                 $hotelAvailability->setRoomCondition($roomCondition);
 
                 $entityManager->persist($hotelAvailability);
