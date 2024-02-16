@@ -99,6 +99,18 @@ class MediaObject
     #[Groups(['media_object:read'])]
     private ?RoomType $roomType = null;
 
+    #[ORM\ManyToOne(inversedBy: 'media')]
+    private ?HeroModule $heroModule = null;
+
+    #[ORM\ManyToOne(inversedBy: 'media')]
+    private ?HeroSlide $heroSlide = null;
+
+    #[ORM\ManyToOne(inversedBy: 'media')]
+    private ?Theme $theme = null;
+
+    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    private ?Seo $seo = null;
+
     public function __construct()
     {
 
@@ -213,6 +225,54 @@ class MediaObject
     public function setRoomType(?RoomType $roomType): static
     {
         $this->roomType = $roomType;
+
+        return $this;
+    }
+
+    public function getHeroModule(): ?HeroModule
+    {
+        return $this->heroModule;
+    }
+
+    public function setHeroModule(?HeroModule $heroModule): static
+    {
+        $this->heroModule = $heroModule;
+
+        return $this;
+    }
+
+    public function getHeroSlide(): ?HeroSlide
+    {
+        return $this->heroSlide;
+    }
+
+    public function setHeroSlide(?HeroSlide $heroSlide): static
+    {
+        $this->heroSlide = $heroSlide;
+
+        return $this;
+    }
+
+    public function getTheme(): ?Theme
+    {
+        return $this->theme;
+    }
+
+    public function setTheme(?Theme $theme): static
+    {
+        $this->theme = $theme;
+
+        return $this;
+    }
+
+    public function getSeo(): ?Seo
+    {
+        return $this->seo;
+    }
+
+    public function setSeo(?Seo $seo): static
+    {
+        $this->seo = $seo;
 
         return $this;
     }

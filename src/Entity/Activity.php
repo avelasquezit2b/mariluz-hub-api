@@ -166,6 +166,9 @@ class Activity
 
     private $minPrice;
 
+    #[ORM\ManyToMany(targetEntity: ProductListModule::class, mappedBy: 'activities')]
+    private Collection $productListModules;
+
     public function __construct()
     {
         $this->categories = new ArrayCollection();
@@ -175,6 +178,7 @@ class Activity
         $this->activityFees = new ArrayCollection();
         $this->media = new ArrayCollection();
         $this->zones = new ArrayCollection();
+        $this->productListModules = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -649,5 +653,32 @@ class Activity
         // var_dump($this->getActivityFees());
 
         return 30;
+    }
+
+    /**
+     * @return Collection<int, ProductListModule>
+     */
+    public function getProductListModules(): Collection
+    {
+        return $this->productListModules;
+    }
+
+    public function addProductListModule(ProductListModule $productListModule): static
+    {
+        if (!$this->productListModules->contains($productListModule)) {
+            $this->productListModules->add($productListModule);
+            $productListModule->addActivity($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProductListModule(ProductListModule $productListModule): static
+    {
+        if ($this->productListModules->removeElement($productListModule)) {
+            $productListModule->removeActivity($this);
+        }
+
+        return $this;
     }
 }

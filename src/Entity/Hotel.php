@@ -135,6 +135,12 @@ class Hotel
     #[ORM\OneToMany(mappedBy: 'hotel', targetEntity: HotelBooking::class)]
     private Collection $hotelBookings;
 
+    #[ORM\ManyToMany(targetEntity: ProductListModule::class, mappedBy: 'hotels')]
+    private Collection $productListModules;
+
+    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    private ?Seo $seo = null;
+
     public function __construct()
     {
         $this->zones = new ArrayCollection();
@@ -143,6 +149,7 @@ class Hotel
         $this->media = new ArrayCollection();
         $this->hotelFees = new ArrayCollection();
         $this->hotelBookings = new ArrayCollection();
+        $this->productListModules = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -530,6 +537,45 @@ class Hotel
                 $hotelBooking->setHotel(null);
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ProductListModule>
+     */
+    public function getProductListModules(): Collection
+    {
+        return $this->productListModules;
+    }
+
+    public function addProductListModule(ProductListModule $productListModule): static
+    {
+        if (!$this->productListModules->contains($productListModule)) {
+            $this->productListModules->add($productListModule);
+            $productListModule->addHotel($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProductListModule(ProductListModule $productListModule): static
+    {
+        if ($this->productListModules->removeElement($productListModule)) {
+            $productListModule->removeHotel($this);
+        }
+
+        return $this;
+    }
+
+    public function getSeo(): ?Seo
+    {
+        return $this->seo;
+    }
+
+    public function setSeo(?Seo $seo): static
+    {
+        $this->seo = $seo;
 
         return $this;
     }
