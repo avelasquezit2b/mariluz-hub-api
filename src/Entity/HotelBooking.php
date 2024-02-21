@@ -91,6 +91,7 @@ class HotelBooking
     private ?Hotel $hotel = null;
 
     #[ORM\ManyToMany(targetEntity: HotelAvailability::class, mappedBy: 'hotelBookings')]
+    #[Groups(['hotelBookingReduced', 'hotelBooking'])]
     private Collection $hotelAvailabilities;
 
     public function __construct()

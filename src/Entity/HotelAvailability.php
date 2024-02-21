@@ -40,6 +40,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ApiFilter(SearchFilter::class, properties: ['roomCondition.hotelSeason.hotelFee.hotel' => 'exact'])]
 #[ApiFilter(RangeFilter::class, properties: ['quota'])]
 #[ApiFilter(BooleanFilter::class, properties: ['isAvailable'])]
+#[ORM\HasLifecycleCallbacks]
 class HotelAvailability
 {
     #[ORM\Id]
@@ -75,6 +76,14 @@ class HotelAvailability
     public function __construct()
     {
         $this->hotelBookings = new ArrayCollection();
+    }
+
+    #[ORM\PreUpdate]
+    public function onPreUpdate($request)
+    {
+        if ($this->getQuota() > $this->getMaxQuota()) {
+            $this->setQuota($this->getMaxQuota());
+        }
     }
 
     public function getId(): ?int
