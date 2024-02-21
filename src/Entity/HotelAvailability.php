@@ -73,6 +73,10 @@ class HotelAvailability
     #[Groups(['hotelAvailabilityReduced', 'hotelAvailability'])]
     private Collection $hotelBookings;
 
+    #[ORM\Column(nullable: true)]
+    #[Groups(['hotelAvailabilityReduced', 'hotelAvailability'])]
+    private ?int $totalBookings = null;
+
     public function __construct()
     {
         $this->hotelBookings = new ArrayCollection();
@@ -171,6 +175,18 @@ class HotelAvailability
     public function removeHotelBooking(HotelBooking $hotelBooking): static
     {
         $this->hotelBookings->removeElement($hotelBooking);
+
+        return $this;
+    }
+
+    public function getTotalBookings(): ?int
+    {
+        return $this->totalBookings;
+    }
+
+    public function setTotalBookings(?int $totalBookings): static
+    {
+        $this->totalBookings = $totalBookings;
 
         return $this;
     }

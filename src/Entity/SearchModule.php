@@ -28,16 +28,20 @@ class SearchModule
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['searchReduced', 'search'])]
+    #[Groups(['searchReduced', 'search', 'page'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['searchReduced', 'search'])]
+    #[Groups(['searchReduced', 'search', 'page'])]
     private ?string $text = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['searchReduced', 'search'])]
+    #[Groups(['searchReduced', 'search', 'page'])]
     private ?string $buttonText = null;
+
+    #[ORM\OneToOne(mappedBy: 'searchModule', cascade: ['persist', 'remove'])]
+    #[Groups(['searchReduced', 'search', 'page'])]
+    private ?Module $module = null;
 
     public function getId(): ?int
     {
@@ -64,6 +68,28 @@ class SearchModule
     public function setButtonText(?string $buttonText): static
     {
         $this->buttonText = $buttonText;
+
+        return $this;
+    }
+
+    public function getModule(): ?Module
+    {
+        return $this->module;
+    }
+
+    public function setModule(?Module $module): static
+    {
+        // unset the owning side of the relation if necessary
+        if ($module === null && $this->module !== null) {
+            $this->module->setSearchModule(null);
+        }
+
+        // set the owning side of the relation if necessary
+        if ($module !== null && $module->getSearchModule() !== $this) {
+            $module->setSearchModule($this);
+        }
+
+        $this->module = $module;
 
         return $this;
     }

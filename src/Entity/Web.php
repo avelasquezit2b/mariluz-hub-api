@@ -39,6 +39,7 @@ class Web
 
     #[ORM\OneToMany(mappedBy: 'web', targetEntity: Page::class)]
     #[Groups(['webReduced', 'web'])]
+    #[ORM\OrderBy(["id" => "ASC"])]
     private Collection $pages;
 
     public function __construct()

@@ -35,11 +35,11 @@ class Theme
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['themeReduced', 'theme'])]
+    #[Groups(['themeReduced', 'theme', 'page'])]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups(['themeReduced', 'theme'])]
+    #[Groups(['themeReduced', 'theme', 'page'])]
     private ?string $description = null;
 
     #[ORM\OneToMany(mappedBy: 'theme', targetEntity: ProductListModule::class)]

@@ -25,3 +25,8 @@ api_send_email:
   path: '/send/email'
   methods:  [POST]
   controller: App\Controller\EmailController::sendEmail
+
+api_update_element_position:
+  path: '/sections/{id}/position'
+  methods:  [PUT]
+  controller: App\Controller\WebController::updatePosition

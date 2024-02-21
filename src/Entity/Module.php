@@ -28,32 +28,36 @@ class Module
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['moduleReduced', 'module'])]
+    #[Groups(['moduleReduced', 'module', 'page'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['moduleReduced', 'module'])]
+    #[Groups(['moduleReduced', 'module', 'page'])]
     private ?string $name = null;
 
     #[ORM\ManyToOne(inversedBy: 'module')]
     #[Groups(['moduleReduced', 'module'])]
     private ?Section $section = null;
 
-    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
-    #[Groups(['moduleReduced', 'module'])]
+    #[ORM\OneToOne(inversedBy: 'module', cascade: ['persist', 'remove'])]
+    #[Groups(['moduleReduced', 'module', 'page'])]
     private ?HeroModule $heroModule = null;
 
-    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
-    #[Groups(['moduleReduced', 'module'])]
+    #[ORM\OneToOne(inversedBy: 'module', cascade: ['persist', 'remove'])]
+    #[Groups(['moduleReduced', 'module', 'page'])]
     private ?ProductListModule $productListModule = null;
 
-    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
-    #[Groups(['moduleReduced', 'module'])]
+    #[ORM\OneToOne(inversedBy: 'module', cascade: ['persist', 'remove'])]
+    #[Groups(['moduleReduced', 'module', 'page'])]
     private ?SearchModule $searchModule = null;
 
-    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
-    #[Groups(['moduleReduced', 'module'])]
+    #[ORM\OneToOne(inversedBy: 'module', cascade: ['persist', 'remove'])]
+    #[Groups(['moduleReduced', 'module', 'page'])]
     private ?ThemeListModule $themeListModule = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['moduleReduced', 'module', 'page'])]
+    private ?string $type = null;
 
     public function getId(): ?int
     {
@@ -128,6 +132,18 @@ class Module
     public function setThemeListModule(?ThemeListModule $themeListModule): static
     {
         $this->themeListModule = $themeListModule;
+
+        return $this;
+    }
+
+    public function getType(): ?string
+    {
+        return $this->type;
+    }
+
+    public function setType(?string $type): static
+    {
+        $this->type = $type;
 
         return $this;
     }

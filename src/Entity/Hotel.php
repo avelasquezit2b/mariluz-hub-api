@@ -39,7 +39,7 @@ class Hotel
     private ?int $id = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['hotelReduced', 'hotel'])]
+    #[Groups(['hotelReduced', 'hotel', 'page'])]
     private ?string $title = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -120,7 +120,7 @@ class Hotel
     private Collection $relatedHotels;
 
     #[ORM\OneToMany(mappedBy: 'hotel', targetEntity: MediaObject::class, cascade: ['remove'])]
-    #[Groups(['hotel'])]
+    #[Groups(['hotel', 'page'])]
     private Collection $media;
 
     #[ORM\Column(nullable: true)]
