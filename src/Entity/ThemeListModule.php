@@ -30,20 +30,24 @@ class ThemeListModule
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['themeListModuleReduced', 'themeListModule'])]
+    #[Groups(['themeListModuleReduced', 'themeListModule', 'page'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['themeListModuleReduced', 'themeListModule'])]
+    #[Groups(['themeListModuleReduced', 'themeListModule', 'page'])]
     private ?string $title = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['themeListModuleReduced', 'themeListModule'])]
+    #[Groups(['themeListModuleReduced', 'themeListModule', 'page'])]
     private ?string $subtitle = null;
 
     #[ORM\ManyToMany(targetEntity: Theme::class, inversedBy: 'themeListModules')]
-    #[Groups(['themeListModuleReduced', 'themeListModule'])]
+    #[Groups(['themeListModuleReduced', 'themeListModule', 'page'])]
     private Collection $themes;
+
+    #[ORM\OneToOne(mappedBy: 'themeListModule', cascade: ['persist', 'remove'])]
+    #[Groups(['themeListModuleReduced', 'themeListModule', 'page'])]
+    private ?Module $module = null;
 
     public function __construct()
     {
@@ -99,6 +103,28 @@ class ThemeListModule
     public function removeTheme(Theme $theme): static
     {
         $this->themes->removeElement($theme);
+
+        return $this;
+    }
+
+    public function getModule(): ?Module
+    {
+        return $this->module;
+    }
+
+    public function setModule(?Module $module): static
+    {
+        // unset the owning side of the relation if necessary
+        if ($module === null && $this->module !== null) {
+            $this->module->setThemeListModule(null);
+        }
+
+        // set the owning side of the relation if necessary
+        if ($module !== null && $module->getThemeListModule() !== $this) {
+            $module->setThemeListModule($this);
+        }
+
+        $this->module = $module;
 
         return $this;
     }

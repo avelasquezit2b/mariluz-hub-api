@@ -30,19 +30,19 @@ class HeroSlide
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['heroSlideReduced', 'heroSlide'])]
+    #[Groups(['heroSlideReduced', 'heroSlide', 'page'])]
     private ?int $id = null;
 
     #[ORM\OneToMany(mappedBy: 'heroSlide', targetEntity: MediaObject::class)]
-    #[Groups(['heroSlideReduced', 'heroSlide'])]
+    #[Groups(['heroSlideReduced', 'heroSlide', 'page'])]
     private Collection $media;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['heroSlideReduced', 'heroSlide'])]
+    #[Groups(['heroSlideReduced', 'heroSlide', 'page'])]
     private ?string $title = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['heroSlideReduced', 'heroSlide'])]
+    #[Groups(['heroSlideReduced', 'heroSlide', 'page'])]
     private ?string $subtitle = null;
 
     #[ORM\ManyToOne(inversedBy: 'heroSlides')]

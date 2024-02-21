@@ -31,27 +31,27 @@ class Section
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['sectionReduced', 'section'])]
+    #[Groups(['sectionReduced', 'section', 'page'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['sectionReduced', 'section'])]
+    #[Groups(['sectionReduced', 'section', 'page'])]
     private ?string $name = null;
 
     #[ORM\Column]
-    #[Groups(['sectionReduced', 'section'])]
+    #[Groups(['sectionReduced', 'section', 'page'])]
     private ?bool $isActive = null;
 
     #[ORM\Column(type: Types::SMALLINT)]
-    #[Groups(['sectionReduced', 'section'])]
+    #[Groups(['sectionReduced', 'section', 'page'])]
     private ?int $position = null;
 
     #[ORM\ManyToOne(inversedBy: 'sections')]
     #[Groups(['sectionReduced', 'section'])]
     private ?Page $page = null;
 
-    #[ORM\OneToMany(mappedBy: 'section', targetEntity: Module::class)]
-    #[Groups(['sectionReduced', 'section'])]
+    #[ORM\OneToMany(mappedBy: 'section', targetEntity: Module::class, cascade: ['remove'])]
+    #[Groups(['sectionReduced', 'section', 'page'])]
     private Collection $module;
 
     public function __construct()

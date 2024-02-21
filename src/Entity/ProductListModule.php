@@ -30,32 +30,36 @@ class ProductListModule
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['productListReduced', 'productList'])]
+    #[Groups(['productListReduced', 'productList', 'page'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['productListReduced', 'productList'])]
+    #[Groups(['productListReduced', 'productList', 'page'])]
     private ?string $title = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['productListReduced', 'productList'])]
+    #[Groups(['productListReduced', 'productList', 'page'])]
     private ?string $subtitle = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['productListReduced', 'productList'])]
+    #[Groups(['productListReduced', 'productList', 'page'])]
     private ?string $productType = null;
 
     #[ORM\ManyToMany(targetEntity: Hotel::class, inversedBy: 'productListModules')]
-    #[Groups(['productListReduced', 'productList'])]
+    #[Groups(['productListReduced', 'productList', 'page'])]
     private Collection $hotels;
 
     #[ORM\ManyToMany(targetEntity: Activity::class, inversedBy: 'productListModules')]
-    #[Groups(['productListReduced', 'productList'])]
+    #[Groups(['productListReduced', 'productList', 'page'])]
     private Collection $activities;
 
     #[ORM\ManyToOne(inversedBy: 'productListModules')]
-    #[Groups(['productListReduced', 'productList'])]
+    #[Groups(['productListReduced', 'productList', 'page'])]
     private ?Theme $theme = null;
+
+    #[ORM\OneToOne(mappedBy: 'productListModule', cascade: ['persist', 'remove'])]
+    #[Groups(['productListReduced', 'productList', 'page'])]
+    private ?Module $module = null;
 
     public function __construct()
     {
@@ -160,6 +164,29 @@ class ProductListModule
     public function setTheme(?Theme $theme): static
     {
         $this->theme = $theme;
+
+        return $this;
+    }
+
+
+    public function getModule(): ?Module
+    {
+        return $this->module;
+    }
+
+    public function setModule(?Module $module): static
+    {
+        // unset the owning side of the relation if necessary
+        if ($module === null && $this->module !== null) {
+            $this->module->setProductListModule(null);
+        }
+
+        // set the owning side of the relation if necessary
+        if ($module !== null && $module->getProductListModule() !== $this) {
+            $module->setProductListModule($this);
+        }
+
+        $this->module = $module;
 
         return $this;
     }

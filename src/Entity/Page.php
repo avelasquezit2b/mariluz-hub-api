@@ -30,11 +30,11 @@ class Page
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['pageReduced', 'page'])]
+    #[Groups(['pageReduced', 'page', 'web'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['pageReduced', 'page'])]
+    #[Groups(['pageReduced', 'page', 'web'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
@@ -62,7 +62,8 @@ class Page
     private ?Web $web = null;
 
     #[ORM\OneToMany(mappedBy: 'page', targetEntity: Section::class)]
-    #[Groups(['pageReduced', 'page'])]
+    #[Groups(['pageReduced', 'page', 'web'])]
+    #[ORM\OrderBy(["position" => "ASC"])]
     private Collection $sections;
 
     public function __construct()

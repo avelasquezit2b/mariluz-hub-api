@@ -30,12 +30,16 @@ class HeroModule
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['heroModuleReduced', 'heroModule'])]
+    #[Groups(['heroModuleReduced', 'heroModule', 'page'])]
     private ?int $id = null;
 
     #[ORM\OneToMany(mappedBy: 'heroModule', targetEntity: HeroSlide::class)]
-    #[Groups(['heroModuleReduced', 'heroModule'])]
+    #[Groups(['heroModuleReduced', 'heroModule', 'page'])]
     private Collection $heroSlides;
+
+    #[ORM\OneToOne(mappedBy: 'heroModule', cascade: ['persist', 'remove'])]
+    #[Groups(['heroModuleReduced', 'heroModule', 'page'])]
+    private ?Module $module = null;
 
     public function __construct()
     {
@@ -73,6 +77,28 @@ class HeroModule
                 $heroSlide->setHeroModule(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getModule(): ?Module
+    {
+        return $this->module;
+    }
+
+    public function setModule(?Module $module): static
+    {
+        // unset the owning side of the relation if necessary
+        if ($module === null && $this->module !== null) {
+            $this->module->setHeroModule(null);
+        }
+
+        // set the owning side of the relation if necessary
+        if ($module !== null && $module->getHeroModule() !== $this) {
+            $module->setHeroModule($this);
+        }
+
+        $this->module = $module;
 
         return $this;
     }
