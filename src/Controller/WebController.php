@@ -2,11 +2,12 @@
 
 namespace App\Controller;
 
+use App\Entity\Section;
+use App\Repository\SectionRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
-use App\Entity\Section;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 class WebController extends AbstractController
@@ -18,29 +19,17 @@ class WebController extends AbstractController
         $this->entityManager = $entityManager;
     }
 
-    #[Route('/sections/{id}/position', name: 'api_update_element_position')]
-    public function updatePosition(Request $request, Section $section): JsonResponse
+    #[Route('/sections/update_positions', name: 'api_update_positions')]
+    public function updatePosition(Request $request,  SectionRepository $sectionRepository): JsonResponse
     {
-        // Get the new position from the request body
-        $newPosition = $request->request->get('newPosition');
+        $requestDecode = json_decode($request->getContent());
 
-        // Get the current position of the element
-        $currentPosition = $section->getPosition();
-
-        // Get all elements with a higher position than the element being updated
-        $elementsToUpdate = $this->entityManager->getRepository(Section::class)->findBy(['position' => $currentPosition]);
-
-        // Update the positions of all elements with a higher position
-        foreach ($elementsToUpdate as $elementToUpdate) {
-            if ($elementToUpdate->getId() !== $section->getId()) {
-                $elementToUpdate->setPosition($elementToUpdate->getPosition() + 1);
-            } else {
-                // Update the position of the element being updated
-                $section->setPosition($newPosition);
-            }
+        foreach ($requestDecode->sections as $key=>$section) {
+            $section = $sectionRepository->find($section->id);
+            $section->setPosition($key);
+            $this->entityManager->persist($section);
         }
 
-        // Persist changes to the database
         $this->entityManager->flush();
 
         return $this->json(['message' => 'Element positions updated successfully']);
