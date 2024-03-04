@@ -61,9 +61,14 @@ class Subcategory
     #[Groups(['subcategoryReduced', 'subcategory', 'categoryReduced', 'category', 'activity'])]
     private ?string $slug = null;
 
+    #[ORM\ManyToMany(targetEntity: Pack::class, mappedBy: 'subCategories')]
+    #[Groups(['subcategory'])]
+    private Collection $packs;
+
     public function __construct()
     {
         $this->activities = new ArrayCollection();
+        $this->packs = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -142,6 +147,33 @@ class Subcategory
     public function setSlug(?string $slug): static
     {
         $this->slug = $slug;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Pack>
+     */
+    public function getPacks(): Collection
+    {
+        return $this->packs;
+    }
+
+    public function addPack(Pack $pack): static
+    {
+        if (!$this->packs->contains($pack)) {
+            $this->packs->add($pack);
+            $pack->addSubCategory($this);
+        }
+
+        return $this;
+    }
+
+    public function removePack(Pack $pack): static
+    {
+        if ($this->packs->removeElement($pack)) {
+            $pack->removeSubCategory($this);
+        }
 
         return $this;
     }

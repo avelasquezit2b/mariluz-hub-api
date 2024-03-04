@@ -34,23 +34,23 @@ class Zone
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['zoneReduced', 'zone', 'activityReduced', 'activity', 'hotelReduced', 'hotel'])]
+    #[Groups(['zoneReduced', 'zone', 'activityReduced', 'activity', 'hotelReduced', 'hotel', 'packReduced', 'pack'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['zoneReduced', 'zone', 'activityReduced', 'activity', 'hotelReduced', 'hotel', 'page'])]
+    #[Groups(['zoneReduced', 'zone', 'activityReduced', 'activity', 'hotelReduced', 'hotel', 'packReduced', 'pack', 'page'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 50, nullable: true)]
-    #[Groups(['zone', 'activity', 'hotel'])]
+    #[Groups(['zone', 'activity', 'hotel', 'pack'])]
     private ?string $latitude = null;
 
     #[ORM\Column(length: 50, nullable: true)]
-    #[Groups(['zone', 'activity', 'hotel'])]
+    #[Groups(['zone', 'activity', 'hotel', 'pack'])]
     private ?string $longitude = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups(['zone', 'activity', 'hotel'])]
+    #[Groups(['zone', 'activity', 'hotel', 'pack'])]
     private ?string $description = null;
 
     #[ORM\ManyToOne(inversedBy: 'zones')]
@@ -62,10 +62,14 @@ class Zone
     #[ORM\ManyToMany(targetEntity: Hotel::class, mappedBy: 'zones')]
     private Collection $hotels;
 
+    #[ORM\ManyToMany(targetEntity: Pack::class, mappedBy: 'zones')]
+    private Collection $packs;
+
     public function __construct()
     {
         $this->activities = new ArrayCollection();
         $this->hotels = new ArrayCollection();
+        $this->packs = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -182,6 +186,33 @@ class Zone
     {
         if ($this->hotels->removeElement($hotel)) {
             $hotel->removeZone($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Pack>
+     */
+    public function getPacks(): Collection
+    {
+        return $this->packs;
+    }
+
+    public function addPack(Pack $pack): static
+    {
+        if (!$this->packs->contains($pack)) {
+            $this->packs->add($pack);
+            $pack->addZone($this);
+        }
+
+        return $this;
+    }
+
+    public function removePack(Pack $pack): static
+    {
+        if ($this->packs->removeElement($pack)) {
+            $pack->removeZone($this);
         }
 
         return $this;

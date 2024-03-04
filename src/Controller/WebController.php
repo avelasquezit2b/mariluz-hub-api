@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Entity\Section;
 use App\Repository\SectionRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Doctrine\ORM\EntityManagerInterface;
@@ -30,8 +29,5 @@ class WebController extends AbstractController
             $this->entityManager->persist($section);
         }
 
-        $this->entityManager->flush();
-
-        return $this->json(['message' => 'Element positions updated successfully']);
     }
 }

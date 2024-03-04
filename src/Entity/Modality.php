@@ -106,6 +106,9 @@ class Modality
     #[ORM\OrderBy(["startTime" => "ASC"])]
     private Collection $pickupSchedules;
 
+    #[ORM\ManyToOne(inversedBy: 'modalities')]
+    private ?Pack $pack = null;
+
     public function __construct()
     {
         $this->clientTypes = new ArrayCollection();
@@ -377,6 +380,18 @@ class Modality
     public function removePickupSchedule(PickupSchedule $pickupSchedule): static
     {
         $this->pickupSchedules->removeElement($pickupSchedule);
+
+        return $this;
+    }
+
+    public function getPack(): ?Pack
+    {
+        return $this->pack;
+    }
+
+    public function setPack(?Pack $pack): static
+    {
+        $this->pack = $pack;
 
         return $this;
     }

@@ -56,10 +56,14 @@ class Category
     #[Groups(['categoryReduced', 'category'])]
     private ?string $slug = null;
 
+    #[ORM\ManyToMany(targetEntity: Pack::class, mappedBy: 'categories')]
+    private Collection $packs;
+
     public function __construct()
     {
         $this->subCategories = new ArrayCollection();
         $this->activities = new ArrayCollection();
+        $this->packs = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -156,6 +160,33 @@ class Category
     public function setSlug(?string $slug): static
     {
         $this->slug = $slug;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Pack>
+     */
+    public function getPacks(): Collection
+    {
+        return $this->packs;
+    }
+
+    public function addPack(Pack $pack): static
+    {
+        if (!$this->packs->contains($pack)) {
+            $this->packs->add($pack);
+            $pack->addCategory($this);
+        }
+
+        return $this;
+    }
+
+    public function removePack(Pack $pack): static
+    {
+        if ($this->packs->removeElement($pack)) {
+            $pack->removeCategory($this);
+        }
 
         return $this;
     }

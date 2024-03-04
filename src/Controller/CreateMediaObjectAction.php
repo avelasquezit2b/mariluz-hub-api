@@ -9,6 +9,7 @@ use App\Repository\HotelRepository;
 use App\Repository\RoomTypeRepository;
 use App\Repository\ThemeRepository;
 use App\Repository\HeroSlideRepository;
+use App\Repository\PackRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\AsController;
@@ -17,7 +18,7 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 #[AsController]
 final class CreateMediaObjectAction extends AbstractController
 {
-    public function __invoke(Request $request, ActivityRepository $activityRepository, HotelRepository $hotelRepository, RoomTypeRepository $roomTypeRepository, ThemeRepository $themeRepository, HeroSlideRepository $heroSlideRepository): MediaObject
+    public function __invoke(Request $request, ActivityRepository $activityRepository, HotelRepository $hotelRepository, PackRepository $packRepository, RoomTypeRepository $roomTypeRepository, ThemeRepository $themeRepository, HeroSlideRepository $heroSlideRepository): MediaObject
     {
         $uploadedFile = $request->files->get('file');
         if (!$uploadedFile) {
@@ -35,6 +36,10 @@ final class CreateMediaObjectAction extends AbstractController
         if ($request->request->get('hotel')) {
             $hotel = $hotelRepository->find($request->request->get('hotel'));
             $mediaObject->setHotel($hotel);
+        }
+        if ($request->request->get('pack')) {
+            $pack = $packRepository->find($request->request->get('pack'));
+            $mediaObject->setPack($pack);
         }
         if ($request->request->get('roomType')) {
             $roomType = $roomTypeRepository->find($request->request->get('roomType'));

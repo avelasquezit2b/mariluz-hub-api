@@ -35,27 +35,27 @@ class Location
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['locationReduced', 'location', 'activityReduced', 'activity', 'hotelReduced', 'hotel'])]
+    #[Groups(['locationReduced', 'location', 'activityReduced', 'activity', 'hotelReduced', 'hotel', 'packReduced', 'pack'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['locationReduced', 'location', 'activityReduced', 'activity', 'hotelReduced', 'hotel', 'page'])]
+    #[Groups(['locationReduced', 'location', 'activityReduced', 'activity', 'hotelReduced', 'hotel', 'packReduced', 'pack', 'page'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 50, nullable: true)]
-    #[Groups(['location', 'activity', 'hotel'])]
+    #[Groups(['location', 'activity', 'hotel', 'pack'])]
     private ?string $latitude = null;
 
     #[ORM\Column(length: 50, nullable: true)]
-    #[Groups(['location', 'activity', 'hotel'])]
+    #[Groups(['location', 'activity', 'hotel', 'pack'])]
     private ?string $longitude = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups(['location', 'activity', 'hotel'])]
+    #[Groups(['location', 'activity', 'hotel', 'pack'])]
     private ?string $description = null;
 
     #[ORM\OneToMany(mappedBy: 'location', targetEntity: Zone::class, cascade: ['persist', 'remove'])]
-    #[Groups(['locationReduced', 'location', 'activityReduced', 'activity', 'hotelReduced', 'hotel'])]
+    #[Groups(['locationReduced', 'location', 'activityReduced', 'activity', 'hotelReduced', 'hotel', 'packReduced', 'pack'])]
     #[ApiSubresource]
     private Collection $zones;
 
@@ -65,11 +65,15 @@ class Location
     #[ORM\OneToMany(mappedBy: 'location', targetEntity: Hotel::class)]
     private Collection $hotels;
 
+    #[ORM\OneToMany(mappedBy: 'location', targetEntity: Pack::class)]
+    private Collection $packs;
+
     public function __construct()
     {
         $this->zones = new ArrayCollection();
         $this->activities = new ArrayCollection();
         $this->hotels = new ArrayCollection();
+        $this->packs = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -209,6 +213,36 @@ class Location
             // set the owning side to null (unless already changed)
             if ($hotel->getLocation() === $this) {
                 $hotel->setLocation(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Pack>
+     */
+    public function getPacks(): Collection
+    {
+        return $this->packs;
+    }
+
+    public function addPack(Pack $pack): static
+    {
+        if (!$this->packs->contains($pack)) {
+            $this->packs->add($pack);
+            $pack->setLocation($this);
+        }
+
+        return $this;
+    }
+
+    public function removePack(Pack $pack): static
+    {
+        if ($this->packs->removeElement($pack)) {
+            // set the owning side to null (unless already changed)
+            if ($pack->getLocation() === $this) {
+                $pack->setLocation(null);
             }
         }
 
