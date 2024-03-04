@@ -33,7 +33,7 @@ class HeroSlide
     #[Groups(['heroSlideReduced', 'heroSlide', 'page'])]
     private ?int $id = null;
 
-    #[ORM\OneToMany(mappedBy: 'heroSlide', targetEntity: MediaObject::class)]
+    #[ORM\OneToMany(mappedBy: 'heroSlide', targetEntity: MediaObject::class, cascade: ['remove'])]
     #[Groups(['heroSlideReduced', 'heroSlide', 'page'])]
     private Collection $media;
 

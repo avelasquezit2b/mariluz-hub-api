@@ -51,7 +51,7 @@ class Theme
     private Collection $themeListModules;
 
     #[ORM\OneToMany(mappedBy: 'theme', targetEntity: MediaObject::class)]
-    #[Groups(['themeReduced', 'theme'])]
+    #[Groups(['themeReduced', 'theme', 'page'])]
     private Collection $media;
 
     public function __construct()

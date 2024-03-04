@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiSubresource;
+use ApiPlatform\Core\Annotation\ApiFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use App\Repository\HotelRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -30,6 +32,7 @@ use Doctrine\ORM\Mapping as ORM;
         // "delete" => ["security" => "is_granted('ROLE_ADMIN') or object.owner == user"],
     ],
 )]
+#[ApiFilter(SearchFilter::class, properties: ['slug' => 'exact'])]
 class Hotel
 {
     #[ORM\Id]
@@ -43,7 +46,7 @@ class Hotel
     private ?string $title = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['hotelReduced', 'hotel'])]
+    #[Groups(['hotelReduced', 'hotel', 'page'])]
     private ?string $slug = null;
 
     #[ORM\ManyToOne(inversedBy: 'hotels')]
@@ -63,7 +66,7 @@ class Hotel
     private ?string $checkOut = null;
 
     #[ORM\ManyToOne(inversedBy: 'hotels')]
-    #[Groups(['hotelReduced', 'hotel'])]
+    #[Groups(['hotelReduced', 'hotel', 'page'])]
     private ?Location $location = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -79,11 +82,11 @@ class Hotel
     private ?string $longitude = null;
 
     #[ORM\ManyToMany(targetEntity: Zone::class, inversedBy: 'hotels')]
-    #[Groups(['hotelReduced', 'hotel'])]
+    #[Groups(['hotelReduced', 'hotel', 'page'])]
     private Collection $zones;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['hotelReduced', 'hotel'])]
+    #[Groups(['hotelReduced', 'hotel', 'page'])]
     private ?string $shortDescription = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
@@ -120,7 +123,7 @@ class Hotel
     private Collection $relatedHotels;
 
     #[ORM\OneToMany(mappedBy: 'hotel', targetEntity: MediaObject::class, cascade: ['remove'])]
-    #[Groups(['hotel', 'page'])]
+    #[Groups(['hotelReduced', 'hotel', 'page'])]
     private Collection $media;
 
     #[ORM\Column(nullable: true)]

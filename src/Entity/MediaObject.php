@@ -49,11 +49,11 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
 class MediaObject
 {
     #[ORM\Id, ORM\Column, ORM\GeneratedValue]
-    #[Groups(['media_object:read', 'activity', 'hotel', 'roomType'])]
+    #[Groups(['media_object:read', 'activity', 'hotel', 'roomType', 'theme'])]
     private ?int $id = null;
 
     #[ApiProperty(iri: 'https://schema.org/contentUrl')]
-    #[Groups(['media_object:read', 'activity', 'hotel', 'roomType', 'page'])]
+    #[Groups(['media_object:read', 'activity', 'hotelReduced', 'hotel', 'roomType', 'themeReduced', 'theme', 'page', 'heroSlide'])]
     public ?string $contentUrl = null;
 
     #[Vich\UploadableField(mapping: "media_object", fileNameProperty: "filePath")]
@@ -64,11 +64,11 @@ class MediaObject
     public ?string $filePath = null;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    #[Groups(['media_object:read', 'activity', 'hotel', 'roomType'])]
+    #[Groups(['media_object:read', 'activity', 'hotel', 'roomType', 'theme'])]
     private $name;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    #[Groups(['media_object:read', 'activity', 'hotel', 'roomType'])]
+    #[Groups(['media_object:read', 'activity', 'hotel', 'roomType', 'theme'])]
     private $alt;
 
     #[ORM\ManyToOne(inversedBy: 'media')]
@@ -76,11 +76,11 @@ class MediaObject
     private ?Activity $activity = null;
 
     #[ORM\Column(length: 25)]
-    #[Groups(['media_object:read', 'activity', 'hotel', 'roomType'])]
+    #[Groups(['media_object:read', 'activity', 'hotel', 'roomType', 'theme'])]
     private ?string $type = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['media_object:read', 'activity', 'hotel', 'roomType'])]
+    #[Groups(['media_object:read', 'activity', 'hotel', 'roomType', 'theme'])]
     private ?int $position = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -88,7 +88,7 @@ class MediaObject
     private ?string $supplier = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['media_object:read', 'activity', 'hotel', 'roomType'])]
+    #[Groups(['media_object:read', 'activity', 'hotel', 'roomType', 'theme'])]
     private ?string $description = null;
 
     #[ORM\ManyToOne(inversedBy: 'media')]
@@ -103,9 +103,11 @@ class MediaObject
     private ?HeroModule $heroModule = null;
 
     #[ORM\ManyToOne(inversedBy: 'media')]
+    #[Groups(['media_object:read'])]
     private ?HeroSlide $heroSlide = null;
 
     #[ORM\ManyToOne(inversedBy: 'media')]
+    #[Groups(['media_object:read'])]
     private ?Theme $theme = null;
 
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
