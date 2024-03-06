@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use App\Repository\ProductListModuleRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -25,6 +27,7 @@ use Doctrine\ORM\Mapping as ORM;
         "delete",
     ],
 )]
+#[ApiFilter(SearchFilter::class, properties: ['slug' => 'exact'])]
 class ProductListModule
 {
     #[ORM\Id]
@@ -64,6 +67,10 @@ class ProductListModule
     #[ORM\ManyToMany(targetEntity: Pack::class, mappedBy: 'productListModules')]
     #[Groups(['productListReduced', 'productList', 'page'])]
     private Collection $packs;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['productListReduced', 'productList', 'page'])]
+    private ?string $slug = null;
 
     public function __construct()
     {
@@ -219,6 +226,18 @@ class ProductListModule
         if ($this->packs->removeElement($pack)) {
             $pack->removeProductListModule($this);
         }
+
+        return $this;
+    }
+
+    public function getSlug(): ?string
+    {
+        return $this->slug;
+    }
+
+    public function setSlug(?string $slug): static
+    {
+        $this->slug = $slug;
 
         return $this;
     }
