@@ -65,6 +65,10 @@ class ProductListModule
     #[Groups(['productListReduced', 'productList', 'page'])]
     private Collection $packs;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['productListReduced', 'productList', 'page'])]
+    private ?string $slug = null;
+
     public function __construct()
     {
         $this->hotels = new ArrayCollection();
@@ -219,6 +223,18 @@ class ProductListModule
         if ($this->packs->removeElement($pack)) {
             $pack->removeProductListModule($this);
         }
+
+        return $this;
+    }
+
+    public function getSlug(): ?string
+    {
+        return $this->slug;
+    }
+
+    public function setSlug(?string $slug): static
+    {
+        $this->slug = $slug;
 
         return $this;
     }
