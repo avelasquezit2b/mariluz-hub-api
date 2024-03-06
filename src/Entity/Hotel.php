@@ -38,11 +38,11 @@ class Hotel
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['hotelReduced', 'hotel'])]
+    #[Groups(['hotelReduced', 'hotel', 'supplier'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['hotelReduced', 'hotel', 'page'])]
+    #[Groups(['hotelReduced', 'hotel', 'page', 'supplier'])]
     private ?string $title = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -144,6 +144,9 @@ class Hotel
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     private ?Seo $seo = null;
 
+    #[ORM\ManyToMany(targetEntity: Modality::class, mappedBy: 'packHotels')]
+    private Collection $packModalities;
+
     public function __construct()
     {
         $this->zones = new ArrayCollection();
@@ -153,6 +156,7 @@ class Hotel
         $this->hotelFees = new ArrayCollection();
         $this->hotelBookings = new ArrayCollection();
         $this->productListModules = new ArrayCollection();
+        $this->packModalities = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -582,4 +586,32 @@ class Hotel
 
         return $this;
     }
+
+    /**
+     * @return Collection<int, Modality>
+     */
+    public function getPackModalities(): Collection
+    {
+        return $this->packModalities;
+    }
+
+    public function addPackModality(Modality $modality): static
+    {
+        if (!$this->packModalities->contains($modality)) {
+            $this->packModalities->add($modality);
+            $modality->addPackHotel($this);
+        }
+
+        return $this;
+    }
+
+    public function removePackModality(Modality $modality): static
+    {
+        if ($this->packModalities->removeElement($modality)) {
+            $modality->removePackHotel($this);
+        }
+
+        return $this;
+    }
+
 }

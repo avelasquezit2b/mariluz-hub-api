@@ -38,11 +38,11 @@ class Activity
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['activityReduced', 'activity'])]
+    #[Groups(['activityReduced', 'activity', 'supplierReduced', 'supplier'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['activityReduced', 'activity'])]
+    #[Groups(['activityReduced', 'activity', 'supplierReduced', 'supplier'])]
     private ?string $title = null;
 
     #[ORM\Column(length: 255)]
@@ -169,6 +169,9 @@ class Activity
     #[ORM\ManyToMany(targetEntity: ProductListModule::class, mappedBy: 'activities')]
     private Collection $productListModules;
 
+    #[ORM\ManyToMany(targetEntity: Modality::class, mappedBy: 'packActivities')]
+    private Collection $packModalities;
+
     public function __construct()
     {
         $this->categories = new ArrayCollection();
@@ -179,6 +182,7 @@ class Activity
         $this->media = new ArrayCollection();
         $this->zones = new ArrayCollection();
         $this->productListModules = new ArrayCollection();
+        $this->packModalities = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -681,4 +685,32 @@ class Activity
 
         return $this;
     }
+
+    /**
+     * @return Collection<int, Modality>
+     */
+    public function getPackModalities(): Collection
+    {
+        return $this->packModalities;
+    }
+
+    public function addPackModality(Modality $packModality): static
+    {
+        if (!$this->packModalities->contains($packModality)) {
+            $this->packModalities->add($packModality);
+            $packModality->addPackActivity($this);
+        }
+
+        return $this;
+    }
+
+    public function removePackModality(Modality $packModality): static
+    {
+        if ($this->packModalities->removeElement($packModality)) {
+            $packModality->removePackActivity($this);
+        }
+
+        return $this;
+    }
+
 }

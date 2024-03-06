@@ -6,64 +6,99 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\SupplierRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: SupplierRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    attributes: [
+        "order" => ["id" => "ASC"],
+        "normalization_context" => ["groups" => ["supplierReduced"]]
+    ],
+    collectionOperations: [
+        "get",
+        "post",
+        // "post" => ["security" => "is_granted('ROLE_ADMIN')"],
+    ],
+    itemOperations: [
+        "get" => ["normalization_context" => ["groups" => "supplier"]],
+        "put",
+        "delete",
+        // "put" => ["security" => "is_granted('ROLE_ADMIN') or object.owner == user"],
+        // "delete" => ["security" => "is_granted('ROLE_ADMIN') or object.owner == user"],
+    ],
+)]
 class Supplier
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['supplierReduced', 'supplier'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['supplierReduced', 'supplier'])]
     private ?string $name = null;
 
     #[ORM\Column]
+    #[Groups(['supplierReduced', 'supplier'])]
     private ?bool $isActive = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['supplierReduced', 'supplier'])]
     private ?string $contactPerson = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['supplierReduced', 'supplier'])]
     private ?string $contactEmail = null;
 
     #[ORM\Column(length: 50, nullable: true)]
+    #[Groups(['supplierReduced', 'supplier'])]
     private ?string $contactPhone = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['supplierReduced', 'supplier'])]
     private ?string $bookingEmail = null;
 
     #[ORM\Column(length: 50, nullable: true)]
+    #[Groups(['supplierReduced', 'supplier'])]
     private ?string $bookingPhone = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['supplierReduced', 'supplier'])]
     private ?bool $hasWhatsapp = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['supplierReduced', 'supplier'])]
     private ?string $internalNotes = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['supplierReduced', 'supplier'])]
     private ?string $legalName = null;
 
     #[ORM\Column(length: 25, nullable: true)]
+    #[Groups(['supplierReduced', 'supplier'])]
     private ?string $documentType = null;
 
     #[ORM\Column(length: 50, nullable: true)]
+    #[Groups(['supplierReduced', 'supplier'])]
     private ?string $document = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['supplierReduced', 'supplier'])]
     private ?string $adminEmail = null;
 
     #[ORM\Column(length: 50, nullable: true)]
+    #[Groups(['supplierReduced', 'supplier'])]
     private ?string $adminPhone = null;
 
     #[ORM\OneToMany(mappedBy: 'supplier', targetEntity: Activity::class)]
+    #[Groups(['supplierReduced', 'supplier'])]
     private Collection $activities;
 
     #[ORM\OneToMany(mappedBy: 'supplier', targetEntity: Hotel::class)]
+    #[Groups(['supplierReduced', 'supplier'])]
     private Collection $hotels;
 
     public function __construct()

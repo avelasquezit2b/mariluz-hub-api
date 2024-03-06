@@ -109,12 +109,22 @@ class Modality
     #[ORM\ManyToOne(inversedBy: 'modalities')]
     private ?Pack $pack = null;
 
+    #[ORM\ManyToMany(targetEntity: Hotel::class, inversedBy: 'modalities')]
+    #[Groups(['modalityReduced', 'modality', 'hotel'])]
+    private Collection $packHotels;
+
+    #[ORM\ManyToMany(targetEntity: Activity::class, inversedBy: 'packModalities')]
+    #[Groups(['modalityReduced', 'modality', 'activity'])]
+    private Collection $packActivities;
+
     public function __construct()
     {
         $this->clientTypes = new ArrayCollection();
         $this->pickups = new ArrayCollection();
         $this->languages = new ArrayCollection();
         $this->pickupSchedules = new ArrayCollection();
+        $this->packHotels = new ArrayCollection();
+        $this->packActivities = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -392,6 +402,54 @@ class Modality
     public function setPack(?Pack $pack): static
     {
         $this->pack = $pack;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Hotel>
+     */
+    public function getPackHotels(): Collection
+    {
+        return $this->packHotels;
+    }
+
+    public function addPackHotel(Hotel $packHotel): static
+    {
+        if (!$this->packHotels->contains($packHotel)) {
+            $this->packHotels->add($packHotel);
+        }
+
+        return $this;
+    }
+
+    public function removePackHotel(Hotel $packHotel): static
+    {
+        $this->packHotels->removeElement($packHotel);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Activity>
+     */
+    public function getPackActivities(): Collection
+    {
+        return $this->packActivities;
+    }
+
+    public function addPackActivity(Activity $packActivity): static
+    {
+        if (!$this->packActivities->contains($packActivity)) {
+            $this->packActivities->add($packActivity);
+        }
+
+        return $this;
+    }
+
+    public function removePackActivity(Activity $packActivity): static
+    {
+        $this->packActivities->removeElement($packActivity);
 
         return $this;
     }
