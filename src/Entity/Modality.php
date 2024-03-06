@@ -35,24 +35,24 @@ class Modality
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['modalityReduced', 'modality', 'activityReduced', 'activity'])]
+    #[Groups(['modalityReduced', 'modality', 'activityReduced', 'activity', 'pack'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['modalityReduced', 'modality', 'activityReduced', 'activity', 'activityAvailabilityReduced'])]
+    #[Groups(['modalityReduced', 'modality', 'activityReduced', 'activity', 'activityAvailabilityReduced', 'pack', 'packReduced'])]
     private ?string $title = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups(['modality', 'activity'])]
+    #[Groups(['modality', 'activity', 'pack', 'packReduced'])]
     private ?string $description = null;
 
     #[ORM\ManyToMany(targetEntity: ClientType::class, inversedBy: 'modalities')]
-    #[Groups(['modalityReduced', 'modality', 'activity'])]
+    #[Groups(['modalityReduced', 'modality', 'activity', 'pack'])]
     private Collection $clientTypes;
 
     #[ORM\Column(length: 50)]
     #[Groups(['modalityReduced', 'modality', 'activity'])]
-    private ?string $priceType = null;
+    private ?string $priceType = 'person';
 
     #[ORM\Column(length: 50, nullable: true)]
     private ?string $basePrice = null;
@@ -67,7 +67,7 @@ class Modality
 
     #[ORM\Column]
     #[Groups(['modalityReduced', 'modality', 'activityReduced', 'activity'])]
-    private ?bool $hasPickup = null;
+    private ?bool $hasPickup = false;
 
     #[ORM\ManyToMany(targetEntity: Pickup::class, inversedBy: 'modalities')]
     #[Groups(['modalityReduced', 'modality', 'activity'])]
@@ -90,7 +90,7 @@ class Modality
     private ?int $businessQuota = null;
 
     #[ORM\ManyToMany(targetEntity: Language::class, inversedBy: 'modalities')]
-    #[Groups(['modalityReduced', 'modality', 'activityReduced', 'activity'])]
+    #[Groups(['modalityReduced', 'modality', 'activityReduced', 'activity', 'pack', 'packReduced'])]
     private Collection $languages;
 
     #[ORM\Column(length: 25, nullable: true)]
@@ -110,11 +110,11 @@ class Modality
     private ?Pack $pack = null;
 
     #[ORM\ManyToMany(targetEntity: Hotel::class, inversedBy: 'modalities')]
-    #[Groups(['modalityReduced', 'modality', 'hotel'])]
+    #[Groups(['modalityReduced', 'modality', 'pack'])]
     private Collection $packHotels;
 
     #[ORM\ManyToMany(targetEntity: Activity::class, inversedBy: 'packModalities')]
-    #[Groups(['modalityReduced', 'modality', 'activity'])]
+    #[Groups(['modalityReduced', 'modality', 'pack'])]
     private Collection $packActivities;
 
     public function __construct()

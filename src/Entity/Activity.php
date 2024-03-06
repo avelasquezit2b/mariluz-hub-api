@@ -42,7 +42,7 @@ class Activity
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['activityReduced', 'activity', 'supplierReduced', 'supplier'])]
+    #[Groups(['activityReduced', 'activity', 'supplierReduced', 'supplier', 'pack'])]
     private ?string $title = null;
 
     #[ORM\Column(length: 255)]
