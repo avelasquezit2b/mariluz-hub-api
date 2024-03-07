@@ -147,6 +147,9 @@ class Hotel
     #[ORM\ManyToMany(targetEntity: Modality::class, mappedBy: 'packHotels')]
     private Collection $packModalities;
 
+    #[ORM\ManyToMany(targetEntity: ItineraryDay::class, mappedBy: 'hotels')]
+    private Collection $itineraryDays;
+
     public function __construct()
     {
         $this->zones = new ArrayCollection();
@@ -157,6 +160,7 @@ class Hotel
         $this->hotelBookings = new ArrayCollection();
         $this->productListModules = new ArrayCollection();
         $this->packModalities = new ArrayCollection();
+        $this->itineraryDays = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -609,6 +613,33 @@ class Hotel
     {
         if ($this->packModalities->removeElement($modality)) {
             $modality->removePackHotel($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ItineraryDay>
+     */
+    public function getItineraryDays(): Collection
+    {
+        return $this->itineraryDays;
+    }
+
+    public function addItineraryDay(ItineraryDay $itineraryDay): static
+    {
+        if (!$this->itineraryDays->contains($itineraryDay)) {
+            $this->itineraryDays->add($itineraryDay);
+            $itineraryDay->addHotel($this);
+        }
+
+        return $this;
+    }
+
+    public function removeItineraryDay(ItineraryDay $itineraryDay): static
+    {
+        if ($this->itineraryDays->removeElement($itineraryDay)) {
+            $itineraryDay->removeHotel($this);
         }
 
         return $this;
