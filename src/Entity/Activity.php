@@ -174,6 +174,8 @@ class Activity
 
     #[ORM\ManyToMany(targetEntity: Theme::class, mappedBy: 'activities')]
     private Collection $themes;
+    #[ORM\ManyToMany(targetEntity: ItineraryDay::class, mappedBy: 'activities')]
+    private Collection $itineraryDays;
 
     public function __construct()
     {
@@ -187,6 +189,7 @@ class Activity
         $this->productListModules = new ArrayCollection();
         $this->packModalities = new ArrayCollection();
         $this->themes = new ArrayCollection();
+        $this->itineraryDays = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -731,6 +734,22 @@ class Activity
             $this->themes->add($theme);
             $theme->addActivity($this);
         }
+    }
+
+    /**
+     * @return Collection<int, ItineraryDay>
+     */
+    public function getItineraryDays(): Collection
+    {
+        return $this->itineraryDays;
+    }
+
+    public function addItineraryDay(ItineraryDay $itineraryDay): static
+    {
+        if (!$this->itineraryDays->contains($itineraryDay)) {
+            $this->itineraryDays->add($itineraryDay);
+            $itineraryDay->addActivity($this);
+        }
 
         return $this;
     }
@@ -739,6 +758,13 @@ class Activity
     {
         if ($this->themes->removeElement($theme)) {
             $theme->removeActivity($this);
+        }
+    }
+    
+    public function removeItineraryDay(ItineraryDay $itineraryDay): static
+    {
+        if ($this->itineraryDays->removeElement($itineraryDay)) {
+            $itineraryDay->removeActivity($this);
         }
 
         return $this;

@@ -117,6 +117,10 @@ class Modality
     #[Groups(['modalityReduced', 'modality', 'pack'])]
     private Collection $packActivities;
 
+    #[ORM\OneToMany(mappedBy: 'modality', targetEntity: ItineraryDay::class, orphanRemoval: true)]
+    #[Groups(['modalityReduced', 'modality', 'pack'])]
+    private Collection $itineraryDays;
+
     public function __construct()
     {
         $this->clientTypes = new ArrayCollection();
@@ -125,6 +129,7 @@ class Modality
         $this->pickupSchedules = new ArrayCollection();
         $this->packHotels = new ArrayCollection();
         $this->packActivities = new ArrayCollection();
+        $this->itineraryDays = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -450,6 +455,36 @@ class Modality
     public function removePackActivity(Activity $packActivity): static
     {
         $this->packActivities->removeElement($packActivity);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ItineraryDay>
+     */
+    public function getItineraryDays(): Collection
+    {
+        return $this->itineraryDays;
+    }
+
+    public function addItineraryDay(ItineraryDay $itineraryDay): static
+    {
+        if (!$this->itineraryDays->contains($itineraryDay)) {
+            $this->itineraryDays->add($itineraryDay);
+            $itineraryDay->setModality($this);
+        }
+
+        return $this;
+    }
+
+    public function removeItineraryDay(ItineraryDay $itineraryDay): static
+    {
+        if ($this->itineraryDays->removeElement($itineraryDay)) {
+            // set the owning side to null (unless already changed)
+            if ($itineraryDay->getModality() === $this) {
+                $itineraryDay->setModality(null);
+            }
+        }
 
         return $this;
     }
