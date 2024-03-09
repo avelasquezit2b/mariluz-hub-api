@@ -80,6 +80,9 @@ class RoomType
     #[Groups(['roomTypeReduced', 'roomType', 'hotel', 'hotelAvailability'])]
     private ?int $totalCapacity = null;
 
+    #[ORM\Column(length: 25, nullable: true)]
+    private ?string $price = null;
+
     public function __construct()
     {
         $this->roomConditions = new ArrayCollection();
@@ -255,6 +258,18 @@ class RoomType
     public function setTotalCapacity(?int $totalCapacity): static
     {
         $this->totalCapacity = $totalCapacity;
+
+        return $this;
+    }
+
+    public function getPrice(): ?string
+    {
+        return $this->price;
+    }
+
+    public function setPrice(?string $price): static
+    {
+        $this->price = $price;
 
         return $this;
     }

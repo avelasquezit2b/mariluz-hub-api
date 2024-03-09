@@ -54,11 +54,22 @@ class Theme
     #[Groups(['themeReduced', 'theme', 'page'])]
     private Collection $media;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $slug = null;
+
+    #[ORM\ManyToMany(targetEntity: Activity::class, inversedBy: 'themes')]
+    private Collection $activities;
+
+    #[ORM\ManyToMany(targetEntity: Hotel::class, inversedBy: 'themes')]
+    private Collection $hotels;
+
     public function __construct()
     {
         $this->productListModules = new ArrayCollection();
         $this->themeListModules = new ArrayCollection();
         $this->media = new ArrayCollection();
+        $this->activities = new ArrayCollection();
+        $this->hotels = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -173,6 +184,66 @@ class Theme
                 $medium->setTheme(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getSlug(): ?string
+    {
+        return $this->slug;
+    }
+
+    public function setSlug(?string $slug): static
+    {
+        $this->slug = $slug;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Activity>
+     */
+    public function getActivities(): Collection
+    {
+        return $this->activities;
+    }
+
+    public function addActivity(Activity $activity): static
+    {
+        if (!$this->activities->contains($activity)) {
+            $this->activities->add($activity);
+        }
+
+        return $this;
+    }
+
+    public function removeActivity(Activity $activity): static
+    {
+        $this->activities->removeElement($activity);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Hotel>
+     */
+    public function getHotels(): Collection
+    {
+        return $this->hotels;
+    }
+
+    public function addHotel(Hotel $hotel): static
+    {
+        if (!$this->hotels->contains($hotel)) {
+            $this->hotels->add($hotel);
+        }
+
+        return $this;
+    }
+
+    public function removeHotel(Hotel $hotel): static
+    {
+        $this->hotels->removeElement($hotel);
 
         return $this;
     }

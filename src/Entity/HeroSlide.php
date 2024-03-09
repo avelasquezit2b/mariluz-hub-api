@@ -49,6 +49,9 @@ class HeroSlide
     #[Groups(['heroSlideReduced', 'heroSlide'])]
     private ?HeroModule $heroModule = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $promoLink = null;
+
     public function __construct()
     {
         $this->media = new ArrayCollection();
@@ -121,6 +124,18 @@ class HeroSlide
     public function setHeroModule(?HeroModule $heroModule): static
     {
         $this->heroModule = $heroModule;
+
+        return $this;
+    }
+
+    public function getPromoLink(): ?string
+    {
+        return $this->promoLink;
+    }
+
+    public function setPromoLink(?string $promoLink): static
+    {
+        $this->promoLink = $promoLink;
 
         return $this;
     }

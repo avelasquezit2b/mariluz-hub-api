@@ -66,7 +66,7 @@ class Hotel
     private ?string $checkOut = null;
 
     #[ORM\ManyToOne(inversedBy: 'hotels')]
-    #[Groups(['hotelReduced', 'hotel', 'page'])]
+    #[Groups(['hotelReduced', 'hotel', 'page', 'productList'])]
     private ?Location $location = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -147,6 +147,9 @@ class Hotel
     #[ORM\ManyToMany(targetEntity: Modality::class, mappedBy: 'packHotels')]
     private Collection $packModalities;
 
+    #[ORM\ManyToMany(targetEntity: Theme::class, mappedBy: 'hotels')]
+    private Collection $themes;
+
     public function __construct()
     {
         $this->zones = new ArrayCollection();
@@ -157,6 +160,7 @@ class Hotel
         $this->hotelBookings = new ArrayCollection();
         $this->productListModules = new ArrayCollection();
         $this->packModalities = new ArrayCollection();
+        $this->themes = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -609,6 +613,33 @@ class Hotel
     {
         if ($this->packModalities->removeElement($modality)) {
             $modality->removePackHotel($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Theme>
+     */
+    public function getThemes(): Collection
+    {
+        return $this->themes;
+    }
+
+    public function addTheme(Theme $theme): static
+    {
+        if (!$this->themes->contains($theme)) {
+            $this->themes->add($theme);
+            $theme->addHotel($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTheme(Theme $theme): static
+    {
+        if ($this->themes->removeElement($theme)) {
+            $theme->removeHotel($this);
         }
 
         return $this;

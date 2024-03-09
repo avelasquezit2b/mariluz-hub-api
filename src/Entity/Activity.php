@@ -172,6 +172,9 @@ class Activity
     #[ORM\ManyToMany(targetEntity: Modality::class, mappedBy: 'packActivities')]
     private Collection $packModalities;
 
+    #[ORM\ManyToMany(targetEntity: Theme::class, mappedBy: 'activities')]
+    private Collection $themes;
+
     public function __construct()
     {
         $this->categories = new ArrayCollection();
@@ -183,6 +186,7 @@ class Activity
         $this->zones = new ArrayCollection();
         $this->productListModules = new ArrayCollection();
         $this->packModalities = new ArrayCollection();
+        $this->themes = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -708,6 +712,33 @@ class Activity
     {
         if ($this->packModalities->removeElement($packModality)) {
             $packModality->removePackActivity($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Theme>
+     */
+    public function getThemes(): Collection
+    {
+        return $this->themes;
+    }
+
+    public function addTheme(Theme $theme): static
+    {
+        if (!$this->themes->contains($theme)) {
+            $this->themes->add($theme);
+            $theme->addActivity($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTheme(Theme $theme): static
+    {
+        if ($this->themes->removeElement($theme)) {
+            $theme->removeActivity($this);
         }
 
         return $this;
