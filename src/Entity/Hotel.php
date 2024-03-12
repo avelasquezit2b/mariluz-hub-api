@@ -42,7 +42,7 @@ class Hotel
     private ?int $id = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['hotelReduced', 'hotel', 'page', 'supplier', 'pack', 'productList'])]
+    #[Groups(['hotelReduced', 'hotel', 'page', 'supplier', 'pack', 'productList', 'hotelBooking'])]
     private ?string $title = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -50,7 +50,7 @@ class Hotel
     private ?string $slug = null;
 
     #[ORM\ManyToOne(inversedBy: 'hotels')]
-    #[Groups(['hotel'])]
+    #[Groups(['hotel', 'supplier'])]
     private ?Supplier $supplier = null;
 
     #[ORM\Column(length: 25, nullable: true)]
@@ -151,6 +151,9 @@ class Hotel
     private Collection $themes;
     #[ORM\ManyToMany(targetEntity: ItineraryDay::class, mappedBy: 'hotels')]
     private Collection $itineraryDays;
+
+    #[Groups(['hotelReduced', 'hotel', 'page', 'productList'])]
+    private $price;
 
     public function __construct()
     {
@@ -661,7 +664,7 @@ class Hotel
             $theme->removeHotel($this);
         }
     }
-    
+
     public function removeItineraryDay(ItineraryDay $itineraryDay): static
     {
         if ($this->itineraryDays->removeElement($itineraryDay)) {
@@ -669,6 +672,19 @@ class Hotel
         }
 
         return $this;
+    }
+
+    public function getPrice(): ?string
+    {
+        $price = null;
+        foreach($this->getRoomTypes() as $roomType) {
+            if (!$price) {
+                $price = $roomType->getPrice();
+            } else if ($price > $roomType->getPrice()) {
+                $price = $roomType->getPrice();
+            }
+        }
+        return $price;
     }
 
 }

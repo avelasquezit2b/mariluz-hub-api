@@ -121,6 +121,10 @@ class Modality
     #[Groups(['modalityReduced', 'modality', 'pack'])]
     private Collection $itineraryDays;
 
+    #[ORM\ManyToMany(targetEntity: Extra::class, inversedBy: 'packModalities')]
+    #[Groups(['modalityReduced', 'modality', 'pack'])]
+    private Collection $packExtras;
+
     public function __construct()
     {
         $this->clientTypes = new ArrayCollection();
@@ -130,6 +134,7 @@ class Modality
         $this->packHotels = new ArrayCollection();
         $this->packActivities = new ArrayCollection();
         $this->itineraryDays = new ArrayCollection();
+        $this->packExtras = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -485,6 +490,30 @@ class Modality
                 $itineraryDay->setModality(null);
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Extra>
+     */
+    public function getPackExtras(): Collection
+    {
+        return $this->packExtras;
+    }
+
+    public function addPackExtra(Extra $packExtra): static
+    {
+        if (!$this->packExtras->contains($packExtra)) {
+            $this->packExtras->add($packExtra);
+        }
+
+        return $this;
+    }
+
+    public function removePackExtra(Extra $packExtra): static
+    {
+        $this->packExtras->removeElement($packExtra);
 
         return $this;
     }

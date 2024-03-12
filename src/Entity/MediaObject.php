@@ -49,11 +49,11 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
 class MediaObject
 {
     #[ORM\Id, ORM\Column, ORM\GeneratedValue]
-    #[Groups(['media_object:read', 'activity', 'hotel', 'roomType', 'theme', 'pack'])]
+    #[Groups(['media_object:read', 'activity', 'hotel', 'roomType', 'theme', 'pack', 'extra'])]
     private ?int $id = null;
 
     #[ApiProperty(iri: 'https://schema.org/contentUrl')]
-    #[Groups(['media_object:read', 'activity', 'hotelReduced', 'hotel', 'roomType', 'themeReduced', 'theme', 'page', 'heroSlide', 'pack', 'productList'])]
+    #[Groups(['media_object:read', 'activity', 'hotelReduced', 'hotel', 'roomType', 'themeReduced', 'theme', 'page', 'heroSlide', 'pack', 'extra', 'productList'])]
     public ?string $contentUrl = null;
 
     #[Vich\UploadableField(mapping: "media_object", fileNameProperty: "filePath")]
@@ -64,11 +64,11 @@ class MediaObject
     public ?string $filePath = null;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    #[Groups(['media_object:read', 'activity', 'hotel', 'roomType', 'theme', 'pack', 'productList'])]
+    #[Groups(['media_object:read', 'activity', 'hotel', 'roomType', 'theme', 'pack', 'extra', 'productList'])]
     private $name;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    #[Groups(['media_object:read', 'activity', 'hotel', 'roomType', 'theme', 'pack', 'productList'])]
+    #[Groups(['media_object:read', 'activity', 'hotel', 'roomType', 'theme', 'pack', 'extra', 'productList'])]
     private $alt;
 
     #[ORM\ManyToOne(inversedBy: 'media')]
@@ -76,11 +76,11 @@ class MediaObject
     private ?Activity $activity = null;
 
     #[ORM\Column(length: 25)]
-    #[Groups(['media_object:read', 'activity', 'hotel', 'roomType', 'theme', 'pack', 'productList'])]
+    #[Groups(['media_object:read', 'activity', 'hotel', 'roomType', 'theme', 'pack', 'extra', 'productList'])]
     private ?string $type = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['media_object:read', 'activity', 'hotel', 'roomType', 'theme', 'pack', 'productList'])]
+    #[Groups(['media_object:read', 'activity', 'hotel', 'roomType', 'theme', 'pack', 'extra', 'productList'])]
     private ?int $position = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -88,7 +88,7 @@ class MediaObject
     private ?string $supplier = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['media_object:read', 'activity', 'hotel', 'roomType', 'theme', 'pack', 'productList'])]
+    #[Groups(['media_object:read', 'activity', 'hotel', 'roomType', 'theme', 'pack', 'extra', 'productList'])]
     private ?string $description = null;
 
     #[ORM\ManyToOne(inversedBy: 'media')]
@@ -116,6 +116,9 @@ class MediaObject
     #[ORM\ManyToOne(inversedBy: 'media')]
     #[Groups(['media_object:read'])]
     private ?Pack $pack = null;
+
+    #[ORM\ManyToOne(inversedBy: 'media')]
+    private ?Extra $extra = null;
 
     public function __construct()
     {
@@ -291,6 +294,18 @@ class MediaObject
     public function setPack(?Pack $pack): static
     {
         $this->pack = $pack;
+
+        return $this;
+    }
+
+    public function getExtra(): ?Extra
+    {
+        return $this->extra;
+    }
+
+    public function setExtra(?Extra $extra): static
+    {
+        $this->extra = $extra;
 
         return $this;
     }

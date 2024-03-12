@@ -93,11 +93,11 @@ class Pack
     #[Groups(['packReduced', 'pack'])]
     private Collection $subCategories;
 
-    #[ORM\OneToMany(mappedBy: 'pack', targetEntity: Modality::class)]
+    #[ORM\OneToMany(mappedBy: 'pack', targetEntity: Modality::class, cascade: ['remove'])]
     #[Groups(['pack'])]
     private Collection $modalities;
 
-    #[ORM\OneToMany(mappedBy: 'pack', targetEntity: MediaObject::class)]
+    #[ORM\OneToMany(mappedBy: 'pack', targetEntity: MediaObject::class, cascade: ['remove'])]
     #[Groups(['packReduced', 'pack'])]
     #[ORM\OrderBy(["position" => "ASC"])]
     #[ApiSubresource]

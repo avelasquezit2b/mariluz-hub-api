@@ -81,6 +81,7 @@ class RoomType
     private ?int $totalCapacity = null;
 
     #[ORM\Column(length: 25, nullable: true)]
+    #[Groups(['hotel'])]
     private ?string $price = null;
 
     public function __construct()

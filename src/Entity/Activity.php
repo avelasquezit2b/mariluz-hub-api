@@ -82,7 +82,7 @@ class Activity
     private ?string $cancelationConditions = null;
 
     #[ORM\ManyToOne(inversedBy: 'activities')]
-    #[Groups(['activity'])]
+    #[Groups(['activity', 'supplier'])]
     private ?Supplier $supplier = null;
 
     #[ORM\Column]

@@ -34,23 +34,23 @@ class Zone
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['zoneReduced', 'zone', 'activityReduced', 'activity', 'hotelReduced', 'hotel', 'packReduced', 'pack'])]
+    #[Groups(['zoneReduced', 'zone', 'activityReduced', 'activity', 'hotelReduced', 'hotel', 'packReduced', 'pack', 'extra'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['zoneReduced', 'zone', 'activityReduced', 'activity', 'hotelReduced', 'hotel', 'packReduced', 'pack', 'page', 'productList'])]
+    #[Groups(['zoneReduced', 'zone', 'activityReduced', 'activity', 'hotelReduced', 'hotel', 'packReduced', 'pack', 'extra', 'page', 'productList'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 50, nullable: true)]
-    #[Groups(['zone', 'activity', 'hotel', 'pack'])]
+    #[Groups(['zone', 'activity', 'hotel', 'pack', 'extra'])]
     private ?string $latitude = null;
 
     #[ORM\Column(length: 50, nullable: true)]
-    #[Groups(['zone', 'activity', 'hotel', 'pack'])]
+    #[Groups(['zone', 'activity', 'hotel', 'pack', 'extra'])]
     private ?string $longitude = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups(['zone', 'activity', 'hotel', 'pack'])]
+    #[Groups(['zone', 'activity', 'hotel', 'pack', 'extra'])]
     private ?string $description = null;
 
     #[ORM\ManyToOne(inversedBy: 'zones')]
@@ -65,11 +65,15 @@ class Zone
     #[ORM\ManyToMany(targetEntity: Pack::class, mappedBy: 'zones')]
     private Collection $packs;
 
+    #[ORM\ManyToMany(targetEntity: Extra::class, mappedBy: 'zones')]
+    private Collection $extras;
+
     public function __construct()
     {
         $this->activities = new ArrayCollection();
         $this->hotels = new ArrayCollection();
         $this->packs = new ArrayCollection();
+        $this->extras = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -213,6 +217,33 @@ class Zone
     {
         if ($this->packs->removeElement($pack)) {
             $pack->removeZone($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Extra>
+     */
+    public function getExtras(): Collection
+    {
+        return $this->extras;
+    }
+
+    public function addExtra(Extra $extra): static
+    {
+        if (!$this->extras->contains($extra)) {
+            $this->extras->add($extra);
+            $extra->addZone($this);
+        }
+
+        return $this;
+    }
+
+    public function removeExtra(Extra $extra): static
+    {
+        if ($this->extras->removeElement($extra)) {
+            $extra->removeZone($this);
         }
 
         return $this;

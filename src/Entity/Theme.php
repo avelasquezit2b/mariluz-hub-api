@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use App\Repository\ThemeRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -26,6 +28,7 @@ use Doctrine\ORM\Mapping as ORM;
         "delete",
     ],
 )]
+#[ApiFilter(SearchFilter::class, properties: ['slug' => 'exact'])]
 class Theme
 {
     #[ORM\Id]
@@ -55,6 +58,7 @@ class Theme
     private Collection $media;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['themeReduced', 'theme', 'page'])]
     private ?string $slug = null;
 
     #[ORM\ManyToMany(targetEntity: Activity::class, inversedBy: 'themes')]

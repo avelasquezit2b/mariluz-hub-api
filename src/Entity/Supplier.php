@@ -34,11 +34,11 @@ class Supplier
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['supplierReduced', 'supplier'])]
+    #[Groups(['supplierReduced', 'supplier', 'extra'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['supplierReduced', 'supplier'])]
+    #[Groups(['supplierReduced', 'supplier', 'extra'])]
     private ?string $name = null;
 
     #[ORM\Column]
@@ -101,10 +101,15 @@ class Supplier
     #[Groups(['supplierReduced', 'supplier'])]
     private Collection $hotels;
 
+    #[ORM\OneToMany(mappedBy: 'supplier', targetEntity: Extra::class)]
+    #[Groups(['supplierReduced', 'supplier'])]
+    private Collection $extras;
+
     public function __construct()
     {
         $this->activities = new ArrayCollection();
         $this->hotels = new ArrayCollection();
+        $this->extras = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -334,6 +339,36 @@ class Supplier
             // set the owning side to null (unless already changed)
             if ($hotel->getSupplier() === $this) {
                 $hotel->setSupplier(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Extra>
+     */
+    public function getExtras(): Collection
+    {
+        return $this->extras;
+    }
+
+    public function addExtra(Extra $extra): static
+    {
+        if (!$this->extras->contains($extra)) {
+            $this->extras->add($extra);
+            $extra->setSupplier($this);
+        }
+
+        return $this;
+    }
+
+    public function removeExtra(Extra $extra): static
+    {
+        if ($this->extras->removeElement($extra)) {
+            // set the owning side to null (unless already changed)
+            if ($extra->getSupplier() === $this) {
+                $extra->setSupplier(null);
             }
         }
 

@@ -35,27 +35,27 @@ class Location
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['locationReduced', 'location', 'activityReduced', 'activity', 'hotelReduced', 'hotel', 'packReduced', 'pack'])]
+    #[Groups(['locationReduced', 'location', 'activityReduced', 'activity', 'hotelReduced', 'hotel', 'packReduced', 'pack', 'extra'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['locationReduced', 'location', 'activityReduced', 'activity', 'hotelReduced', 'hotel', 'packReduced', 'pack', 'page', 'productList'])]
+    #[Groups(['locationReduced', 'location', 'activityReduced', 'activity', 'hotelReduced', 'hotel', 'packReduced', 'pack', 'extra', 'page', 'productList'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 50, nullable: true)]
-    #[Groups(['location', 'activity', 'hotel', 'pack'])]
+    #[Groups(['location', 'activity', 'hotel', 'pack', 'extra'])]
     private ?string $latitude = null;
 
     #[ORM\Column(length: 50, nullable: true)]
-    #[Groups(['location', 'activity', 'hotel', 'pack'])]
+    #[Groups(['location', 'activity', 'hotel', 'pack', 'extra'])]
     private ?string $longitude = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups(['location', 'activity', 'hotel', 'pack'])]
+    #[Groups(['location', 'activity', 'hotel', 'pack', 'extra'])]
     private ?string $description = null;
 
     #[ORM\OneToMany(mappedBy: 'location', targetEntity: Zone::class, cascade: ['persist', 'remove'])]
-    #[Groups(['locationReduced', 'location', 'activityReduced', 'activity', 'hotelReduced', 'hotel', 'packReduced', 'pack'])]
+    #[Groups(['locationReduced', 'location'])]
     #[ApiSubresource]
     private Collection $zones;
 
@@ -68,12 +68,16 @@ class Location
     #[ORM\OneToMany(mappedBy: 'location', targetEntity: Pack::class)]
     private Collection $packs;
 
+    #[ORM\OneToMany(mappedBy: 'location', targetEntity: Extra::class)]
+    private Collection $extras;
+
     public function __construct()
     {
         $this->zones = new ArrayCollection();
         $this->activities = new ArrayCollection();
         $this->hotels = new ArrayCollection();
         $this->packs = new ArrayCollection();
+        $this->extras = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -243,6 +247,36 @@ class Location
             // set the owning side to null (unless already changed)
             if ($pack->getLocation() === $this) {
                 $pack->setLocation(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Extra>
+     */
+    public function getExtras(): Collection
+    {
+        return $this->extras;
+    }
+
+    public function addExtra(Extra $extra): static
+    {
+        if (!$this->extras->contains($extra)) {
+            $this->extras->add($extra);
+            $extra->setLocation($this);
+        }
+
+        return $this;
+    }
+
+    public function removeExtra(Extra $extra): static
+    {
+        if ($this->extras->removeElement($extra)) {
+            // set the owning side to null (unless already changed)
+            if ($extra->getLocation() === $this) {
+                $extra->setLocation(null);
             }
         }
 

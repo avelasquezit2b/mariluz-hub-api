@@ -50,6 +50,7 @@ class HeroSlide
     private ?HeroModule $heroModule = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['heroSlideReduced', 'heroSlide', 'page'])]
     private ?string $promoLink = null;
 
     public function __construct()
