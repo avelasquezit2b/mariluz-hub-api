@@ -164,8 +164,6 @@ class Activity
     #[Groups(['activityReduced', 'activity'])]
     private Collection $zones;
 
-    private $minPrice;
-
     #[ORM\ManyToMany(targetEntity: ProductListModule::class, mappedBy: 'activities')]
     private Collection $productListModules;
 
@@ -176,6 +174,9 @@ class Activity
     private Collection $themes;
     #[ORM\ManyToMany(targetEntity: ItineraryDay::class, mappedBy: 'activities')]
     private Collection $itineraryDays;
+
+    #[Groups(['activityReduced', 'activity'])]
+    private $price;
 
     public function __construct()
     {
@@ -659,13 +660,6 @@ class Activity
         return $this;
     }
 
-    public function getMinPrice(): ?float
-    {
-        // var_dump($this->getActivityFees());
-
-        return 30;
-    }
-
     /**
      * @return Collection<int, ProductListModule>
      */
@@ -770,4 +764,16 @@ class Activity
         return $this;
     }
 
+    public function getPrice(): ?string
+    {
+        $price = null;
+        foreach($this->getModalities() as $modality) {
+            if (!$price) {
+                $price = $modality->getPrice();
+            } else if ($price > $modality->getPrice()) {
+                $price = $modality->getPrice();
+            }
+        }
+        return $price;
+    }
 }

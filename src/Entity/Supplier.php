@@ -34,11 +34,11 @@ class Supplier
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['supplierReduced', 'supplier', 'extra'])]
+    #[Groups(['supplierReduced', 'supplier'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['supplierReduced', 'supplier', 'extra'])]
+    #[Groups(['supplierReduced', 'supplier'])]
     private ?string $name = null;
 
     #[ORM\Column]
