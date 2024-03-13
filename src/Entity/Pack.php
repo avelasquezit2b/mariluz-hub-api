@@ -42,15 +42,15 @@ class Pack
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['packReduced', 'pack'])]
+    #[Groups(['packReduced', 'pack', 'productList'])]
     private ?string $title = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['packReduced', 'pack'])]
+    #[Groups(['packReduced', 'pack', 'productList'])]
     private ?string $slug = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['packReduced', 'pack'])]
+    #[Groups(['packReduced', 'pack', 'productList'])]
     private ?string $shortDescription = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
@@ -98,17 +98,17 @@ class Pack
     private Collection $modalities;
 
     #[ORM\OneToMany(mappedBy: 'pack', targetEntity: MediaObject::class, cascade: ['remove'])]
-    #[Groups(['packReduced', 'pack'])]
+    #[Groups(['packReduced', 'pack', 'productList'])]
     #[ORM\OrderBy(["position" => "ASC"])]
     #[ApiSubresource]
     private Collection $media;
 
     #[ORM\ManyToOne(inversedBy: 'packs')]
-    #[Groups(['packReduced', 'pack'])]
+    #[Groups(['packReduced', 'pack', 'productList'])]
     private ?Location $location = null;
 
     #[ORM\ManyToMany(targetEntity: Zone::class, inversedBy: 'packs')]
-    #[Groups(['packReduced', 'pack'])]
+    #[Groups(['packReduced', 'pack', 'productList'])]
     private Collection $zones;
 
     #[ORM\ManyToMany(targetEntity: ProductListModule::class, inversedBy: 'packs')]
