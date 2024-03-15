@@ -175,7 +175,7 @@ class Activity
     #[ORM\ManyToMany(targetEntity: ItineraryDay::class, mappedBy: 'activities')]
     private Collection $itineraryDays;
 
-    #[Groups(['activityReduced', 'activity'])]
+    #[Groups(['activityReduced', 'activity', 'page', 'productList'])]
     private $price;
 
     public function __construct()

@@ -34,7 +34,7 @@ class Theme
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['themeReduced', 'theme'])]
+    #[Groups(['themeReduced', 'theme', 'page'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
