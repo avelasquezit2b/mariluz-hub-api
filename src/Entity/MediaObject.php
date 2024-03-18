@@ -57,7 +57,7 @@ class MediaObject
     public ?string $contentUrl = null;
 
     #[Vich\UploadableField(mapping: "media_object", fileNameProperty: "filePath")]
-    #[Assert\NotNull(groups: ['media_object_create'])]
+    #[Groups(['media_object_create'])]
     public ?File $file = null;
 
     #[ORM\Column(nullable: true)] 

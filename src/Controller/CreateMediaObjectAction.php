@@ -22,14 +22,14 @@ final class CreateMediaObjectAction extends AbstractController
     public function __invoke(Request $request, ActivityRepository $activityRepository, HotelRepository $hotelRepository, ExtraRepository $extraRepository, PackRepository $packRepository, RoomTypeRepository $roomTypeRepository, ThemeRepository $themeRepository, HeroSlideRepository $heroSlideRepository): MediaObject
     {
         $uploadedFile = $request->files->get('file');
-        if (!$uploadedFile) {
-            throw new BadRequestHttpException('"file" is required');
-        }
+        // if (!$uploadedFile) {
+        //     throw new BadRequestHttpException('"file" is required');
+        // }
 
         $mediaObject = new MediaObject();
         $mediaObject->file = $uploadedFile;
-        $mediaObject->setType($request->request->get('type'));
-        $mediaObject->setPosition($request->request->get('position'));
+        $mediaObject->setType('video');
+        $mediaObject->setPosition('0');
         if ($request->request->get('activity')) {
             $activity = $activityRepository->find($request->request->get('activity'));
             $mediaObject->setActivity($activity);
