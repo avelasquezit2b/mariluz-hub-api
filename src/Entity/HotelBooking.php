@@ -94,6 +94,9 @@ class HotelBooking
     #[Groups(['hotelBookingReduced', 'hotelBooking'])]
     private Collection $hotelAvailabilities;
 
+    #[ORM\ManyToOne(inversedBy: 'bookings')]
+    private ?Client $client = null;
+
     public function __construct()
     {
         $this->hotelAvailabilities = new ArrayCollection();
@@ -283,6 +286,18 @@ class HotelBooking
         if ($this->hotelAvailabilities->removeElement($hotelAvailability)) {
             $hotelAvailability->removeHotelBooking($this);
         }
+
+        return $this;
+    }
+
+    public function getClient(): ?Client
+    {
+        return $this->client;
+    }
+
+    public function setClient(?Client $client): static
+    {
+        $this->client = $client;
 
         return $this;
     }
