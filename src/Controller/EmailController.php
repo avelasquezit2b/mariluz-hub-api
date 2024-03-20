@@ -40,4 +40,29 @@ class EmailController extends AbstractController
             'email'  => $email
         ]);
     }
+
+    #[Route('/bookingEmail')]
+    public function sendBookingEmail(Request $request, MailerInterface $mailer): Response
+    {
+        $request = json_decode($request->getContent());
+
+        $email = (new TemplatedEmail())
+            ->from('adriarias@it2b.es')
+            ->to('adriarias@it2b.es')
+            //->cc('cc@example.com')
+            //->bcc('bcc@example.com')
+            //->replyTo('fabien@example.com')
+            //->priority(Email::PRIORITY_HIGH)
+            ->subject('Correo de prueba')
+            // ->context([
+            //     "message" => $request->message
+            // ])
+            ->htmlTemplate('email/booking_confirmed.html.twig');
+
+        $mailer->send($email);
+
+        return $this->json([
+            'email'  => $email
+        ]);
+    }
 }

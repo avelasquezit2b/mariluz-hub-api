@@ -26,6 +26,11 @@ api_send_email:
   methods:  [POST]
   controller: App\Controller\EmailController::sendEmail
 
+api_send_booking_email:
+  path: '/send/bookingEmail'
+  methods:  [POST]
+  controller: App\Controller\EmailController::sendBookingEmail
+
 api_update_element_position:
   path: '/sections/{id}/position'
   methods:  [PUT]
