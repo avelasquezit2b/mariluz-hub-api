@@ -10,6 +10,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints\Date;
 
 #[ORM\Entity(repositoryClass: ClientRepository::class)]
 #[ApiResource(
@@ -50,7 +51,7 @@ class Client
     #[Groups(['client'])]
     private ?int $phone = null;
 
-    #[ORM\Column]
+    #[ORM\Column(nullable: true)]
     #[Groups(['client'])]
     private ?\DateTimeImmutable $createdAt = null;
 
@@ -109,9 +110,14 @@ class Client
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $createdAt): static
+    public function setCreatedAt(\DateTimeImmutable $createdAt): self
     {
-        $this->createdAt = $createdAt;
+        //set automatically the created_at date
+        if ($createdAt == null) {
+            $this->createdAt = new \DateTime();
+        } else {
+            $this->createdAt = $createdAt;
+        }
 
         return $this;
     }
