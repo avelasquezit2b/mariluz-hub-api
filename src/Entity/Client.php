@@ -44,12 +44,12 @@ class Client
     private ?string $name = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['client'])]
+    #[Groups(['clientReduced','client'])]
     private ?string $email = null;
 
-    #[ORM\Column(type: Types::SMALLINT, nullable: true)]
-    #[Groups(['client'])]
-    private ?int $phone = null;
+    #[ORM\Column(length:255, nullable: true)]
+    #[Groups(['clientReduced','client'])]
+    private ?string $phone = null;
 
     #[ORM\Column(nullable: true)]
     #[Groups(['client'])]
