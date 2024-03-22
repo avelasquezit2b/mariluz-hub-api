@@ -178,6 +178,9 @@ class Activity
     #[Groups(['activityReduced', 'activity', 'page', 'productList'])]
     private $price;
 
+    #[ORM\OneToMany(mappedBy: 'activity', targetEntity: PackPrice::class)]
+    private Collection $packPrices;
+
     public function __construct()
     {
         $this->categories = new ArrayCollection();
@@ -191,6 +194,7 @@ class Activity
         $this->packModalities = new ArrayCollection();
         $this->themes = new ArrayCollection();
         $this->itineraryDays = new ArrayCollection();
+        $this->packPrices = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -775,5 +779,35 @@ class Activity
             }
         }
         return $price;
+    }
+
+    /**
+     * @return Collection<int, PackPrice>
+     */
+    public function getPackPrices(): Collection
+    {
+        return $this->packPrices;
+    }
+
+    public function addPackPrice(PackPrice $packPrice): static
+    {
+        if (!$this->packPrices->contains($packPrice)) {
+            $this->packPrices->add($packPrice);
+            $packPrice->setActivity($this);
+        }
+
+        return $this;
+    }
+
+    public function removePackPrice(PackPrice $packPrice): static
+    {
+        if ($this->packPrices->removeElement($packPrice)) {
+            // set the owning side to null (unless already changed)
+            if ($packPrice->getActivity() === $this) {
+                $packPrice->setActivity(null);
+            }
+        }
+
+        return $this;
     }
 }

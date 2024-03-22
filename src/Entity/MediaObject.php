@@ -120,6 +120,10 @@ class MediaObject
     #[ORM\ManyToOne(inversedBy: 'media')]
     private ?Extra $extra = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['media_object:read', 'activity', 'hotel', 'roomType', 'theme', 'pack', 'extra', 'productList'])]
+    private ?string $externalUrl = null;
+
     public function __construct()
     {
 
@@ -306,6 +310,18 @@ class MediaObject
     public function setExtra(?Extra $extra): static
     {
         $this->extra = $extra;
+
+        return $this;
+    }
+
+    public function getExternalUrl(): ?string
+    {
+        return $this->externalUrl;
+    }
+
+    public function setExternalUrl(?string $externalUrl): static
+    {
+        $this->externalUrl = $externalUrl;
 
         return $this;
     }
