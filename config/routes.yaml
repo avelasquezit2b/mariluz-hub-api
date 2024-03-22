@@ -35,3 +35,8 @@ api_update_element_position:
   path: '/sections/{id}/position'
   methods:  [PUT]
   controller: App\Controller\WebController::updatePosition
+
+api_print_pdf:
+  path: '/print_pdf'
+  methods:  [POST]
+  controller: App\Controller\DocumentController::pdfAction
