@@ -80,11 +80,15 @@ class Extra
     #[ORM\ManyToMany(targetEntity: Modality::class, mappedBy: 'packExtras')]
     private Collection $packModalities;
 
+    #[ORM\OneToMany(mappedBy: 'extra', targetEntity: PackPrice::class)]
+    private Collection $packPrices;
+
     public function __construct()
     {
         $this->media = new ArrayCollection();
         $this->zones = new ArrayCollection();
         $this->packModalities = new ArrayCollection();
+        $this->packPrices = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -264,6 +268,36 @@ class Extra
     {
         if ($this->packModalities->removeElement($packModality)) {
             $packModality->removePackExtra($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, PackPrice>
+     */
+    public function getPackPrices(): Collection
+    {
+        return $this->packPrices;
+    }
+
+    public function addPackPrice(PackPrice $packPrice): static
+    {
+        if (!$this->packPrices->contains($packPrice)) {
+            $this->packPrices->add($packPrice);
+            $packPrice->setExtra($this);
+        }
+
+        return $this;
+    }
+
+    public function removePackPrice(PackPrice $packPrice): static
+    {
+        if ($this->packPrices->removeElement($packPrice)) {
+            // set the owning side to null (unless already changed)
+            if ($packPrice->getExtra() === $this) {
+                $packPrice->setExtra(null);
+            }
         }
 
         return $this;

@@ -155,6 +155,9 @@ class Hotel
     #[Groups(['hotelReduced', 'hotel', 'page', 'productList'])]
     private $price;
 
+    #[ORM\OneToMany(mappedBy: 'hotel', targetEntity: PackPrice::class)]
+    private Collection $packPrices;
+
     public function __construct()
     {
         $this->zones = new ArrayCollection();
@@ -167,6 +170,7 @@ class Hotel
         $this->packModalities = new ArrayCollection();
         $this->themes = new ArrayCollection();
         $this->itineraryDays = new ArrayCollection();
+        $this->packPrices = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -685,6 +689,36 @@ class Hotel
             }
         }
         return $price;
+    }
+
+    /**
+     * @return Collection<int, PackPrice>
+     */
+    public function getPackPrices(): Collection
+    {
+        return $this->packPrices;
+    }
+
+    public function addPackPrice(PackPrice $packPrice): static
+    {
+        if (!$this->packPrices->contains($packPrice)) {
+            $this->packPrices->add($packPrice);
+            $packPrice->setHotel($this);
+        }
+
+        return $this;
+    }
+
+    public function removePackPrice(PackPrice $packPrice): static
+    {
+        if ($this->packPrices->removeElement($packPrice)) {
+            // set the owning side to null (unless already changed)
+            if ($packPrice->getHotel() === $this) {
+                $packPrice->setHotel(null);
+            }
+        }
+
+        return $this;
     }
 
 }

@@ -27,9 +27,13 @@ final class CreateMediaObjectAction extends AbstractController
         // }
 
         $mediaObject = new MediaObject();
-        $mediaObject->file = $uploadedFile;
-        $mediaObject->setType('video');
-        $mediaObject->setPosition('0');
+        if ($uploadedFile) {
+            $mediaObject->file = $uploadedFile;
+        } else {
+            $mediaObject->setExternalUrl($request->request->get('url'));
+        }
+        $mediaObject->setType($request->request->get('type'));
+        $mediaObject->setPosition($request->request->get('position'));
         if ($request->request->get('activity')) {
             $activity = $activityRepository->find($request->request->get('activity'));
             $mediaObject->setActivity($activity);

@@ -94,7 +94,7 @@ class Modality
     private Collection $languages;
 
     #[ORM\Column(length: 25, nullable: true)]
-    #[Groups(['modalityReduced', 'modality', 'activityReduced', 'activity'])]
+    #[Groups(['modalityReduced', 'modality', 'activityReduced', 'activity', 'pack'])]
     private ?string $price = null;
 
     #[ORM\Column(length: 25, nullable: true)]

@@ -114,6 +114,12 @@ class Pack
     #[ORM\ManyToMany(targetEntity: ProductListModule::class, inversedBy: 'packs')]
     private Collection $productListModules;
 
+    #[ORM\OneToMany(mappedBy: 'pack', targetEntity: PackFee::class)]
+    private Collection $packFees;
+
+    #[Groups(['packReduced', 'pack', 'page', 'productList'])]
+    private $price;
+
     public function __construct()
     {
         $this->categories = new ArrayCollection();
@@ -122,6 +128,7 @@ class Pack
         $this->media = new ArrayCollection();
         $this->zones = new ArrayCollection();
         $this->productListModules = new ArrayCollection();
+        $this->packFees = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -429,4 +436,46 @@ class Pack
         return $this;
     }
 
+    /**
+     * @return Collection<int, PackFee>
+     */
+    public function getPackFees(): Collection
+    {
+        return $this->packFees;
+    }
+
+    public function addPackFee(PackFee $packFee): static
+    {
+        if (!$this->packFees->contains($packFee)) {
+            $this->packFees->add($packFee);
+            $packFee->setPack($this);
+        }
+
+        return $this;
+    }
+
+    public function removePackFee(PackFee $packFee): static
+    {
+        if ($this->packFees->removeElement($packFee)) {
+            // set the owning side to null (unless already changed)
+            if ($packFee->getPack() === $this) {
+                $packFee->setPack(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getPrice(): ?string
+    {
+        $price = null;
+        foreach($this->getModalities() as $modality) {
+            if (!$price) {
+                $price = $modality->getPrice();
+            } else if ($price > $modality->getPrice()) {
+                $price = $modality->getPrice();
+            }
+        }
+        return $price;
+    }
 }
