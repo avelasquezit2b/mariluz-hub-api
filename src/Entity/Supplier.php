@@ -105,11 +105,16 @@ class Supplier
     #[Groups(['supplierReduced', 'supplier'])]
     private Collection $extras;
 
+    #[ORM\ManyToMany(mappedBy: 'supplier', targetEntity: CommunicationTemplate::class)]
+    #[Groups(['supplierReduced', 'supplier'])]
+    private Collection $communicationTemplates;
+
     public function __construct()
     {
         $this->activities = new ArrayCollection();
         $this->hotels = new ArrayCollection();
         $this->extras = new ArrayCollection();
+        $this->communicationTemplates = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -370,6 +375,33 @@ class Supplier
             if ($extra->getSupplier() === $this) {
                 $extra->setSupplier(null);
             }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, CommunicationTemplate>
+     */
+    public function getCommunicationTemplates(): Collection
+    {
+        return $this->communicationTemplates;
+    }
+
+    public function addCommunicationTemplate(CommunicationTemplate $communicationTemplate): static
+    {
+        if (!$this->communicationTemplates->contains($communicationTemplate)) {
+            $this->communicationTemplates->add($communicationTemplate);
+            $communicationTemplate->addSupplier($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCommunicationTemplate(CommunicationTemplate $communicationTemplate): static
+    {
+        if ($this->communicationTemplates->removeElement($communicationTemplate)) {
+            $communicationTemplate->removeSupplier($this);
         }
 
         return $this;

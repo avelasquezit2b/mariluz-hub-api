@@ -56,9 +56,14 @@ class Client
     #[Groups(['clientReduced', 'client'])]
     private Collection $bookings;
 
+    #[ORM\ManyToMany(targetEntity: CommunicationTemplate::class, mappedBy: 'client')]
+    #[Groups(['clientReduced', 'client'])]
+    private Collection $communicationTemplates;
+
     public function __construct()
     {
         $this->bookings = new ArrayCollection();
+        $this->communicationTemplates = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -144,6 +149,33 @@ class Client
             if ($booking->getClient() === $this) {
                 $booking->setClient(null);
             }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, CommunicationTemplate>
+     */
+    public function getCommunicationTemplates(): Collection
+    {
+        return $this->communicationTemplates;
+    }
+
+    public function addCommunicationTemplate(CommunicationTemplate $communicationTemplate): static
+    {
+        if (!$this->communicationTemplates->contains($communicationTemplate)) {
+            $this->communicationTemplates->add($communicationTemplate);
+            $communicationTemplate->addClient($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCommunicationTemplate(CommunicationTemplate $communicationTemplate): static
+    {
+        if ($this->communicationTemplates->removeElement($communicationTemplate)) {
+            $communicationTemplate->removeClient($this);
         }
 
         return $this;
