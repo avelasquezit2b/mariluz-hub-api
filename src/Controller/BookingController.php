@@ -6,6 +6,10 @@ use App\Entity\HotelBooking;
 use App\Repository\HotelRepository;
 use App\Repository\HotelAvailabilityRepository;
 use App\Repository\HotelBookingRepository;
+use App\Entity\ActivityBooking;
+use App\Repository\ActivityRepository;
+use App\Repository\ActivityAvailabilityRepository;
+use App\Repository\ActivityBookingRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -143,6 +147,139 @@ class BookingController extends AbstractController
                 ->htmlTemplate('email/thank_you.html.twig');
 
             if ($hotelBooking->getStatus() == 'booked') {
+                $mailer->send($email);
+            }
+
+            return $this->json([
+                'response'  => $email
+            ]);
+
+
+        } catch (SoapFault $e) {
+            return $this->json([
+                'response'  => $e
+            ]);
+        }
+    }
+
+    #[Route('/activity_prebooking', name: 'api_activity_prebooking')]
+    public function activity_prebooking(Request $request, EntityManagerInterface $entityManager, ActivityBookingRepository $activityBookingRepository, ActivityAvailabilityRepository $activityAvailabilityRepository, ActivityRepository $activityRepository): Response
+    {
+        $requestDecode = json_decode($request->getContent());
+
+        try {
+            $formattedRooms = [];
+            $activityAvailabilities = [];
+            foreach ($requestDecode->data as $data) {
+                // $formattedRoom = [
+                //     'adults' => $room->adults,
+                //     'kids' => $room->kids,
+                //     'babies' => $room->babies,
+                //     'pensionType' => $room->pensionType->pensionType->title,
+                //     'cancellationType' => $room->pensionType->cancellationType->title,
+                //     'pensionTypePriceId' => $room->pensionType->id,
+                //     'price' => $room->pensionType->price,
+                //     'availabilities' => $room->roomType->availabilities,
+                //     'roomType' => $room->roomType->roomCondition->roomType->title
+                // ];
+                // array_push($formattedRooms, $formattedRoom);
+                // foreach ($room->roomType->availabilities as $availability) {
+                    $activityAvailability = $activityAvailabilityRepository->find($data->availableSchedule->id);
+                    array_push($activityAvailabilities, $activityAvailability);
+                    if ($activityAvailability->quota <= $activityAvailability->getMaxQuota()) {
+                        $activityAvailability->setQuota($activityAvailability->getQuota()+1);
+                        $entityManager->persist($activityAvailability);
+                    } else {
+                        throw new BadRequestHttpException('No hay disponibilidad para las fechas seleccionadas'); 
+                    }
+                // }
+            }
+
+            $activityBooking = new ActivityBooking();
+            $activityBooking->setCheckIn(new \DateTime($requestDecode->checkIn));
+            $activityBooking->setCheckOut(new \DateTime($requestDecode->checkOut));
+            $activityBooking->setEmail($requestDecode->email);
+            $activityBooking->setHasAcceptance($requestDecode->hasAcceptance);
+            $activity = $activityRepository->find($requestDecode->activity);
+            $activityBooking->setActivity($activity);
+            $activityBooking->setName($requestDecode->name);
+            $activityBooking->setObservations($requestDecode->observations);
+            $activityBooking->setPaymentMethod($requestDecode->paymentMethod);
+            $activityBooking->setPhone($requestDecode->phone);
+            $activityBooking->setPromoCode($requestDecode->promoCode);
+            $activityBooking->setData($requestDecode->data);
+            $activityBooking->setStatus('preBooked');
+            $activityBooking->setTotalPrice($requestDecode->totalPrice);
+
+            foreach ($activityAvailabilities as $activityAvailability) {
+                $activityAvailability->addActivityBooking($activityBooking);
+                $entityManager->persist($activityAvailability);
+            }
+
+            $entityManager->persist($activityBooking);
+            $entityManager->flush();
+
+            return $this->json([
+                'response'  => $activityBooking
+            ]);
+
+
+        } catch (SoapFault $e) {
+            return $this->json([
+                'response'  => $e
+            ]);
+        }
+    }
+
+    #[Route('/activity_booking', name: 'api_activity_booking')]
+    public function activity_booking(Request $request, MailerInterface $mailer, EntityManagerInterface $entityManager, ActivityBookingRepository $activityBookingRepository, ActivityAvailabilityRepository $activityAvailabilityRepository, ActivityRepository $activityRepository): Response
+    {
+        $request = file_get_contents('php://input');
+        parse_str($request, $output);
+
+        try {
+            $requestData = str_replace("?", "", utf8_decode(base64_decode($output['Ds_MerchantParameters'])));
+            $requestData = json_decode($requestData, true);
+            $activityBooking = $activityBookingRepository->find($requestData->id);
+
+            // $bookingHub->setLocator($bookingOfi->BookingResult->BookingCode);
+            if ($requestData['Ds_Response'] < 100) {
+                $activityBooking->setStatus('booked');
+            } else {
+                $activityBooking->setStatus('paymentError - ' . $requestData['Ds_Response']);
+                foreach ($activityBooking->getData() as $data) {
+                    foreach ($data['availabilities'] as $availability) {
+                        $activityAvailability = $activityAvailabilityRepository->find($availability);
+                        $activityAvailability->setQuota($activityAvailability->getQuota()-1);
+                        $activityAvailability->removeActivityBooking($activityBooking);
+                        $entityManager->persist($activityAvailability);
+                    }
+                }
+            }
+
+            $entityManager->persist($activityBooking);
+            $entityManager->flush();
+
+            $email = (new TemplatedEmail())
+                ->from('adriarias@it2b.es')
+                ->to('adriarias@it2b.es')
+                ->subject('Gracias por tu reserva')
+                ->context([
+                    "name" => $activityBooking->getName(),
+                    "bookingEmail" => $activityBooking->getEmail(),
+                    "phone" => $activityBooking->getPhone(),
+                    "id" => $activityBooking->getId(),
+                    "product" => $activityBooking->getActivity(),
+                    "rooms" => $activityBooking->getData(),
+                    "totalPrice" => $activityBooking->getTotalPrice(),
+                    "startDate" => date_format($activityBooking->getCheckIn(),"d/m/Y"),
+                    "endDate" => date_format($activityBooking->getCheckOut(),"d/m/Y"),
+                    "paymentMethod" => $activityBooking->getPaymentMethod(),
+                    "date" => date("d-m-Y"),
+                ])
+                ->htmlTemplate('email/thank_you.html.twig');
+
+            if ($activityBooking->getStatus() == 'booked') {
                 $mailer->send($email);
             }
 

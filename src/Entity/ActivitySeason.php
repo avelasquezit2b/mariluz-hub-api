@@ -55,7 +55,7 @@ class ActivitySeason
     private array $ranges = [];
 
     #[ORM\ManyToOne(inversedBy: 'activitySeasons', cascade: ['persist', 'remove'])]
-    #[Groups(['activityAvailabilityReduced'])]
+    #[Groups(['activityAvailabilityReduced', 'activityAvailability'])]
     private ?ActivityFee $activityFee = null;
 
     #[ORM\OneToMany(mappedBy: 'activitySeason', targetEntity: ActivitySchedule::class, cascade: ['persist', 'remove'])]

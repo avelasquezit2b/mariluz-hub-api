@@ -39,7 +39,7 @@ class Modality
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['modalityReduced', 'modality', 'activityReduced', 'activity', 'activityAvailabilityReduced', 'pack', 'packReduced'])]
+    #[Groups(['modalityReduced', 'modality', 'activityReduced', 'activity', 'activityAvailabilityReduced', 'activityAvailability', 'pack', 'packReduced'])]
     private ?string $title = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]

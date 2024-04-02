@@ -60,10 +60,14 @@ class Client
     #[Groups(['clientReduced', 'client'])]
     private Collection $communicationTemplates;
 
+    #[ORM\OneToMany(mappedBy: 'client', targetEntity: ActivityBooking::class)]
+    private Collection $activityBookings;
+
     public function __construct()
     {
         $this->bookings = new ArrayCollection();
         $this->communicationTemplates = new ArrayCollection();
+        $this->activityBookings = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -176,6 +180,36 @@ class Client
     {
         if ($this->communicationTemplates->removeElement($communicationTemplate)) {
             $communicationTemplate->removeClient($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ActivityBooking>
+     */
+    public function getActivityBookings(): Collection
+    {
+        return $this->activityBookings;
+    }
+
+    public function addActivityBooking(ActivityBooking $activityBooking): static
+    {
+        if (!$this->activityBookings->contains($activityBooking)) {
+            $this->activityBookings->add($activityBooking);
+            $activityBooking->setClient($this);
+        }
+
+        return $this;
+    }
+
+    public function removeActivityBooking(ActivityBooking $activityBooking): static
+    {
+        if ($this->activityBookings->removeElement($activityBooking)) {
+            // set the owning side to null (unless already changed)
+            if ($activityBooking->getClient() === $this) {
+                $activityBooking->setClient(null);
+            }
         }
 
         return $this;

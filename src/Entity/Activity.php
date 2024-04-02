@@ -32,13 +32,13 @@ use Doctrine\ORM\Mapping as ORM;
         // "delete" => ["security" => "is_granted('ROLE_ADMIN') or object.owner == user"],
     ],
 )]
-#[ApiFilter(SearchFilter::class, properties: ['id' => 'partial', 'title' => 'partial', 'slug' => 'exact'])]
+#[ApiFilter(SearchFilter::class, properties: ['id' => 'exact', 'title' => 'partial', 'slug' => 'exact'])]
 class Activity
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['activityReduced', 'activity', 'supplierReduced', 'supplier'])]
+    #[Groups(['activityReduced', 'activity', 'supplierReduced', 'supplier', 'activityAvailabilityReduced'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
@@ -181,6 +181,13 @@ class Activity
     #[ORM\OneToMany(mappedBy: 'activity', targetEntity: PackPrice::class)]
     private Collection $packPrices;
 
+    #[ORM\ManyToOne(inversedBy: 'activities')]
+    #[Groups(['activityReduced', 'activity', 'page', 'productList'])]
+    private ?ProductTag $productTag = null;
+
+    #[ORM\OneToMany(mappedBy: 'activity', targetEntity: ActivityBooking::class)]
+    private Collection $activityBookings;
+
     public function __construct()
     {
         $this->categories = new ArrayCollection();
@@ -195,6 +202,7 @@ class Activity
         $this->themes = new ArrayCollection();
         $this->itineraryDays = new ArrayCollection();
         $this->packPrices = new ArrayCollection();
+        $this->activityBookings = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -805,6 +813,48 @@ class Activity
             // set the owning side to null (unless already changed)
             if ($packPrice->getActivity() === $this) {
                 $packPrice->setActivity(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getProductTag(): ?ProductTag
+    {
+        return $this->productTag;
+    }
+
+    public function setProductTag(?ProductTag $productTag): static
+    {
+        $this->productTag = $productTag;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ActivityBooking>
+     */
+    public function getActivityBookings(): Collection
+    {
+        return $this->activityBookings;
+    }
+
+    public function addActivityBooking(ActivityBooking $activityBooking): static
+    {
+        if (!$this->activityBookings->contains($activityBooking)) {
+            $this->activityBookings->add($activityBooking);
+            $activityBooking->setActivity($this);
+        }
+
+        return $this;
+    }
+
+    public function removeActivityBooking(ActivityBooking $activityBooking): static
+    {
+        if ($this->activityBookings->removeElement($activityBooking)) {
+            // set the owning side to null (unless already changed)
+            if ($activityBooking->getActivity() === $this) {
+                $activityBooking->setActivity(null);
             }
         }
 

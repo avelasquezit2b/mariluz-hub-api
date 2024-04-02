@@ -58,10 +58,11 @@ class ActivityFee
     private ?bool $hasOnRequest = null;
 
     #[ORM\OneToOne(inversedBy: 'activityFee', cascade: ['persist', 'remove'])]
-    #[Groups(['activityFeeReduced', 'activityFee', 'activity', 'activityAvailabilityReduced'])]
+    #[Groups(['activityFeeReduced', 'activityFee', 'activity', 'activityAvailabilityReduced', 'activityAvailability'])]
     private ?Modality $modality = null;
 
     #[ORM\ManyToOne(inversedBy: 'activityFees')]
+    #[Groups(['activityAvailabilityReduced'])]
     private ?Activity $activity = null;
 
     #[ORM\OneToMany(mappedBy: 'activityFee', targetEntity: ActivitySeason::class, cascade: ['persist', 'remove'])]

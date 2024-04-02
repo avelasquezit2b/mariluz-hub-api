@@ -37,7 +37,7 @@ class ActivityPrice
     private ?int $id = null;
 
     #[ORM\Column(length: 50, nullable: true)]
-    #[Groups(['activityPriceReduced', 'activityPrice', 'activityFeeReduced'])]
+    #[Groups(['activityPriceReduced', 'activityPrice', 'activityFeeReduced', 'activityAvailability'])]
     private ?string $price = null;
 
     #[ORM\Column(length: 50, nullable: true)]
@@ -49,7 +49,7 @@ class ActivityPrice
     private ?int $quota = null;
 
     #[ORM\ManyToOne(inversedBy: 'activityPrices')]
-    #[Groups(['activityPriceReduced', 'activityPrice', 'activityFeeReduced'])]
+    #[Groups(['activityPriceReduced', 'activityPrice', 'activityFeeReduced', 'activityAvailability'])]
     private ?ClientType $clientType = null;
 
     #[ORM\ManyToOne(inversedBy: 'activityPrices')]

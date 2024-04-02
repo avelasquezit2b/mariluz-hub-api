@@ -39,7 +39,7 @@ class ActivitySchedule
     private ?int $id = null;
 
     #[ORM\Column(length: 25, nullable: true)]
-    #[Groups(['activityScheduleReduced', 'activitySchedule', 'activityFeeReduced', 'activityAvailabilityReduced'])]
+    #[Groups(['activityScheduleReduced', 'activitySchedule', 'activityFeeReduced', 'activityAvailabilityReduced', 'activityAvailability'])]
     private ?string $startTime = null;
 
     #[ORM\Column(length: 25, nullable: true)]
@@ -51,11 +51,12 @@ class ActivitySchedule
     private ?string $duration = null;
 
     #[ORM\ManyToOne(inversedBy: 'activitySchedules')]
-    #[Groups(['activityAvailabilityReduced'])]
+    #[Groups(['activityAvailabilityReduced', 'activityAvailability'])]
     private ?ActivitySeason $activitySeason = null;
 
     #[ORM\OneToMany(mappedBy: 'activitySchedule', targetEntity: ActivityPrice::class, cascade: ['remove'])]
-    #[Groups(['activityScheduleReduced', 'activitySchedule', 'activityFeeReduced'])]
+    #[Groups(['activityScheduleReduced', 'activitySchedule', 'activityFeeReduced', 'activityAvailability'])]
+    #[ORM\OrderBy(["price" => "DESC"])]
     #[ApiSubresource]
     private Collection $activityPrices;
 
@@ -67,7 +68,7 @@ class ActivitySchedule
     #[Groups(['activityScheduleReduced', 'activitySchedule', 'activityFeeReduced'])]
     private ?int $quota = null;
 
-    #[ORM\OneToMany(mappedBy: 'activitySchedule', targetEntity: ActivityAvailability::class)]
+    #[ORM\OneToMany(mappedBy: 'activitySchedule', targetEntity: ActivityAvailability::class, cascade: ['remove'])]
     private Collection $activityAvailabilities;
 
     public function __construct()

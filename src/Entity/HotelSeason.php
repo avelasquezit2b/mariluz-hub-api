@@ -46,7 +46,7 @@ class HotelSeason
     private ?array $ranges = null;
 
     #[ORM\ManyToOne(inversedBy: 'hotelSeasons')]
-    #[Groups(['hotelSeasonReduced', 'hotelSeason'])]
+    #[Groups(['hotelSeasonReduced', 'hotelSeason', 'hotelAvailabilityReduced'])]
     private ?HotelFee $hotelFee = null;
 
     #[ORM\OneToMany(mappedBy: 'hotelSeason', targetEntity: RoomCondition::class, cascade: ['remove'])]

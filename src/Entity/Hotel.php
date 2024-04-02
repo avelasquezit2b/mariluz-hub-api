@@ -32,13 +32,13 @@ use Doctrine\ORM\Mapping as ORM;
         // "delete" => ["security" => "is_granted('ROLE_ADMIN') or object.owner == user"],
     ],
 )]
-#[ApiFilter(SearchFilter::class, properties: ['slug' => 'exact'])]
+#[ApiFilter(SearchFilter::class, properties: ['slug' => 'exact', 'id' => 'exact'])]
 class Hotel
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['hotelReduced', 'hotel', 'supplier'])]
+    #[Groups(['hotelReduced', 'hotel', 'supplier', 'hotelAvailabilityReduced'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -124,6 +124,7 @@ class Hotel
 
     #[ORM\OneToMany(mappedBy: 'hotel', targetEntity: MediaObject::class, cascade: ['remove'])]
     #[Groups(['hotelReduced', 'hotel', 'page', 'productList'])]
+    #[ORM\OrderBy(["position" => "ASC"])]
     private Collection $media;
 
     #[ORM\Column(nullable: true)]
@@ -157,6 +158,10 @@ class Hotel
 
     #[ORM\OneToMany(mappedBy: 'hotel', targetEntity: PackPrice::class)]
     private Collection $packPrices;
+
+    #[ORM\ManyToOne(inversedBy: 'hotels')]
+    #[Groups(['hotelReduced', 'hotel', 'page', 'productList'])]
+    private ?ProductTag $productTag = null;
 
     public function __construct()
     {
@@ -717,6 +722,18 @@ class Hotel
                 $packPrice->setHotel(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getProductTag(): ?ProductTag
+    {
+        return $this->productTag;
+    }
+
+    public function setProductTag(?ProductTag $productTag): static
+    {
+        $this->productTag = $productTag;
 
         return $this;
     }

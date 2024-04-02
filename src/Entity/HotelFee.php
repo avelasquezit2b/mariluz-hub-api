@@ -56,7 +56,7 @@ class HotelFee
     private Collection $pensionTypes;
 
     #[ORM\ManyToOne(inversedBy: 'hotelFees')]
-    // #[Groups(['hotelFeeReduced', 'hotelFee'])]
+    #[Groups(['hotelAvailabilityReduced'])]
     private ?Hotel $hotel = null;
 
     public function __construct()

@@ -38,19 +38,19 @@ class ClientType
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['clientTypeReduced', 'clientType', 'activity', 'activityFeeReduced'])]
+    #[Groups(['clientTypeReduced', 'clientType', 'activity', 'activityFeeReduced', 'activityAvailability'])]
     private ?string $title = null;
 
     #[ORM\Column(length: 25)]
-    #[Groups(['clientTypeReduced', 'clientType'])]
+    #[Groups(['clientTypeReduced', 'clientType', 'activityAvailability'])]
     private ?string $code = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['clientTypeReduced', 'clientType'])]
+    #[Groups(['clientTypeReduced', 'clientType', 'activityAvailability'])]
     private ?int $minAge = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['clientTypeReduced', 'clientType'])]
+    #[Groups(['clientTypeReduced', 'clientType', 'activityAvailability'])]
     private ?int $maxAge = null;
 
     #[ORM\Column(length: 255, nullable: true)]

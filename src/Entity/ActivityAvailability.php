@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\DateFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
 use App\Repository\ActivityAvailabilityRepository;
@@ -33,6 +34,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
         // "delete" => ["security" => "is_granted('ROLE_ADMIN') or object.owner == user"],
     ],
 )]
+#[ApiFilter(DateFilter::class, properties: ['date'])]
 #[ApiFilter(SearchFilter::class, properties: ['activitySchedule.activitySeason.activityFee.activity' => 'exact'])]
 #[ApiFilter(OrderFilter::class, properties: ['activitySchedule.startTime' => 'ASC'])]
 class ActivityAvailability
@@ -49,7 +51,7 @@ class ActivityAvailability
 
     #[ORM\Column]
     #[Groups(['activityAvailabilityReduced', 'activityAvailability'])]
-    private ?int $quota = 0;
+    public ?int $quota = 0;
 
     #[ORM\Column]
     #[Groups(['activityAvailabilityReduced', 'activityAvailability'])]
@@ -59,9 +61,17 @@ class ActivityAvailability
     #[Groups(['activityAvailabilityReduced', 'activityAvailability'])]
     private ?ActivitySchedule $activitySchedule = null;
 
+    #[ORM\Column]
+    #[Groups(['activityAvailabilityReduced', 'activityAvailability'])]
+    private ?int $maxQuota = null;
+
+    #[ORM\ManyToMany(targetEntity: ActivityBooking::class, mappedBy: 'activityAvailabilities')]
+    private Collection $activityBookings;
+
     public function __construct()
     {
         $this->activityPrices = new ArrayCollection();
+        $this->activityBookings = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -113,6 +123,45 @@ class ActivityAvailability
     public function setActivitySchedule(?ActivitySchedule $activitySchedule): static
     {
         $this->activitySchedule = $activitySchedule;
+
+        return $this;
+    }
+
+    public function getMaxQuota(): ?int
+    {
+        return $this->maxQuota;
+    }
+
+    public function setMaxQuota(?int $maxQuota): static
+    {
+        $this->maxQuota = $maxQuota;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ActivityBooking>
+     */
+    public function getActivityBookings(): Collection
+    {
+        return $this->activityBookings;
+    }
+
+    public function addActivityBooking(ActivityBooking $activityBooking): static
+    {
+        if (!$this->activityBookings->contains($activityBooking)) {
+            $this->activityBookings->add($activityBooking);
+            $activityBooking->addActivityAvailability($this);
+        }
+
+        return $this;
+    }
+
+    public function removeActivityBooking(ActivityBooking $activityBooking): static
+    {
+        if ($this->activityBookings->removeElement($activityBooking)) {
+            $activityBooking->removeActivityAvailability($this);
+        }
 
         return $this;
     }
