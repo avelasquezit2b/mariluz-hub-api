@@ -163,6 +163,9 @@ class Hotel
     #[Groups(['hotelReduced', 'hotel', 'page', 'productList'])]
     private ?ProductTag $productTag = null;
 
+    #[ORM\OneToMany(mappedBy: 'hotel', targetEntity: Voucher::class)]
+    private Collection $vouchers;
+
     public function __construct()
     {
         $this->zones = new ArrayCollection();
@@ -176,6 +179,7 @@ class Hotel
         $this->themes = new ArrayCollection();
         $this->itineraryDays = new ArrayCollection();
         $this->packPrices = new ArrayCollection();
+        $this->vouchers = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -734,6 +738,36 @@ class Hotel
     public function setProductTag(?ProductTag $productTag): static
     {
         $this->productTag = $productTag;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Voucher>
+     */
+    public function getVouchers(): Collection
+    {
+        return $this->vouchers;
+    }
+
+    public function addVoucher(Voucher $voucher): static
+    {
+        if (!$this->vouchers->contains($voucher)) {
+            $this->vouchers->add($voucher);
+            $voucher->setHotel($this);
+        }
+
+        return $this;
+    }
+
+    public function removeVoucher(Voucher $voucher): static
+    {
+        if ($this->vouchers->removeElement($voucher)) {
+            // set the owning side to null (unless already changed)
+            if ($voucher->getHotel() === $this) {
+                $voucher->setHotel(null);
+            }
+        }
 
         return $this;
     }

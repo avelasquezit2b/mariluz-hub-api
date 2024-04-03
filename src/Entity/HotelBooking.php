@@ -100,6 +100,9 @@ class HotelBooking
     #[ORM\ManyToOne(inversedBy: 'booking')]
     private ?Bill $bill = null;
 
+    #[ORM\ManyToOne(inversedBy: 'booking')]
+    private ?Voucher $voucher = null;
+
     public function __construct()
     {
         $this->hotelAvailabilities = new ArrayCollection();
@@ -313,6 +316,18 @@ class HotelBooking
     public function setBill(?Bill $bill): static
     {
         $this->bill = $bill;
+
+        return $this;
+    }
+
+    public function getVoucher(): ?Voucher
+    {
+        return $this->voucher;
+    }
+
+    public function setVoucher(?Voucher $voucher): static
+    {
+        $this->voucher = $voucher;
 
         return $this;
     }
