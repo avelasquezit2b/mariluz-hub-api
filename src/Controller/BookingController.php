@@ -7,6 +7,7 @@ use App\Repository\HotelRepository;
 use App\Repository\HotelAvailabilityRepository;
 use App\Repository\HotelBookingRepository;
 use App\Entity\ActivityBooking;
+use App\Entity\Bill;
 use App\Repository\ActivityRepository;
 use App\Repository\ActivityAvailabilityRepository;
 use App\Repository\ActivityBookingRepository;
@@ -126,6 +127,34 @@ class BookingController extends AbstractController
 
             $entityManager->persist($hotelBooking);
             $entityManager->flush();
+
+            // TO - DO Generate bill after creating the booking
+
+            $bill = new Bill();
+            $bill->setTotalPrice(new \DateTime($requestDecode->checkIn));
+            $bill->setTotalAmount(new \DateTime($requestDecode->checkOut));
+            $bill->setTotalPriceWithoutTaxes($requestDecode->email);
+            // $bill->setHasAcceptance($requestDecode->hasAcceptance);
+            // $activity = $activityRepository->find($requestDecode->activity);
+            // $bill->setActivity($activity);
+            // $bill->setName($requestDecode->name);
+            // $bill->setObservations($requestDecode->observations);
+            // $bill->setPaymentMethod($requestDecode->paymentMethod);
+            // $bill->setPhone($requestDecode->phone);
+            // $bill->setPromoCode($requestDecode->promoCode);
+            // $bill->setData($requestDecode->data);
+            // $bill->setStatus('preBooked');
+            // $bill->setTotalPrice($requestDecode->totalPrice);
+
+            // foreach ($activityAvailabilities as $activityAvailability) {
+            //     $activityAvailability->addActivityBooking($activityBooking);
+            //     $entityManager->persist($activityAvailability);
+            // }
+
+            $entityManager->persist($bill);
+            $entityManager->flush();
+
+            //
 
             $email = (new TemplatedEmail())
                 ->from('adriarias@it2b.es')

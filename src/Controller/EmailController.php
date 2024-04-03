@@ -48,31 +48,31 @@ class EmailController extends AbstractController
     {
         $request = json_decode($request->getContent());
 
-        if ($request->type == 'suppliers') {
-            $supplier = $supplierRepository->find(str_replace("/suppliers/", '', $request->specificId));
-            $name = $supplier->getName();
-            $filename = 'supplier_';
-        } else if ($request->type == 'clients') {
-            $client = $clientRepository->find(str_replace("/clients/", '', $request->specificId));
-            $name = $client->getName();
-            $filename = 'client_';
-        } else {
+        // if ($request->type == 'suppliers') {
+        //     $supplier = $supplierRepository->find(str_replace("/suppliers/", '', $request->specificId));
+        //     $name = $supplier->getName();
+        //     $filename = 'supplier_';
+        // } else if ($request->type == 'clients') {
+        //     $client = $clientRepository->find(str_replace("/clients/", '', $request->specificId));
+        //     $name = $client->getName();
+        //     $filename = 'client_';
+        // } else {
             $filename = '';
-        }
+        // }
 
         $email = (new TemplatedEmail())
             ->from('adriarias@it2b.es')
-            ->to(implode(',', $request->recipients))
+            ->to(implode(',', ['avelasquez@it2b.es']))
             //->cc('cc@example.com')
             //->bcc('bcc@example.com')
             //->replyTo('fabien@example.com')
             //->priority(Email::PRIORITY_HIGH)
-            ->subject($request->subject)
+            ->subject('$request->subject')
             ->context([
-                "name" => $name,
-                "message" => $request->message
+                "name" => '$name',
+                "message" => '$request->message'
             ])
-            ->htmlTemplate('communications/' . $filename . 'booking_' . $request->status . '.html.twig');
+            ->htmlTemplate('communications/' . $filename . 'booking_' . 'confirmed' . '.html');
 
         $mailer->send($email);
 

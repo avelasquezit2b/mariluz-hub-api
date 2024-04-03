@@ -107,7 +107,12 @@ class Page
 
     public function setCreatedAt(\DateTimeImmutable $createdAt): static
     {
-        $this->createdAt = $createdAt;
+        //set automatically the created_at date
+        if ($createdAt == null) {
+            $this->createdAt = new \DateTime();
+        } else {
+            $this->createdAt = $createdAt;
+        }
 
         return $this;
     }
