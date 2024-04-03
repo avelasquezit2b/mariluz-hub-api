@@ -131,9 +131,9 @@ class BookingController extends AbstractController
             // TO - DO Generate bill after creating the booking
 
             $bill = new Bill();
-            $bill->setTotalPrice(new \DateTime($requestDecode->checkIn));
-            $bill->setTotalAmount(new \DateTime($requestDecode->checkOut));
-            $bill->setTotalPriceWithoutTaxes($requestDecode->email);
+            // $bill->setTotalPrice(new \DateTime($requestDecode->checkIn));
+            // $bill->setTotalAmount(new \DateTime($requestDecode->checkOut));
+            // $bill->setTotalPriceWithoutTaxes($requestDecode->email);
             // $bill->setHasAcceptance($requestDecode->hasAcceptance);
             // $activity = $activityRepository->find($requestDecode->activity);
             // $bill->setActivity($activity);

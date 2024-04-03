@@ -4,6 +4,9 @@ namespace App\Entity;
 
 use App\Repository\BillRepository;
 use ApiPlatform\Core\Annotation\ApiResource;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -48,11 +51,28 @@ class Bill
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Groups(['billReduced', 'bill'])]
-    private ?string $totalAmount = null;
+    private ?string $pricePayed = null;
+
+    #[ORM\ManyToOne(inversedBy: 'bills')]
+    #[Groups(['billReduced', 'bill'])]
+    private ?Client $client = null;
+
+    #[ORM\OneToMany(mappedBy: 'bill', targetEntity: HotelBooking::class)]
+    #[Groups(['billReduced', 'bill'])]
+    private Collection $booking;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['billReduced', 'bill'])]
+    private ?string $aditionalDescription = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Groups(['billReduced', 'bill'])]
-    private ?string $totalPriceWithoutTaxes = null;
+    private ?string $accountingCode = null;
+
+    public function __construct()
+    {
+        $this->booking = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -100,26 +120,80 @@ class Bill
         return $this;
     }
 
-    public function getTotalAmount(): ?string
+    public function getClient(): ?Client
     {
-        return $this->totalAmount;
+        return $this->client;
     }
 
-    public function setTotalAmount(?string $totalAmount): static
+    public function setClient(?Client $client): static
     {
-        $this->totalAmount = $totalAmount;
+        $this->client = $client;
 
         return $this;
     }
 
-    public function getTotalPriceWithoutTaxes(): ?string
+    /**
+     * @return Collection<int, HotelBooking>
+     */
+    public function getBooking(): Collection
     {
-        return $this->totalPriceWithoutTaxes;
+        return $this->booking;
     }
 
-    public function setTotalPriceWithoutTaxes(?string $totalPriceWithoutTaxes): static
+    public function addBooking(HotelBooking $booking): static
     {
-        $this->totalPriceWithoutTaxes = $totalPriceWithoutTaxes;
+        if (!$this->booking->contains($booking)) {
+            $this->booking->add($booking);
+            $booking->setBill($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBooking(HotelBooking $booking): static
+    {
+        if ($this->booking->removeElement($booking)) {
+            // set the owning side to null (unless already changed)
+            if ($booking->getBill() === $this) {
+                $booking->setBill(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getAditionalDescription(): ?string
+    {
+        return $this->aditionalDescription;
+    }
+
+    public function setAditionalDescription(?string $aditionalDescription): static
+    {
+        $this->aditionalDescription = $aditionalDescription;
+
+        return $this;
+    }
+
+    public function getPricePayed(): ?string
+    {
+        return $this->pricePayed;
+    }
+
+    public function setPricePayed(?string $pricePayed): static
+    {
+        $this->pricePayed = $pricePayed;
+
+        return $this;
+    }
+
+    public function getAccountingCode(): ?string
+    {
+        return $this->accountingCode;
+    }
+
+    public function setAccountingCode(?string $accountingCode): static
+    {
+        $this->accountingCode = $accountingCode;
 
         return $this;
     }

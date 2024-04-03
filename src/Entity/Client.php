@@ -63,11 +63,15 @@ class Client
     #[ORM\OneToMany(mappedBy: 'client', targetEntity: ActivityBooking::class)]
     private Collection $activityBookings;
 
+    #[ORM\OneToMany(mappedBy: 'client', targetEntity: Bill::class)]
+    private Collection $bills;
+
     public function __construct()
     {
         $this->bookings = new ArrayCollection();
         $this->communicationTemplates = new ArrayCollection();
         $this->activityBookings = new ArrayCollection();
+        $this->bills = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -209,6 +213,36 @@ class Client
             // set the owning side to null (unless already changed)
             if ($activityBooking->getClient() === $this) {
                 $activityBooking->setClient(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Bill>
+     */
+    public function getBills(): Collection
+    {
+        return $this->bills;
+    }
+
+    public function addBill(Bill $bill): static
+    {
+        if (!$this->bills->contains($bill)) {
+            $this->bills->add($bill);
+            $bill->setClient($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBill(Bill $bill): static
+    {
+        if ($this->bills->removeElement($bill)) {
+            // set the owning side to null (unless already changed)
+            if ($bill->getClient() === $this) {
+                $bill->setClient(null);
             }
         }
 

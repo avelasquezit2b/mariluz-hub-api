@@ -97,6 +97,9 @@ class HotelBooking
     #[ORM\ManyToOne(inversedBy: 'bookings')]
     private ?Client $client = null;
 
+    #[ORM\ManyToOne(inversedBy: 'booking')]
+    private ?Bill $bill = null;
+
     public function __construct()
     {
         $this->hotelAvailabilities = new ArrayCollection();
@@ -298,6 +301,18 @@ class HotelBooking
     public function setClient(?Client $client): static
     {
         $this->client = $client;
+
+        return $this;
+    }
+
+    public function getBill(): ?Bill
+    {
+        return $this->bill;
+    }
+
+    public function setBill(?Bill $bill): static
+    {
+        $this->bill = $bill;
 
         return $this;
     }
