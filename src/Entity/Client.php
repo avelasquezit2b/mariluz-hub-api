@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use App\Repository\ClientRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -28,6 +30,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
         // "delete" => ["security" => "is_granted('ROLE_ADMIN') or object.owner == user"],
     ],
 )]
+#[ApiFilter(SearchFilter::class, properties: ['id' => 'exact', 'email' => 'exact'])]
 class Client
 {
     #[ORM\Id]
@@ -41,11 +44,11 @@ class Client
     private ?string $name = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['clientReduced','client'])]
+    #[Groups(['clientReduced', 'client'])]
     private ?string $email = null;
 
-    #[ORM\Column(length:255, nullable: true)]
-    #[Groups(['clientReduced','client'])]
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['clientReduced', 'client'])]
     private ?string $phone = null;
 
     #[ORM\Column(nullable: true)]
@@ -57,9 +60,11 @@ class Client
     private Collection $communicationTemplates;
 
     #[ORM\OneToMany(mappedBy: 'client', targetEntity: Bill::class)]
+    #[Groups(['clientReduced', 'client'])]
     private Collection $bills;
 
     #[ORM\OneToMany(mappedBy: 'client', targetEntity: Booking::class)]
+    #[Groups(['clientReduced', 'client'])]
     private Collection $bookings;
 
     public function __construct()

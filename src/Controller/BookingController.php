@@ -7,6 +7,7 @@ use App\Repository\HotelRepository;
 use App\Repository\HotelAvailabilityRepository;
 use App\Repository\BookingRepository;
 use App\Entity\Bill;
+use App\Entity\Voucher;
 use App\Repository\ActivityRepository;
 use App\Repository\ActivityAvailabilityRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -52,10 +53,10 @@ class BookingController extends AbstractController
                     $hotelAvailability = $hotelAvailabilityRepository->find($availability);
                     array_push($hotelAvailabilities, $hotelAvailability);
                     if ($hotelAvailability->quota > 0) {
-                        $hotelAvailability->setQuota($hotelAvailability->getQuota()-1);
+                        $hotelAvailability->setQuota($hotelAvailability->getQuota() - 1);
                         $entityManager->persist($hotelAvailability);
                     } else {
-                        throw new BadRequestHttpException('No hay disponibilidad para las fechas seleccionadas'); 
+                        throw new BadRequestHttpException('No hay disponibilidad para las fechas seleccionadas');
                     }
                 }
             }
@@ -88,8 +89,6 @@ class BookingController extends AbstractController
             return $this->json([
                 'response'  => $hotelBooking
             ]);
-
-
         } catch (SoapFault $e) {
             return $this->json([
                 'response'  => $e
@@ -116,7 +115,7 @@ class BookingController extends AbstractController
                 foreach ($hotelBooking->getRooms() as $room) {
                     foreach ($room['availabilities'] as $availability) {
                         $hotelAvailability = $hotelAvailabilityRepository->find($availability);
-                        $hotelAvailability->setQuota($hotelAvailability->getQuota()+1);
+                        $hotelAvailability->setQuota($hotelAvailability->getQuota() + 1);
                         $hotelAvailability->removeHotelBooking($hotelBooking);
                         $entityManager->persist($hotelAvailability);
                     }
@@ -125,6 +124,15 @@ class BookingController extends AbstractController
 
             $entityManager->persist($hotelBooking);
             $entityManager->flush();
+
+            // TO - DO Generar un Voucher a partir de los datos de la reserva (recibes los datos del cliente de la reserva)
+
+            $newVoucher = new Voucher();
+            $newVoucher->setHotel();
+            $newVoucher->setToBePaidBy();
+            $newVoucher->setBooking();
+
+            //
 
             $email = (new TemplatedEmail())
                 ->from('adriarias@it2b.es')
@@ -138,8 +146,8 @@ class BookingController extends AbstractController
                     "product" => $hotelBooking->getHotel(),
                     "rooms" => $hotelBooking->getRooms(),
                     "totalPrice" => $hotelBooking->getTotalPrice(),
-                    "startDate" => date_format($hotelBooking->getCheckIn(),"d/m/Y"),
-                    "endDate" => date_format($hotelBooking->getCheckOut(),"d/m/Y"),
+                    "startDate" => date_format($hotelBooking->getCheckIn(), "d/m/Y"),
+                    "endDate" => date_format($hotelBooking->getCheckOut(), "d/m/Y"),
                     "paymentMethod" => $hotelBooking->getPaymentMethod(),
                     "date" => date("d-m-Y"),
                 ])
@@ -152,8 +160,6 @@ class BookingController extends AbstractController
             return $this->json([
                 'response'  => $email
             ]);
-
-
         } catch (SoapFault $e) {
             return $this->json([
                 'response'  => $e
@@ -183,14 +189,14 @@ class BookingController extends AbstractController
                 // ];
                 // array_push($formattedRooms, $formattedRoom);
                 // foreach ($room->roomType->availabilities as $availability) {
-                    $activityAvailability = $activityAvailabilityRepository->find($data->availableSchedule->id);
-                    array_push($activityAvailabilities, $activityAvailability);
-                    if ($activityAvailability->quota <= $activityAvailability->getMaxQuota()) {
-                        $activityAvailability->setQuota($activityAvailability->getQuota()+1);
-                        $entityManager->persist($activityAvailability);
-                    } else {
-                        throw new BadRequestHttpException('No hay disponibilidad para las fechas seleccionadas'); 
-                    }
+                $activityAvailability = $activityAvailabilityRepository->find($data->availableSchedule->id);
+                array_push($activityAvailabilities, $activityAvailability);
+                if ($activityAvailability->quota <= $activityAvailability->getMaxQuota()) {
+                    $activityAvailability->setQuota($activityAvailability->getQuota() + 1);
+                    $entityManager->persist($activityAvailability);
+                } else {
+                    throw new BadRequestHttpException('No hay disponibilidad para las fechas seleccionadas');
+                }
                 // }
             }
 
@@ -221,8 +227,6 @@ class BookingController extends AbstractController
             return $this->json([
                 'response'  => $activityBooking
             ]);
-
-
         } catch (SoapFault $e) {
             return $this->json([
                 'response'  => $e
@@ -249,7 +253,7 @@ class BookingController extends AbstractController
                 foreach ($activityBooking->getData() as $data) {
                     foreach ($data['availabilities'] as $availability) {
                         $activityAvailability = $activityAvailabilityRepository->find($availability);
-                        $activityAvailability->setQuota($activityAvailability->getQuota()-1);
+                        $activityAvailability->setQuota($activityAvailability->getQuota() - 1);
                         $activityAvailability->removeActivityBooking($activityBooking);
                         $entityManager->persist($activityAvailability);
                     }
@@ -271,8 +275,8 @@ class BookingController extends AbstractController
                     "product" => $activityBooking->getActivity(),
                     "rooms" => $activityBooking->getData(),
                     "totalPrice" => $activityBooking->getTotalPrice(),
-                    "startDate" => date_format($activityBooking->getCheckIn(),"d/m/Y"),
-                    "endDate" => date_format($activityBooking->getCheckOut(),"d/m/Y"),
+                    "startDate" => date_format($activityBooking->getCheckIn(), "d/m/Y"),
+                    "endDate" => date_format($activityBooking->getCheckOut(), "d/m/Y"),
                     "paymentMethod" => $activityBooking->getPaymentMethod(),
                     "date" => date("d-m-Y"),
                 ])

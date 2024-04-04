@@ -48,11 +48,10 @@ class Voucher
     #[Groups(['voucherReduced', 'voucher'])]
     private ?string $toBePaidBy = null;
 
-    public function __construct()
-    {
-        $this->booking = new ArrayCollection();
-    }
-
+    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    #[Groups(['voucherReduced', 'voucher'])]
+    private ?Booking $booking = null;
+    
     public function getId(): ?int
     {
         return $this->id;
@@ -95,6 +94,18 @@ class Voucher
     public function setToBePaidBy(?string $toBePaidBy): static
     {
         $this->toBePaidBy = $toBePaidBy;
+
+        return $this;
+    }
+
+    public function getBooking(): ?Booking
+    {
+        return $this->booking;
+    }
+
+    public function setBooking(?Booking $booking): static
+    {
+        $this->booking = $booking;
 
         return $this;
     }

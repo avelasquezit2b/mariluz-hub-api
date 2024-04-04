@@ -65,10 +65,9 @@ class Bill
     #[Groups(['billReduced', 'bill'])]
     private ?string $accountingCode = null;
 
-    public function __construct()
-    {
-        $this->booking = new ArrayCollection();
-    }
+    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    #[Groups(['billReduced', 'bill'])]
+    private ?Booking $booking = null;
 
     public function getId(): ?int
     {
@@ -160,6 +159,18 @@ class Bill
     public function setAccountingCode(?string $accountingCode): static
     {
         $this->accountingCode = $accountingCode;
+
+        return $this;
+    }
+
+    public function getBooking(): ?Booking
+    {
+        return $this->booking;
+    }
+
+    public function setBooking(?Booking $booking): static
+    {
+        $this->booking = $booking;
 
         return $this;
     }
