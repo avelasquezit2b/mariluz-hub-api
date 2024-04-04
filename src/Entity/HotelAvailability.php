@@ -69,17 +69,12 @@ class HotelAvailability
     #[Groups(['hotelAvailabilityReduced', 'hotelAvailability'])]
     private ?int $maxQuota = null;
 
-    #[ORM\ManyToMany(targetEntity: HotelBooking::class, inversedBy: 'hotelAvailabilities')]
-    #[Groups(['hotelAvailabilityReduced', 'hotelAvailability'])]
-    private Collection $hotelBookings;
-
     #[ORM\Column(nullable: true)]
     #[Groups(['hotelAvailabilityReduced', 'hotelAvailability'])]
     private ?int $totalBookings = null;
 
     public function __construct()
     {
-        $this->hotelBookings = new ArrayCollection();
     }
 
     #[ORM\PreUpdate]
@@ -151,30 +146,6 @@ class HotelAvailability
     public function setMaxQuota(int $maxQuota): static
     {
         $this->maxQuota = $maxQuota;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, HotelBooking>
-     */
-    public function getHotelBookings(): Collection
-    {
-        return $this->hotelBookings;
-    }
-
-    public function addHotelBooking(HotelBooking $hotelBooking): static
-    {
-        if (!$this->hotelBookings->contains($hotelBooking)) {
-            $this->hotelBookings->add($hotelBooking);
-        }
-
-        return $this;
-    }
-
-    public function removeHotelBooking(HotelBooking $hotelBooking): static
-    {
-        $this->hotelBookings->removeElement($hotelBooking);
 
         return $this;
     }

@@ -185,9 +185,6 @@ class Activity
     #[Groups(['activityReduced', 'activity', 'page', 'productList'])]
     private ?ProductTag $productTag = null;
 
-    #[ORM\OneToMany(mappedBy: 'activity', targetEntity: ActivityBooking::class)]
-    private Collection $activityBookings;
-
     public function __construct()
     {
         $this->categories = new ArrayCollection();
@@ -202,7 +199,6 @@ class Activity
         $this->themes = new ArrayCollection();
         $this->itineraryDays = new ArrayCollection();
         $this->packPrices = new ArrayCollection();
-        $this->activityBookings = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -827,36 +823,6 @@ class Activity
     public function setProductTag(?ProductTag $productTag): static
     {
         $this->productTag = $productTag;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, ActivityBooking>
-     */
-    public function getActivityBookings(): Collection
-    {
-        return $this->activityBookings;
-    }
-
-    public function addActivityBooking(ActivityBooking $activityBooking): static
-    {
-        if (!$this->activityBookings->contains($activityBooking)) {
-            $this->activityBookings->add($activityBooking);
-            $activityBooking->setActivity($this);
-        }
-
-        return $this;
-    }
-
-    public function removeActivityBooking(ActivityBooking $activityBooking): static
-    {
-        if ($this->activityBookings->removeElement($activityBooking)) {
-            // set the owning side to null (unless already changed)
-            if ($activityBooking->getActivity() === $this) {
-                $activityBooking->setActivity(null);
-            }
-        }
 
         return $this;
     }

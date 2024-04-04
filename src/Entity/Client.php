@@ -52,26 +52,21 @@ class Client
     #[Groups(['client'])]
     private ?\DateTimeImmutable $createdAt = null;
 
-    #[ORM\OneToMany(mappedBy: 'client', targetEntity: HotelBooking::class)]
-    #[Groups(['clientReduced', 'client'])]
-    private Collection $bookings;
-
     #[ORM\ManyToMany(targetEntity: CommunicationTemplate::class, mappedBy: 'client')]
     #[Groups(['clientReduced', 'client'])]
     private Collection $communicationTemplates;
 
-    #[ORM\OneToMany(mappedBy: 'client', targetEntity: ActivityBooking::class)]
-    private Collection $activityBookings;
-
     #[ORM\OneToMany(mappedBy: 'client', targetEntity: Bill::class)]
     private Collection $bills;
 
+    #[ORM\OneToMany(mappedBy: 'client', targetEntity: Booking::class)]
+    private Collection $bookings;
+
     public function __construct()
     {
-        $this->bookings = new ArrayCollection();
         $this->communicationTemplates = new ArrayCollection();
-        $this->activityBookings = new ArrayCollection();
         $this->bills = new ArrayCollection();
+        $this->bookings = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -133,36 +128,6 @@ class Client
     }
 
     /**
-     * @return Collection<int, HotelBooking>
-     */
-    public function getBookings(): Collection
-    {
-        return $this->bookings;
-    }
-
-    public function addBooking(HotelBooking $booking): static
-    {
-        if (!$this->bookings->contains($booking)) {
-            $this->bookings->add($booking);
-            $booking->setClient($this);
-        }
-
-        return $this;
-    }
-
-    public function removeBooking(HotelBooking $booking): static
-    {
-        if ($this->bookings->removeElement($booking)) {
-            // set the owning side to null (unless already changed)
-            if ($booking->getClient() === $this) {
-                $booking->setClient(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
      * @return Collection<int, CommunicationTemplate>
      */
     public function getCommunicationTemplates(): Collection
@@ -184,36 +149,6 @@ class Client
     {
         if ($this->communicationTemplates->removeElement($communicationTemplate)) {
             $communicationTemplate->removeClient($this);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, ActivityBooking>
-     */
-    public function getActivityBookings(): Collection
-    {
-        return $this->activityBookings;
-    }
-
-    public function addActivityBooking(ActivityBooking $activityBooking): static
-    {
-        if (!$this->activityBookings->contains($activityBooking)) {
-            $this->activityBookings->add($activityBooking);
-            $activityBooking->setClient($this);
-        }
-
-        return $this;
-    }
-
-    public function removeActivityBooking(ActivityBooking $activityBooking): static
-    {
-        if ($this->activityBookings->removeElement($activityBooking)) {
-            // set the owning side to null (unless already changed)
-            if ($activityBooking->getClient() === $this) {
-                $activityBooking->setClient(null);
-            }
         }
 
         return $this;
@@ -243,6 +178,36 @@ class Client
             // set the owning side to null (unless already changed)
             if ($bill->getClient() === $this) {
                 $bill->setClient(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Booking>
+     */
+    public function getBookings(): Collection
+    {
+        return $this->bookings;
+    }
+
+    public function addBooking(Booking $booking): static
+    {
+        if (!$this->bookings->contains($booking)) {
+            $this->bookings->add($booking);
+            $booking->setClient($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBooking(Booking $booking): static
+    {
+        if ($this->bookings->removeElement($booking)) {
+            // set the owning side to null (unless already changed)
+            if ($booking->getClient() === $this) {
+                $booking->setClient(null);
             }
         }
 

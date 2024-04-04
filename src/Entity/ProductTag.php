@@ -37,11 +37,11 @@ class ProductTag
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['productTagReduced', 'productTag', 'hotelReduced', 'hotel', 'activityReduced', 'activity', 'page'])]
+    #[Groups(['productTagReduced', 'productTag', 'hotelReduced', 'hotel', 'activityReduced', 'activity', 'page', 'productList'])]
     private ?string $title = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['productTagReduced', 'productTag', 'hotelReduced', 'hotel', 'activityReduced', 'activity', 'page'])]
+    #[Groups(['productTagReduced', 'productTag', 'hotelReduced', 'hotel', 'activityReduced', 'activity', 'page', 'productList'])]
     private ?string $icon = null;
 
     #[ORM\OneToMany(mappedBy: 'productTag', targetEntity: Hotel::class)]
