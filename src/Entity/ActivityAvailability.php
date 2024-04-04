@@ -35,7 +35,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
     ],
 )]
 #[ApiFilter(DateFilter::class, properties: ['date'])]
-#[ApiFilter(SearchFilter::class, properties: ['activitySchedule.activitySeason.activityFee.activity' => 'exact'])]
+#[ApiFilter(SearchFilter::class, properties: ['activitySchedule.activitySeason.activityFee.activity' => 'exact', 'activitySchedule.activitySeason.activityFee.activity.location.name' => 'exact'])]
 #[ApiFilter(OrderFilter::class, properties: ['activitySchedule.startTime' => 'ASC'])]
 class ActivityAvailability
 {
@@ -65,13 +65,9 @@ class ActivityAvailability
     #[Groups(['activityAvailabilityReduced', 'activityAvailability'])]
     private ?int $maxQuota = null;
 
-    #[ORM\ManyToMany(targetEntity: ActivityBooking::class, mappedBy: 'activityAvailabilities')]
-    private Collection $activityBookings;
-
     public function __construct()
     {
         $this->activityPrices = new ArrayCollection();
-        $this->activityBookings = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -135,33 +131,6 @@ class ActivityAvailability
     public function setMaxQuota(?int $maxQuota): static
     {
         $this->maxQuota = $maxQuota;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, ActivityBooking>
-     */
-    public function getActivityBookings(): Collection
-    {
-        return $this->activityBookings;
-    }
-
-    public function addActivityBooking(ActivityBooking $activityBooking): static
-    {
-        if (!$this->activityBookings->contains($activityBooking)) {
-            $this->activityBookings->add($activityBooking);
-            $activityBooking->addActivityAvailability($this);
-        }
-
-        return $this;
-    }
-
-    public function removeActivityBooking(ActivityBooking $activityBooking): static
-    {
-        if ($this->activityBookings->removeElement($activityBooking)) {
-            $activityBooking->removeActivityAvailability($this);
-        }
 
         return $this;
     }

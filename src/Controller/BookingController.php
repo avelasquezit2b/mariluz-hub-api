@@ -2,15 +2,13 @@
 
 namespace App\Controller;
 
-use App\Entity\HotelBooking;
+use App\Entity\Booking;
 use App\Repository\HotelRepository;
 use App\Repository\HotelAvailabilityRepository;
-use App\Repository\HotelBookingRepository;
-use App\Entity\ActivityBooking;
+use App\Repository\BookingRepository;
 use App\Entity\Bill;
 use App\Repository\ActivityRepository;
 use App\Repository\ActivityAvailabilityRepository;
-use App\Repository\ActivityBookingRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -30,7 +28,7 @@ class BookingController extends AbstractController
     }
 
     #[Route('/hotel_prebooking', name: 'api_hotel_prebooking')]
-    public function prebooking(Request $request, EntityManagerInterface $entityManager, HotelBookingRepository $hotelBookingRepository, HotelAvailabilityRepository $hotelAvailabilityRepository, HotelRepository $hotelRepository): Response
+    public function prebooking(Request $request, EntityManagerInterface $entityManager, BookingRepository $bookingRepository, HotelAvailabilityRepository $hotelAvailabilityRepository, HotelRepository $hotelRepository): Response
     {
         $requestDecode = json_decode($request->getContent());
 
@@ -62,7 +60,7 @@ class BookingController extends AbstractController
                 }
             }
 
-            $hotelBooking = new HotelBooking();
+            $hotelBooking = new Booking();
             $hotelBooking->setCheckIn(new \DateTime($requestDecode->checkIn));
             $hotelBooking->setCheckOut(new \DateTime($requestDecode->checkOut));
             $hotelBooking->setEmail($requestDecode->email);
@@ -75,7 +73,7 @@ class BookingController extends AbstractController
             $hotelBooking->setPaymentMethod($requestDecode->paymentMethod);
             $hotelBooking->setPhone($requestDecode->phone);
             $hotelBooking->setPromoCode($requestDecode->promoCode);
-            $hotelBooking->setRooms($formattedRooms);
+            $hotelBooking->setData($formattedRooms);
             $hotelBooking->setStatus('preBooked');
             $hotelBooking->setTotalPrice($requestDecode->totalPrice);
 
@@ -100,7 +98,7 @@ class BookingController extends AbstractController
     }
 
     #[Route('/hotel_booking', name: 'api_hotel_booking')]
-    public function booking(Request $request, MailerInterface $mailer, EntityManagerInterface $entityManager, HotelBookingRepository $hotelBookingRepository, HotelAvailabilityRepository $hotelAvailabilityRepository, HotelRepository $hotelRepository): Response
+    public function booking(Request $request, MailerInterface $mailer, EntityManagerInterface $entityManager, BookingRepository $bookingRepository, HotelAvailabilityRepository $hotelAvailabilityRepository, HotelRepository $hotelRepository): Response
     {
         $request = file_get_contents('php://input');
         parse_str($request, $output);
@@ -108,7 +106,7 @@ class BookingController extends AbstractController
         try {
             $requestData = str_replace("?", "", utf8_decode(base64_decode($output['Ds_MerchantParameters'])));
             $requestData = json_decode($requestData, true);
-            $hotelBooking = $hotelBookingRepository->find($requestData->id);
+            $hotelBooking = $bookingRepository->find($requestData->id);
 
             // $bookingHub->setLocator($bookingOfi->BookingResult->BookingCode);
             if ($requestData['Ds_Response'] < 100) {
@@ -192,7 +190,7 @@ class BookingController extends AbstractController
     }
 
     #[Route('/activity_prebooking', name: 'api_activity_prebooking')]
-    public function activity_prebooking(Request $request, EntityManagerInterface $entityManager, ActivityBookingRepository $activityBookingRepository, ActivityAvailabilityRepository $activityAvailabilityRepository, ActivityRepository $activityRepository): Response
+    public function activity_prebooking(Request $request, EntityManagerInterface $entityManager, BookingRepository $bookingRepository, ActivityAvailabilityRepository $activityAvailabilityRepository, ActivityRepository $activityRepository): Response
     {
         $requestDecode = json_decode($request->getContent());
 
@@ -224,13 +222,13 @@ class BookingController extends AbstractController
                 // }
             }
 
-            $activityBooking = new ActivityBooking();
+            $activityBooking = new Booking();
             $activityBooking->setCheckIn(new \DateTime($requestDecode->checkIn));
             $activityBooking->setCheckOut(new \DateTime($requestDecode->checkOut));
             $activityBooking->setEmail($requestDecode->email);
             $activityBooking->setHasAcceptance($requestDecode->hasAcceptance);
             $activity = $activityRepository->find($requestDecode->activity);
-            $activityBooking->setActivity($activity);
+            // $activityBooking->setActivity($activity);
             $activityBooking->setName($requestDecode->name);
             $activityBooking->setObservations($requestDecode->observations);
             $activityBooking->setPaymentMethod($requestDecode->paymentMethod);
@@ -240,10 +238,10 @@ class BookingController extends AbstractController
             $activityBooking->setStatus('preBooked');
             $activityBooking->setTotalPrice($requestDecode->totalPrice);
 
-            foreach ($activityAvailabilities as $activityAvailability) {
-                $activityAvailability->addActivityBooking($activityBooking);
-                $entityManager->persist($activityAvailability);
-            }
+            // foreach ($activityAvailabilities as $activityAvailability) {
+            //     $activityAvailability->addActivityBooking($activityBooking);
+            //     $entityManager->persist($activityAvailability);
+            // }
 
             $entityManager->persist($activityBooking);
             $entityManager->flush();
@@ -261,7 +259,7 @@ class BookingController extends AbstractController
     }
 
     #[Route('/activity_booking', name: 'api_activity_booking')]
-    public function activity_booking(Request $request, MailerInterface $mailer, EntityManagerInterface $entityManager, ActivityBookingRepository $activityBookingRepository, ActivityAvailabilityRepository $activityAvailabilityRepository, ActivityRepository $activityRepository): Response
+    public function activity_booking(Request $request, MailerInterface $mailer, EntityManagerInterface $entityManager, BookingRepository $bookingRepository, ActivityAvailabilityRepository $activityAvailabilityRepository, ActivityRepository $activityRepository): Response
     {
         $request = file_get_contents('php://input');
         parse_str($request, $output);
@@ -269,7 +267,7 @@ class BookingController extends AbstractController
         try {
             $requestData = str_replace("?", "", utf8_decode(base64_decode($output['Ds_MerchantParameters'])));
             $requestData = json_decode($requestData, true);
-            $activityBooking = $activityBookingRepository->find($requestData->id);
+            $activityBooking = $bookingRepository->find(intval(ltrim($requestData['Ds_Order'], "0")));
 
             // $bookingHub->setLocator($bookingOfi->BookingResult->BookingCode);
             if ($requestData['Ds_Response'] < 100) {
@@ -315,8 +313,6 @@ class BookingController extends AbstractController
             return $this->json([
                 'response'  => $email
             ]);
-
-
         } catch (SoapFault $e) {
             return $this->json([
                 'response'  => $e

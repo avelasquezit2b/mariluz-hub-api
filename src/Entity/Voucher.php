@@ -40,10 +40,6 @@ class Voucher
     #[Groups(['voucherReduced', 'voucher'])]
     private ?Hotel $hotel = null;
 
-    #[ORM\OneToMany(mappedBy: 'voucher', targetEntity: HotelBooking::class)]
-    #[Groups(['voucherReduced', 'voucher'])]
-    private Collection $booking;
-
     #[ORM\Column]
     #[Groups(['voucherReduced', 'voucher'])]
     private ?\DateTimeImmutable $createdAt = null;
@@ -70,36 +66,6 @@ class Voucher
     public function setHotel(?Hotel $hotel): static
     {
         $this->hotel = $hotel;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, HotelBooking>
-     */
-    public function getBooking(): Collection
-    {
-        return $this->booking;
-    }
-
-    public function addBooking(HotelBooking $booking): static
-    {
-        if (!$this->booking->contains($booking)) {
-            $this->booking->add($booking);
-            $booking->setVoucher($this);
-        }
-
-        return $this;
-    }
-
-    public function removeBooking(HotelBooking $booking): static
-    {
-        if ($this->booking->removeElement($booking)) {
-            // set the owning side to null (unless already changed)
-            if ($booking->getVoucher() === $this) {
-                $booking->setVoucher(null);
-            }
-        }
 
         return $this;
     }

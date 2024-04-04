@@ -136,9 +136,6 @@ class Hotel
     #[ApiSubresource]
     private Collection $hotelFees;
 
-    #[ORM\OneToMany(mappedBy: 'hotel', targetEntity: HotelBooking::class)]
-    private Collection $hotelBookings;
-
     #[ORM\ManyToMany(targetEntity: ProductListModule::class, mappedBy: 'hotels')]
     private Collection $productListModules;
 
@@ -173,7 +170,6 @@ class Hotel
         $this->relatedHotels = new ArrayCollection();
         $this->media = new ArrayCollection();
         $this->hotelFees = new ArrayCollection();
-        $this->hotelBookings = new ArrayCollection();
         $this->productListModules = new ArrayCollection();
         $this->packModalities = new ArrayCollection();
         $this->themes = new ArrayCollection();
@@ -535,36 +531,6 @@ class Hotel
             // set the owning side to null (unless already changed)
             if ($hotelFee->getHotel() === $this) {
                 $hotelFee->setHotel(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, HotelBooking>
-     */
-    public function getHotelBookings(): Collection
-    {
-        return $this->hotelBookings;
-    }
-
-    public function addHotelBooking(HotelBooking $hotelBooking): static
-    {
-        if (!$this->hotelBookings->contains($hotelBooking)) {
-            $this->hotelBookings->add($hotelBooking);
-            $hotelBooking->setHotel($this);
-        }
-
-        return $this;
-    }
-
-    public function removeHotelBooking(HotelBooking $hotelBooking): static
-    {
-        if ($this->hotelBookings->removeElement($hotelBooking)) {
-            // set the owning side to null (unless already changed)
-            if ($hotelBooking->getHotel() === $this) {
-                $hotelBooking->setHotel(null);
             }
         }
 

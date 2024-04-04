@@ -57,10 +57,6 @@ class Bill
     #[Groups(['billReduced', 'bill'])]
     private ?Client $client = null;
 
-    #[ORM\OneToMany(mappedBy: 'bill', targetEntity: HotelBooking::class)]
-    #[Groups(['billReduced', 'bill'])]
-    private Collection $booking;
-
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     #[Groups(['billReduced', 'bill'])]
     private ?string $aditionalDescription = null;
@@ -128,36 +124,6 @@ class Bill
     public function setClient(?Client $client): static
     {
         $this->client = $client;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, HotelBooking>
-     */
-    public function getBooking(): Collection
-    {
-        return $this->booking;
-    }
-
-    public function addBooking(HotelBooking $booking): static
-    {
-        if (!$this->booking->contains($booking)) {
-            $this->booking->add($booking);
-            $booking->setBill($this);
-        }
-
-        return $this;
-    }
-
-    public function removeBooking(HotelBooking $booking): static
-    {
-        if ($this->booking->removeElement($booking)) {
-            // set the owning side to null (unless already changed)
-            if ($booking->getBill() === $this) {
-                $booking->setBill(null);
-            }
-        }
 
         return $this;
     }

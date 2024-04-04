@@ -3,19 +3,17 @@
 namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
-use App\Repository\ActivityBookingRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use App\Repository\BookingRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
-#[ORM\Entity(repositoryClass: ActivityBookingRepository::class)]
+#[ORM\Entity(repositoryClass: BookingRepository::class)]
 #[ApiResource(
     paginationEnabled: false,
     attributes: [
         "order" => ["id" => "ASC"],
-        "normalization_context" => ["groups" => ["activityBookingReduced"]]
+        "normalization_context" => ["groups" => ["bookingReduced"]]
     ],
     collectionOperations: [
         "get",
@@ -23,84 +21,72 @@ use Symfony\Component\Serializer\Annotation\Groups;
         // "post" => ["security" => "is_granted('ROLE_ADMIN')"],
     ],
     itemOperations: [
-        "get" => ["normalization_context" => ["groups" => "activityBooking"]],
+        "get" => ["normalization_context" => ["groups" => "booking"]],
         "put",
         "delete",
         // "put" => ["security" => "is_granted('ROLE_ADMIN') or object.owner == user"],
         // "delete" => ["security" => "is_granted('ROLE_ADMIN') or object.owner == user"],
     ],
 )]
-class ActivityBooking
+class Booking
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['activityBookingReduced', 'activityBooking'])]
+    #[Groups(['bookingReduced', 'booking'])]
     private ?int $id = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
-    #[Groups(['activityBookingReduced', 'activityBooking'])]
+    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    #[Groups(['bookingReduced', 'booking'])]
     private ?\DateTimeInterface $checkIn = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
-    #[Groups(['activityBookingReduced', 'activityBooking'])]
+    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    #[Groups(['bookingReduced', 'booking'])]
     private ?\DateTimeInterface $checkOut = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['activityBookingReduced', 'activityBooking'])]
+    #[Groups(['bookingReduced', 'booking'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['activityBookingReduced', 'activityBooking'])]
+    #[Groups(['bookingReduced', 'booking'])]
     private ?string $email = null;
 
     #[ORM\Column(length: 25, nullable: true)]
-    #[Groups(['activityBookingReduced', 'activityBooking'])]
+    #[Groups(['bookingReduced', 'booking'])]
     private ?string $phone = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['activityBookingReduced'])]
+    #[Groups(['bookingReduced', 'booking'])]
     private ?string $observations = null;
 
     #[ORM\Column(length: 25, nullable: true)]
-    #[Groups(['activityBookingReduced'])]
+    #[Groups(['bookingReduced', 'booking'])]
     private ?string $promoCode = null;
 
     #[ORM\Column(length: 25)]
-    #[Groups(['activityBookingReduced', 'activityBooking'])]
+    #[Groups(['bookingReduced', 'booking'])]
     private ?string $totalPrice = null;
 
     #[ORM\Column(length: 25)]
-    #[Groups(['activityBookingReduced', 'activityBooking'])]
+    #[Groups(['bookingReduced', 'booking'])]
     private ?string $paymentMethod = null;
 
     #[ORM\Column(type: Types::ARRAY, nullable: true)]
-    #[Groups(['activityBookingReduced'])]
+    #[Groups(['bookingReduced', 'booking'])]
     private ?array $data = null;
 
-    #[ORM\Column(nullable: true)]
-    #[Groups(['activityBookingReduced'])]
+    #[ORM\Column]
+    #[Groups(['bookingReduced', 'booking'])]
     private ?bool $hasAcceptance = null;
 
     #[ORM\Column(length: 25)]
-    #[Groups(['activityBookingReduced', 'activityBooking'])]
+    #[Groups(['bookingReduced', 'booking'])]
     private ?string $status = null;
 
-    #[ORM\ManyToOne(inversedBy: 'activityBookings')]
-    #[Groups(['activityBookingReduced', 'activityBooking'])]
-    private ?Activity $activity = null;
-
-    #[ORM\ManyToMany(targetEntity: ActivityAvailability::class, inversedBy: 'activityBookings')]
-    #[Groups(['activityBookingReduced', 'activityBooking'])]
-    private Collection $activityAvailabilities;
-
-    #[ORM\ManyToOne(inversedBy: 'activityBookings')]
+    #[ORM\ManyToOne(inversedBy: 'bookings')]
+    #[Groups(['bookingReduced', 'booking'])]
     private ?Client $client = null;
-
-    public function __construct()
-    {
-        $this->activityAvailabilities = new ArrayCollection();
-    }
 
     public function getId(): ?int
     {
@@ -112,7 +98,7 @@ class ActivityBooking
         return $this->checkIn;
     }
 
-    public function setCheckIn(\DateTimeInterface $checkIn): static
+    public function setCheckIn(?\DateTimeInterface $checkIn): static
     {
         $this->checkIn = $checkIn;
 
@@ -124,7 +110,7 @@ class ActivityBooking
         return $this->checkOut;
     }
 
-    public function setCheckOut(\DateTimeInterface $checkOut): static
+    public function setCheckOut(?\DateTimeInterface $checkOut): static
     {
         $this->checkOut = $checkOut;
 
@@ -232,7 +218,7 @@ class ActivityBooking
         return $this->hasAcceptance;
     }
 
-    public function setHasAcceptance(?bool $hasAcceptance): static
+    public function setHasAcceptance(bool $hasAcceptance): static
     {
         $this->hasAcceptance = $hasAcceptance;
 
@@ -247,42 +233,6 @@ class ActivityBooking
     public function setStatus(string $status): static
     {
         $this->status = $status;
-
-        return $this;
-    }
-
-    public function getActivity(): ?Activity
-    {
-        return $this->activity;
-    }
-
-    public function setActivity(?Activity $activity): static
-    {
-        $this->activity = $activity;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, ActivityAvailability>
-     */
-    public function getActivityAvailabilities(): Collection
-    {
-        return $this->activityAvailabilities;
-    }
-
-    public function addActivityAvailability(ActivityAvailability $activityAvailability): static
-    {
-        if (!$this->activityAvailabilities->contains($activityAvailability)) {
-            $this->activityAvailabilities->add($activityAvailability);
-        }
-
-        return $this;
-    }
-
-    public function removeActivityAvailability(ActivityAvailability $activityAvailability): static
-    {
-        $this->activityAvailabilities->removeElement($activityAvailability);
 
         return $this;
     }
