@@ -19,10 +19,29 @@ class DocumentController extends AbstractController
         ]);
     }
 
-    #[Route('/print_pdf')]
-    public function pdfAction(Pdf $pdf)
+    #[Route('/print_voucher')]
+    public function pdfVoucherAction(Pdf $pdf)
     {
-        $html = $this->renderView('document/index.html.twig', [
+        $html = $this->renderView('document/voucher.html.twig', [
+            // Add any data needed for rendering the Twig template
+        ]);
+
+        $filename = 'pdf.pdf';
+
+        return new Response(
+            $pdf->getOutputFromHtml($html),
+            200,
+            [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => sprintf('attachment; filename="%s"', $filename),
+            ]
+        );
+    }
+
+    #[Route('/print_bill')]
+    public function pdfBillAction(Pdf $pdf)
+    {
+        $html = $this->renderView('document/bill.html.twig', [
             // Add any data needed for rendering the Twig template
         ]);
 
