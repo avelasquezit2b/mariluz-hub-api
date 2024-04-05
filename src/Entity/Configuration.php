@@ -78,6 +78,22 @@ class Configuration
     #[Groups(['configReduced', 'config'])]
     private ?string $billFooter = null;
 
+    #[ORM\OneToOne(inversedBy: 'configuration', cascade: ['persist', 'remove'])]
+    #[Groups(['configReduced', 'config'])]
+    private ?MediaObject $logo = null;
+
+    #[ORM\Column]
+    #[Groups(['configReduced', 'config'])]
+    private ?bool $hasHotels = null;
+
+    #[ORM\Column]
+    #[Groups(['configReduced', 'config'])]
+    private ?bool $hasActivities = null;
+
+    #[ORM\Column]
+    #[Groups(['configReduced', 'config'])]
+    private ?bool $hasExtras = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -211,6 +227,54 @@ class Configuration
     public function setBillFooter(?string $billFooter): static
     {
         $this->billFooter = $billFooter;
+
+        return $this;
+    }
+
+    public function getLogo(): ?MediaObject
+    {
+        return $this->logo;
+    }
+
+    public function setLogo(?MediaObject $logo): static
+    {
+        $this->logo = $logo;
+
+        return $this;
+    }
+
+    public function isHasHotels(): ?bool
+    {
+        return $this->hasHotels;
+    }
+
+    public function setHasHotels(bool $hasHotels): static
+    {
+        $this->hasHotels = $hasHotels;
+
+        return $this;
+    }
+
+    public function isHasActivities(): ?bool
+    {
+        return $this->hasActivities;
+    }
+
+    public function setHasActivities(bool $hasActivities): static
+    {
+        $this->hasActivities = $hasActivities;
+
+        return $this;
+    }
+
+    public function isHasExtras(): ?bool
+    {
+        return $this->hasExtras;
+    }
+
+    public function setHasExtras(bool $hasExtras): static
+    {
+        $this->hasExtras = $hasExtras;
 
         return $this;
     }

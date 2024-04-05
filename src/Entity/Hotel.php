@@ -42,7 +42,7 @@ class Hotel
     private ?int $id = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['hotelReduced', 'hotel', 'page', 'supplier', 'pack', 'productList', 'hotelBooking'])]
+    #[Groups(['hotelReduced', 'hotel', 'page', 'supplier', 'pack', 'productList', 'hotelBooking', 'booking'])]
     private ?string $title = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -163,6 +163,9 @@ class Hotel
     #[ORM\OneToMany(mappedBy: 'hotel', targetEntity: Voucher::class)]
     private Collection $vouchers;
 
+    #[ORM\OneToMany(mappedBy: 'hotel', targetEntity: BookingLine::class)]
+    private Collection $bookingLines;
+
     public function __construct()
     {
         $this->zones = new ArrayCollection();
@@ -176,6 +179,7 @@ class Hotel
         $this->itineraryDays = new ArrayCollection();
         $this->packPrices = new ArrayCollection();
         $this->vouchers = new ArrayCollection();
+        $this->bookingLines = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -732,6 +736,36 @@ class Hotel
             // set the owning side to null (unless already changed)
             if ($voucher->getHotel() === $this) {
                 $voucher->setHotel(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, BookingLine>
+     */
+    public function getBookingLines(): Collection
+    {
+        return $this->bookingLines;
+    }
+
+    public function addBookingLine(BookingLine $bookingLine): static
+    {
+        if (!$this->bookingLines->contains($bookingLine)) {
+            $this->bookingLines->add($bookingLine);
+            $bookingLine->setHotel($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBookingLine(BookingLine $bookingLine): static
+    {
+        if ($this->bookingLines->removeElement($bookingLine)) {
+            // set the owning side to null (unless already changed)
+            if ($bookingLine->getHotel() === $this) {
+                $bookingLine->setHotel(null);
             }
         }
 

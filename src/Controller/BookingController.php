@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Booking;
+use App\Entity\BookingLine;
 use App\Repository\HotelRepository;
 use App\Repository\HotelAvailabilityRepository;
 use App\Repository\BookingRepository;
@@ -176,53 +177,62 @@ class BookingController extends AbstractController
             $formattedRooms = [];
             $activityAvailabilities = [];
             foreach ($requestDecode->data as $data) {
-                // $formattedRoom = [
-                //     'adults' => $room->adults,
-                //     'kids' => $room->kids,
-                //     'babies' => $room->babies,
-                //     'pensionType' => $room->pensionType->pensionType->title,
-                //     'cancellationType' => $room->pensionType->cancellationType->title,
-                //     'pensionTypePriceId' => $room->pensionType->id,
-                //     'price' => $room->pensionType->price,
-                //     'availabilities' => $room->roomType->availabilities,
-                //     'roomType' => $room->roomType->roomCondition->roomType->title
-                // ];
-                // array_push($formattedRooms, $formattedRoom);
-                // foreach ($room->roomType->availabilities as $availability) {
+                $formattedActivity = [
+                    'availability' => $data->availableSchedule->id,
+                    'clientTypes' => []
+                ];
                 $activityAvailability = $activityAvailabilityRepository->find($data->availableSchedule->id);
                 array_push($activityAvailabilities, $activityAvailability);
-                if ($activityAvailability->quota <= $activityAvailability->getMaxQuota()) {
-                    $activityAvailability->setQuota($activityAvailability->getQuota() + 1);
-                    $entityManager->persist($activityAvailability);
-                } else {
-                    throw new BadRequestHttpException('No hay disponibilidad para las fechas seleccionadas');
+
+                foreach ($data->clientTypes as $key => $value) {
+                    $formattedActivity['clientTypes'][$key] = [
+                        'quantity' => $value->quantity,
+                        'price' => $value->price,
+                        'clientType' => $value->clientType
+                    ];
+                    if (($activityAvailability->quota + $value->quantity) <= $activityAvailability->getMaxQuota()) {
+                        $activityAvailability->setQuota($activityAvailability->getQuota() + $value->quantity);
+                        $entityManager->persist($activityAvailability);
+                    } else {
+                        throw new BadRequestHttpException('No hay disponibilidad para las fechas seleccionadas');
+                    }
                 }
+                // array_push($formattedRooms, $formattedRoom);
+                // foreach ($room->roomType->availabilities as $availability) {
+                
+                
                 // }
             }
 
             $activityBooking = new Booking();
-            $activityBooking->setCheckIn(new \DateTime($requestDecode->checkIn));
-            $activityBooking->setCheckOut(new \DateTime($requestDecode->checkOut));
+            $activityBookingLine = new BookingLine();
+
             $activityBooking->setEmail($requestDecode->email);
             $activityBooking->setHasAcceptance($requestDecode->hasAcceptance);
-            $activity = $activityRepository->find($requestDecode->activity);
-            // $activityBooking->setActivity($activity);
             $activityBooking->setName($requestDecode->name);
             $activityBooking->setObservations($requestDecode->observations);
             $activityBooking->setPaymentMethod($requestDecode->paymentMethod);
             $activityBooking->setPhone($requestDecode->phone);
             $activityBooking->setPromoCode($requestDecode->promoCode);
-            $activityBooking->setData($requestDecode->data);
             $activityBooking->setStatus('preBooked');
             $activityBooking->setTotalPrice($requestDecode->totalPrice);
+            $entityManager->persist($activityBooking);
+
+            $activityBookingLine->setCheckIn(new \DateTime($requestDecode->checkIn));
+            $activityBookingLine->setCheckOut(new \DateTime($requestDecode->checkOut));
+            $activityBookingLine->setData($formattedActivity);
+            $activityBookingLine->setTotalPrice($requestDecode->totalPrice);
+            $activity = $activityRepository->find($requestDecode->activity);
+            $activityBookingLine->setActivity($activity);
+            $activityBookingLine->setBooking($activityBooking);
+            $entityManager->persist($activityBookingLine);
+
+            $entityManager->flush();
 
             // foreach ($activityAvailabilities as $activityAvailability) {
             //     $activityAvailability->addActivityBooking($activityBooking);
             //     $entityManager->persist($activityAvailability);
             // }
-
-            $entityManager->persist($activityBooking);
-            $entityManager->flush();
 
             return $this->json([
                 'response'  => $activityBooking

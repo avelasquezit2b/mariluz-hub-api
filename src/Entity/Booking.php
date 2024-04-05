@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\BookingRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -87,6 +89,15 @@ class Booking
     #[ORM\ManyToOne(inversedBy: 'bookings')]
     #[Groups(['bookingReduced', 'booking'])]
     private ?Client $client = null;
+
+    #[ORM\OneToMany(mappedBy: 'booking', targetEntity: BookingLine::class)]
+    #[Groups(['bookingReduced', 'booking'])]
+    private Collection $bookingLines;
+
+    public function __construct()
+    {
+        $this->bookingLines = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -245,6 +256,36 @@ class Booking
     public function setClient(?Client $client): static
     {
         $this->client = $client;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, BookingLine>
+     */
+    public function getBookingLines(): Collection
+    {
+        return $this->bookingLines;
+    }
+
+    public function addBookingLine(BookingLine $bookingLine): static
+    {
+        if (!$this->bookingLines->contains($bookingLine)) {
+            $this->bookingLines->add($bookingLine);
+            $bookingLine->setBooking($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBookingLine(BookingLine $bookingLine): static
+    {
+        if ($this->bookingLines->removeElement($bookingLine)) {
+            // set the owning side to null (unless already changed)
+            if ($bookingLine->getBooking() === $this) {
+                $bookingLine->setBooking(null);
+            }
+        }
 
         return $this;
     }

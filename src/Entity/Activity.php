@@ -42,7 +42,7 @@ class Activity
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['activityReduced', 'activity', 'supplierReduced', 'supplier', 'pack', 'page', 'productList'])]
+    #[Groups(['activityReduced', 'activity', 'supplierReduced', 'supplier', 'pack', 'page', 'productList', 'booking'])]
     private ?string $title = null;
 
     #[ORM\Column(length: 255)]
@@ -185,6 +185,9 @@ class Activity
     #[Groups(['activityReduced', 'activity', 'page', 'productList'])]
     private ?ProductTag $productTag = null;
 
+    #[ORM\OneToMany(mappedBy: 'activity', targetEntity: BookingLine::class)]
+    private Collection $bookingLines;
+
     public function __construct()
     {
         $this->categories = new ArrayCollection();
@@ -199,6 +202,7 @@ class Activity
         $this->themes = new ArrayCollection();
         $this->itineraryDays = new ArrayCollection();
         $this->packPrices = new ArrayCollection();
+        $this->bookingLines = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -823,6 +827,36 @@ class Activity
     public function setProductTag(?ProductTag $productTag): static
     {
         $this->productTag = $productTag;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, BookingLine>
+     */
+    public function getBookingLines(): Collection
+    {
+        return $this->bookingLines;
+    }
+
+    public function addBookingLine(BookingLine $bookingLine): static
+    {
+        if (!$this->bookingLines->contains($bookingLine)) {
+            $this->bookingLines->add($bookingLine);
+            $bookingLine->setActivity($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBookingLine(BookingLine $bookingLine): static
+    {
+        if ($this->bookingLines->removeElement($bookingLine)) {
+            // set the owning side to null (unless already changed)
+            if ($bookingLine->getActivity() === $this) {
+                $bookingLine->setActivity(null);
+            }
+        }
 
         return $this;
     }

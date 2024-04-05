@@ -53,7 +53,7 @@ class MediaObject
     private ?int $id = null;
 
     #[ApiProperty(iri: 'https://schema.org/contentUrl')]
-    #[Groups(['media_object:read', 'activityReduced', 'activity', 'hotelReduced', 'hotel', 'roomType', 'themeReduced', 'theme', 'page', 'heroSlide', 'packReduced', 'pack', 'extra', 'productList'])]
+    #[Groups(['media_object:read', 'activityReduced', 'activity', 'hotelReduced', 'hotel', 'roomType', 'themeReduced', 'theme', 'page', 'heroSlide', 'packReduced', 'pack', 'extra', 'productList', 'configReduced'])]
     public ?string $contentUrl = null;
 
     #[Vich\UploadableField(mapping: "media_object", fileNameProperty: "filePath")]
@@ -64,11 +64,11 @@ class MediaObject
     public ?string $filePath = null;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    #[Groups(['media_object:read', 'activity', 'hotel', 'roomType', 'theme', 'pack', 'extra', 'productList'])]
+    #[Groups(['media_object:read', 'activity', 'hotel', 'roomType', 'theme', 'pack', 'extra', 'productList', 'configReduced'])]
     private $name;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    #[Groups(['media_object:read', 'activity', 'hotel', 'roomType', 'theme', 'pack', 'extra', 'productList'])]
+    #[Groups(['media_object:read', 'activity', 'hotel', 'roomType', 'theme', 'pack', 'extra', 'productList', 'configReduced'])]
     private $alt;
 
     #[ORM\ManyToOne(inversedBy: 'media')]
@@ -76,11 +76,11 @@ class MediaObject
     private ?Activity $activity = null;
 
     #[ORM\Column(length: 25)]
-    #[Groups(['media_object:read', 'activity', 'hotel', 'roomType', 'theme', 'pack', 'extra', 'productList'])]
+    #[Groups(['media_object:read', 'activity', 'hotel', 'roomType', 'theme', 'pack', 'extra', 'productList', 'configReduced'])]
     private ?string $type = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['media_object:read', 'activity', 'hotel', 'roomType', 'theme', 'pack', 'extra', 'productList'])]
+    #[Groups(['media_object:read', 'activity', 'hotel', 'roomType', 'theme', 'pack', 'extra', 'productList', 'configReduced'])]
     private ?int $position = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -88,7 +88,7 @@ class MediaObject
     private ?string $supplier = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['media_object:read', 'activity', 'hotel', 'roomType', 'theme', 'pack', 'extra', 'productList'])]
+    #[Groups(['media_object:read', 'activity', 'hotel', 'roomType', 'theme', 'pack', 'extra', 'productList', 'configReduced'])]
     private ?string $description = null;
 
     #[ORM\ManyToOne(inversedBy: 'media')]
@@ -123,6 +123,10 @@ class MediaObject
     #[ORM\Column(length: 255, nullable: true)]
     #[Groups(['media_object:read', 'activity', 'hotel', 'roomType', 'theme', 'pack', 'extra', 'productList'])]
     private ?string $externalUrl = null;
+
+    #[ORM\OneToOne(mappedBy: 'logo', cascade: ['persist', 'remove'])]
+    #[Groups(['media_object:read'])]
+    private ?Configuration $configuration = null;
 
     public function __construct()
     {
@@ -322,6 +326,28 @@ class MediaObject
     public function setExternalUrl(?string $externalUrl): static
     {
         $this->externalUrl = $externalUrl;
+
+        return $this;
+    }
+
+    public function getConfiguration(): ?Configuration
+    {
+        return $this->configuration;
+    }
+
+    public function setConfiguration(?Configuration $configuration): static
+    {
+        // unset the owning side of the relation if necessary
+        if ($configuration === null && $this->configuration !== null) {
+            $this->configuration->setLogo(null);
+        }
+
+        // set the owning side of the relation if necessary
+        if ($configuration !== null && $configuration->getLogo() !== $this) {
+            $configuration->setLogo($this);
+        }
+
+        $this->configuration = $configuration;
 
         return $this;
     }
