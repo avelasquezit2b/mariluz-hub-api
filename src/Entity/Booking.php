@@ -87,7 +87,7 @@ class Booking
     private ?string $status = null;
 
     #[ORM\ManyToOne(inversedBy: 'bookings')]
-    #[Groups(['bookingReduced', 'booking'])]
+    #[Groups(['bookingReduced', 'booking', 'voucherReduced', 'voucher'])]
     private ?Client $client = null;
 
     #[ORM\OneToMany(mappedBy: 'booking', targetEntity: BookingLine::class)]

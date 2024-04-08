@@ -40,7 +40,7 @@ class Voucher
     #[Groups(['voucherReduced', 'voucher'])]
     private ?Hotel $hotel = null;
 
-    #[ORM\Column]
+    #[ORM\Column(nullable: true)]
     #[Groups(['voucherReduced', 'voucher'])]
     private ?\DateTimeImmutable $createdAt = null;
 

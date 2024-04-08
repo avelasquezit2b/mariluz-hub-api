@@ -21,7 +21,8 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-
+use App\Controller\DocumentController;
+use Knp\Snappy\Pdf;
 
 class BookingController extends AbstractController
 {
@@ -129,9 +130,9 @@ class BookingController extends AbstractController
             // TO - DO Generar un Voucher a partir de los datos de la reserva (recibes los datos del cliente de la reserva)
 
             $newVoucher = new Voucher();
-            $newVoucher->setHotel();
-            $newVoucher->setToBePaidBy();
-            $newVoucher->setBooking();
+            $newVoucher->setHotel($requestData->hotel);
+            $newVoucher->setToBePaidBy($requestData->toBePaidBy);
+            $newVoucher->setBooking($requestData->booking);
 
             //
 
@@ -245,7 +246,7 @@ class BookingController extends AbstractController
     }
 
     #[Route('/activity_booking', name: 'api_activity_booking')]
-    public function activity_booking(Request $request, MailerInterface $mailer, EntityManagerInterface $entityManager, BookingRepository $bookingRepository, ActivityAvailabilityRepository $activityAvailabilityRepository, ActivityRepository $activityRepository): Response
+    public function activity_booking(Request $request, MailerInterface $mailer, EntityManagerInterface $entityManager, BookingRepository $bookingRepository, ActivityAvailabilityRepository $activityAvailabilityRepository, DocumentController $documentController): Response
     {
         $request = file_get_contents('php://input');
         parse_str($request, $output);
@@ -273,6 +274,18 @@ class BookingController extends AbstractController
             $entityManager->persist($activityBooking);
             $entityManager->flush();
 
+            // TO - DO Generar un Voucher a partir de los datos de la reserva (recibes los datos del cliente de la reserva)
+
+            $newVoucher = new Voucher();
+            $newVoucher->setToBePaidBy('MARILUZ TRAVEL TOUR S.L.');
+            $newVoucher->setBooking($activityBooking);
+
+            $entityManager->persist($newVoucher);
+            $entityManager->flush();
+
+            //
+
+            $pdf = new Pdf();
             $email = (new TemplatedEmail())
                 ->from('adriarias@it2b.es')
                 ->to('adriarias@it2b.es')
@@ -282,7 +295,7 @@ class BookingController extends AbstractController
                     "bookingEmail" => $activityBooking->getEmail(),
                     "phone" => $activityBooking->getPhone(),
                     "id" => $activityBooking->getId(),
-                    "product" => $activityBooking->getActivity(),
+                    "productLines" => $activityBooking->getBookingLines(),
                     "rooms" => $activityBooking->getData(),
                     "totalPrice" => $activityBooking->getTotalPrice(),
                     "startDate" => date_format($activityBooking->getCheckIn(), "d/m/Y"),
@@ -290,6 +303,7 @@ class BookingController extends AbstractController
                     "paymentMethod" => $activityBooking->getPaymentMethod(),
                     "date" => date("d-m-Y"),
                 ])
+                ->attach($documentController->pdfVoucherAction($pdf))
                 ->htmlTemplate('email/thank_you.html.twig');
 
             if ($activityBooking->getStatus() == 'booked') {

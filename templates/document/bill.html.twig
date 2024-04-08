@@ -27,8 +27,21 @@
 		border-bottom: 1px solid #000;
 	}
 
+	.line {
+		content: '';
+		width: 100%;
+		margin-bottom: .25rem;
+		border-bottom: 1px solid #000;
+	}
+
 	.content {
-		height: 1254px;
+		height: 1060px;
+	}
+
+	.black-box {
+		border: 2px solid black;
+		text-align: center;
+		padding: .5rem 1rem;
 	}
 
 </style>
@@ -36,21 +49,21 @@
 
 <div id="container">
 	<div class="content">
-		<table width="100%";>
+		<table width="100%">
 			<tbody>
 				<tr class="spaceUnder">
 					<td colspan="3" style="text-align: center">
 						<img class="logo" src="http://api.mariluz.hub2b.travel/media/logo-mariluz.png" alt="logo" style="width: 250px;">
 					</td>
 				</tr>
-				<tr colspan="3">
-					<td>
+				<tr>
+					<td colspan="3">
 						<div>
 							<h1>Factura</h1>
 						</div>
 					</td>
 				</tr>
-				<tr>
+				<tr class="spaceUnder">
 					<td>
 						<div>
 							<span>Número / Number</span>
@@ -71,155 +84,147 @@
 							<strong>000034702</strong>
 						</div>
 					</td>
-					<td>
+					<td style="padding-right: 2rem;vertical-align: top">
+						<div style="margin-bottom:.5rem">
+							<strong>JOYFER JARDINES S.L</strong>
+						</div>
+						<div style="margin-bottom:.5rem">
+							<span>C/ Son Muntaner 71 bajos</span>
+						</div>
+						<div style="margin-bottom:.5rem">
+							<span>07013 Palma de Mallorca</span>
+						</div>
+					</td>
+					<td style="width: 300px;vertical-align: top">
 						<div>
 							<span>CIF</span>
 						</div>
 						<div style="margin-bottom:.5rem">
 							<strong>B09809492</strong>
 						</div>
-						<div>
-							<span>Código / Code</span>
-						</div>
-						<div style="margin-bottom:.5rem">
-							<strong>4300000000000</strong>
-						</div>
-					</td>
-					<td>
-						<div>
-							<strong>JOYFER JARDINES S.L</strong>
-						</div>
-						<div style="margin-bottom:.5rem">
-							<strong>C/ Son Muntaner 71 bajos 07013 Palma de Mallorca</strong>
-						</div>
-					</td>
-				</tr>
-				<tr>
-					<td colspan="3">
-						<div class="divisor"></div>
 					</td>
 				</tr>
 				<tr class="spaceUnder">
-					<td colspan="2">
-						<div style="margin-bottom:1rem">
-							Emitido para / Issued For
-						</div>
-						<div>
-							<strong>APTHOTEL VIVA BLUE 4*</strong>
-						</div>
-						<div>
-							<span>Passeig de Bateman, s/n</span>
-						</div>
-						<div>
-							<span>07408 PLAYA DE MURO</span>
-						</div>
-						<div>
-							<span>BALEARES España</span>
-						</div>
-						<span>
-							Tel:
-						</span>
-						<span>
-							971 89 25 05
-						</span>
-					</td>
-					<td>
-						<div>
-							<span>Expediente / File</span>
-						</div>
-						<div style="margin-bottom:.5rem">
-							<strong>00013855</strong>
-						</div>
-						<div>
-							<span>Fecha Emisión / Issue Date</span>
-						</div>
-						<div style="margin-bottom:.5rem">
-							<strong>27/02/2015</strong>
-						</div>
-						<div>
-							<span>Pagadero por / To be Paid By</span>
-						</div>
-						<div>
-							<strong>INVERSIONES PASCUAL S.L</strong>
+					<td style="width: 250px;">
+						<div class="black-box">
+							<strong>
+								Fecha / Date
+							</strong>
 						</div>
 					</td>
-				</tr>
-				<tr>
-					<td colspan="3">
-						<div class="divisor"></div>
-					</td>
-				</tr>
-				<tr>
-					<td colspan="2">
-						<div style="margin-bottom:.5rem">
-							<span>Clientes: </span>
-							<strong>ANTONI REUS</strong>
-						</div>
-						<div>
-							<span>Rogamos presten los siguientes servicios al titular del presente bono:</span>
-						</div>
-						<div style="margin-bottom:.5rem">
-							<strong>OFERTA 2015 VIVA BLUE</strong>
-						</div>
-						<div>
-							<span>Régimen:</span>
-							<strong>PC</strong>
-						</div>
-						</div>
-							<strong>1</strong>
-							<span>Dobles</span>
+					<td style="width: 500px;">
+						<div class="black-box">
+							<strong>
+								Concepto / Concept
+							</strong>
 						</div>
 					</td>
 					<td>
-						<div style="margin-bottom:.5rem">
-							<span>Personas: </span>
-							<span>2</span>
-						</div>
-						<div style="margin-bottom:.5rem">
-							<span>Llegada: </span>
-							<strong>28/02/2015</strong>
-						</div>
-						<div style="margin-bottom:.5rem">
-							<span>Salida: </span>
-							<strong>01/03/2015</strong>
-						</div>
-						<div>
-							<span>Servicio: </span>
-							<strong>0001</strong>
+						<div class="black-box">
+							<strong>
+								Importe / Amount
+							</strong>
 						</div>
 					</td>
 				</tr>
 				<tr>
-					<td colspan="3">
-						<div style="margin-top:2rem;border-bottom: 1px solid black">
-							<span>Observaciones / Remarks</span>
+					<td style="width: 250px;padding:1rem">
+						<div style="text-align:center">
+							<span>
+								29/03/2024 - 31/03/2024
+							</span>
 						</div>
-						<div style="margin-top:1rem">
-							<span>PC + Agua y vino bebe</span>
+					</td>
+					<td style="width: 500px;padding:1rem">
+						<div>
+							<span>
+								OFERTA POLLENSA PARK 4*
+							</span>
+						</div>
+						<div>
+							<span>
+								4 ADU
+							</span>
+						</div>
+						<div>
+							<span>
+								Pax. FELIX CAMARA Rég TI
+							</span>
+						</div>
+						<div>
+							<span>
+								4  Pax TI/AI x 80.00 x 2 d. = 640.00
+							</span>
+						</div>
+						<div>
+							<strong>
+								Régimen Especial de las Agencias de Viajes (Impuestos no deducibles)
+							</strong>
+						</div>
+					</td>
+					<td>
+						<div style="padding:1rem;text-align:center">
+							<strong>
+								640.00
+							</strong>
 						</div>
 					</td>
 				</tr>
-				{# <tr style="margin-top:auto">
-					<td style="height:100% !important" colspan="3">
-						<div style="position:absolute;bottom:0;left:0;display:flex;justify-content:center">
-							<span>
-								C/ Jaume III, 27 - Ent 2ª Despacho 18 - 19
-							</span>
-							<span>
-								07012 Palma de Mallorca
-							</span>
-							<span>
-								BALEARES España
-							</span>
-							<span>
-								Tel:
-							</span>
-							<span>
-								971 42 51 10
-							</span>
+			</tbody>
+		</table>
+	</div>
+	<div class="recount">
+		<table width="100%">
+			<tbody>
+				<tr>
+					<td style="padding-bottom: 3rem">
+						<div style="padding-bottom: 1rem;padding-right: 1rem">
+							<span>CAIXA BANK IBAN ES18 2100 8122 8313 0049 0357</span>
+						</div>
+						<div style="font-size:14px">
+							<span>Forma de Pago / Payment:</span>
+						</div>
+						<div style="font-size:14px">
+							<span>Transferencia</span>
 						</div>
 					</td>
-				</tr> #}
+					<td style="width: 125px;padding-bottom: 3rem;font-size:12px;padding-right:1rem">
+						<div style="text-align:center">
+							<div>
+								<strong>Importe Prepagado / Pre-paid Amount</strong>
+							</div>
+							<div class="line"></div>
+							<div>
+								<strong>640.00 Eur</strong>
+							</div>
+						</div>
+					</td>
+					<td style="width: 125px;padding-bottom: 3rem;font-size:12px;padding-right:1rem">
+						<div style="text-align:center">
+							<div>
+								<strong>Pendiente Cobro / Balance Due</strong>
+							</div>
+							<div class="line"></div>
+							<div>
+								<strong>640.00 Eur</strong>
+							</div>
+						</div>
+					</td>
+					<td style="width: 200px;padding-bottom: 3rem">
+						<div class="black-box">
+							<div>
+								<strong>Total Factura </strong>
+							</div>
+							<div>
+								<strong>Total invoice </strong>
+							</div>
+							<div class="line"></div>
+							<div>
+								<strong>0.00 Eur</strong>
+							</div>
+						</div>
+					</td>
+				</tr>
 			</tbody>
 		</table>
 	</div>
@@ -249,6 +254,11 @@
 		<span>
 			971 42 51 10
 		</span>
+		<div style="padding-top: 1rem;font-size:12px">
+			<span>
+				Registro Mercantil de Baleares, Folio 207, Tomo 2366,  Hoja PM-63134, Inscripción 1ª
+			</span>
+		</div>
 	</div>
 </div>
 </body>

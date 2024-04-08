@@ -67,7 +67,7 @@ class EmailController extends AbstractController
             //->bcc('bcc@example.com')
             //->replyTo('fabien@example.com')
             //->priority(Email::PRIORITY_HIGH)
-            ->subject('$request->subject')
+            ->subject($request->subject)
             ->context([
                 "name" => '$name',
                 "message" => '$request->message'
