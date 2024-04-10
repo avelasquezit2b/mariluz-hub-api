@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Repository\VoucherRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -18,11 +19,15 @@ class DocumentController extends AbstractController
         ]);
     }
 
-    #[Route('/print_voucher')]
-    public function pdfVoucherAction(Pdf $pdf)
+    #[Route('/print_voucher/{id}')]
+    public function pdfVoucherAction(Pdf $pdf, VoucherRepository $voucherRepository, string $id)
     {
+        $bookingVoucher = $voucherRepository->find($id);
+
         $html = $this->renderView('document/voucher.html.twig', [
-            // Add any data needed for rendering the Twig template
+            'to_be_paid_by' => $bookingVoucher->getToBePaidBy(),
+            'hotel' => $bookingVoucher->getHotel(),
+            'booking' => $bookingVoucher->getBooking()
         ]);
 
         $filename = 'pdf.pdf';

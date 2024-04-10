@@ -325,4 +325,38 @@ class BookingController extends AbstractController
             ]);
         }
     }
+
+    #[Route('/send_thank_you_email', name: 'api_send_email')]
+    public function send_email(): Response
+    {
+        $html = $this->renderView('document/voucher.html.twig', [
+            // Add any data needed for rendering the Twig template
+        ]);
+
+        $email = (new TemplatedEmail())
+            ->from('adriarias@it2b.es')
+            ->to('adriarias@it2b.es')
+            ->subject('Gracias por tu reserva')
+            ->context([
+                "name" => $activityBooking->getName(),
+                "bookingEmail" => $activityBooking->getEmail(),
+                "phone" => $activityBooking->getPhone(),
+                "id" => $activityBooking->getId(),
+                "product" => $activityBooking->getBookingLines()[0]->getActivity(),
+                "totalPrice" => $activityBooking->getTotalPrice(),
+                "paymentMethod" => $activityBooking->getPaymentMethod(),
+                "date" => date("d-m-Y"),
+            ])
+            ->attach($pdf->getOutputFromHtml($html), 'Bono_Actividad.pdf', 'application/pdf') 
+            ->htmlTemplate('email/activity_thank_you.html.twig');
+
+        if ($activityBooking->getStatus() == 'booked') {
+            $mailer->send($email);
+        }
+
+        return $this->json([
+            'response'  => $email
+        ]);
+    }
+    
 }
