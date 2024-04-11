@@ -33,34 +33,35 @@ class BookingLine
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['bookingLineReduced', 'bookingLine'])]
+    #[Groups(['booking', 'bookingReduced', 'bookingLineReduced', 'bookingLine'])]
     private ?int $id = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
-    #[Groups(['bookingLineReduced', 'bookingLine', 'booking'])]
+    #[Groups(['bookingLineReduced', 'bookingLine', 'booking', 'bookingReduced', 'voucherReduced', 'voucher'])]
     private ?\DateTimeInterface $checkIn = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
-    #[Groups(['bookingLineReduced', 'bookingLine', 'booking'])]
+    #[Groups(['bookingLineReduced', 'bookingLine', 'booking', 'bookingReduced', 'voucherReduced', 'voucher'])]
     private ?\DateTimeInterface $checkOut = null;
 
     #[ORM\Column(length: 25)]
-    #[Groups(['bookingLineReduced', 'bookingLine', 'booking'])]
+    #[Groups(['bookingLineReduced', 'bookingLine', 'booking', 'voucherReduced', 'voucher'])]
     private ?string $totalPrice = null;
 
     #[ORM\Column(type: Types::ARRAY, nullable: true)]
-    #[Groups(['bookingLineReduced', 'bookingLine', 'booking'])]
+    #[Groups(['bookingLineReduced', 'bookingLine', 'booking', 'voucherReduced', 'voucher'])]
     private ?array $data = null;
 
     #[ORM\ManyToOne(inversedBy: 'bookingLines')]
-    #[Groups(['bookingLineReduced', 'bookingLine', 'booking'])]
+    #[Groups(['bookingLineReduced', 'bookingLine', 'booking', 'voucherReduced', 'voucher'])]
     private ?Hotel $hotel = null;
 
     #[ORM\ManyToOne(inversedBy: 'bookingLines')]
-    #[Groups(['bookingLineReduced', 'bookingLine', 'booking'])]
+    #[Groups(['bookingLineReduced', 'bookingLine', 'booking', 'voucherReduced', 'voucher'])]
     private ?Activity $activity = null;
 
     #[ORM\ManyToOne(inversedBy: 'bookingLines')]
+    #[Groups(['bookingLineReduced', 'bookingLine', 'booking', 'voucherReduced', 'voucher'])]
     private ?Booking $booking = null;
 
     public function getId(): ?int

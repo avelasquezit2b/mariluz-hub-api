@@ -61,22 +61,22 @@
 							Emitido para / Issued For
 						</div>
 						<div>
-							<strong>{{hotel.title}}</strong>
+							<strong>{{productTitle}}</strong>
 						</div>
 						<div>
-							<span>Passeig de Bateman, s/n</span>
+							<span>{{productZone}}</span>
 						</div>
 						<div>
-							<span>07408 PLAYA DE MURO</span>
+							<span>{{productLocation}}</span>
 						</div>
 						<div>
-							<span>BALEARES España</span>
+							<span>España</span>
 						</div>
 						<span>
 							Tel:
 						</span>
 						<span>
-							971 89 25 05
+							XXX XX XX XX
 						</span>
 					</td>
 					<td>
@@ -84,13 +84,13 @@
 							<span>Expediente / File</span>
 						</div>
 						<div style="margin-bottom:.5rem">
-							<strong>00013855</strong>
+							<strong>{{bookingId}}</strong>
 						</div>
 						<div>
 							<span>Fecha Emisión / Issue Date</span>
 						</div>
 						<div style="margin-bottom:.5rem">
-							<strong>27/02/2015</strong>
+							<strong>{{bookingDate}}</strong>
 						</div>
 						<div>
 							<span>Pagadero por / To be Paid By</span>
@@ -109,39 +109,39 @@
 					<td colspan="2">
 						<div style="margin-bottom:.5rem">
 							<span>Clientes: </span>
-							<strong>ANTONI REUS</strong>
+							<strong>{{clientName}}</strong>
 						</div>
 						<div>
 							<span>Rogamos presten los siguientes servicios al titular del presente bono:</span>
 						</div>
 						<div style="margin-bottom:.5rem">
-							<strong>OFERTA 2015 VIVA BLUE</strong>
+							<strong>XXXXX XX XXXX XXXX</strong>
 						</div>
 						<div>
 							<span>Régimen:</span>
-							<strong>PC</strong>
+							<strong>XX</strong>
 						</div>
 						</div>
-							<strong>1</strong>
+							<strong>X</strong>
 							<span>Dobles</span>
 						</div>
 					</td>
 					<td>
 						<div style="margin-bottom:.5rem">
 							<span>Personas: </span>
-							<span>2</span>
+							<span>X</span>
 						</div>
 						<div style="margin-bottom:.5rem">
 							<span>Llegada: </span>
-							<strong>28/02/2015</strong>
+							<strong>{{checkIn}}</strong>
 						</div>
 						<div style="margin-bottom:.5rem">
 							<span>Salida: </span>
-							<strong>01/03/2015</strong>
+							<strong>{{checkOut}}</strong>
 						</div>
 						<div>
 							<span>Servicio: </span>
-							<strong>0001</strong>
+							<strong>XXXX</strong>
 						</div>
 					</td>
 				</tr>
@@ -151,7 +151,7 @@
 							<span>Observaciones / Remarks</span>
 						</div>
 						<div style="margin-top:1rem">
-							<span>PC + Agua y vino bebe</span>
+							<span>XX X XXXX X XXXX XXXX</span>
 						</div>
 					</td>
 				</tr>
@@ -182,28 +182,28 @@
 	<div style="width: 100%;text-align: center;font-size:14px">
 		<div>
 			<strong>
-				MARILUZ TRAVEL TOUR S.L
+				{{companyName}}
 			</strong>
 		</div>
 		<div>
 			<span>
-				CIF B-57595217
+				{{companyCif}}
 			</span>
 		</div>
 		<span>
-			C/ Jaume III, 27 - Ent 2ª Despacho 18 - 19
+			{{companyAddress}}
 		</span>
 		<span>
-			07012 Palma de Mallorca
+			{{companyPostalCode}} {{companyCity}}
 		</span>
 		<span>
-			BALEARES España
+			{{companyProvince}} {{companyCountry}}
 		</span>
 		<span>
 			Tel:
 		</span>
 		<span>
-			971 42 51 10
+			{{companyPhone}}
 		</span>
 	</div>
 </div>
