@@ -35,7 +35,7 @@ class Booking
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['bookingReduced', 'booking'])]
+    #[Groups(['bookingReduced', 'booking', 'voucher'])]
     private ?int $id = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
@@ -87,7 +87,7 @@ class Booking
     private ?string $status = null;
 
     #[ORM\ManyToOne(inversedBy: 'bookings')]
-    #[Groups(['bookingReduced', 'booking'])]
+    #[Groups(['bookingReduced', 'booking', 'voucher'])]
     private ?Client $client = null;
 
     #[ORM\OneToMany(mappedBy: 'booking', targetEntity: BookingLine::class)]
