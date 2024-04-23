@@ -83,6 +83,10 @@ class Extra
     #[ORM\OneToMany(mappedBy: 'extra', targetEntity: PackPrice::class)]
     private Collection $packPrices;
 
+    #[ORM\OneToOne(inversedBy: 'extra', cascade: ['persist', 'remove'])]
+    #[Groups(['extra', 'extraReduced'])]
+    private ?Seo $seo = null;
+
     public function __construct()
     {
         $this->media = new ArrayCollection();
@@ -299,6 +303,18 @@ class Extra
                 $packPrice->setExtra(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getSeo(): ?Seo
+    {
+        return $this->seo;
+    }
+
+    public function setSeo(?Seo $seo): static
+    {
+        $this->seo = $seo;
 
         return $this;
     }

@@ -188,6 +188,10 @@ class Activity
     #[ORM\OneToMany(mappedBy: 'activity', targetEntity: BookingLine::class)]
     private Collection $bookingLines;
 
+    #[ORM\OneToOne(inversedBy: 'activity', cascade: ['persist', 'remove'])]
+    #[Groups(['activity', 'activityReduced'])]
+    private ?Seo $seo = null;
+
     public function __construct()
     {
         $this->categories = new ArrayCollection();
@@ -766,7 +770,7 @@ class Activity
             $theme->removeActivity($this);
         }
     }
-    
+
     public function removeItineraryDay(ItineraryDay $itineraryDay): static
     {
         if ($this->itineraryDays->removeElement($itineraryDay)) {
@@ -779,7 +783,7 @@ class Activity
     public function getPrice(): ?string
     {
         $price = null;
-        foreach($this->getModalities() as $modality) {
+        foreach ($this->getModalities() as $modality) {
             if (!$price) {
                 $price = $modality->getPrice();
             } else if ($price > $modality->getPrice()) {
@@ -857,6 +861,18 @@ class Activity
                 $bookingLine->setActivity(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getSeo(): ?Seo
+    {
+        return $this->seo;
+    }
+
+    public function setSeo(?Seo $seo): static
+    {
+        $this->seo = $seo;
 
         return $this;
     }

@@ -139,7 +139,8 @@ class Hotel
     #[ORM\ManyToMany(targetEntity: ProductListModule::class, mappedBy: 'hotels')]
     private Collection $productListModules;
 
-    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    #[ORM\OneToOne(inversedBy: 'hotel', cascade: ['persist', 'remove'])]
+    #[Groups(['hotel', 'hotelReduced'])]
     private ?Seo $seo = null;
 
     #[ORM\ManyToMany(targetEntity: Modality::class, mappedBy: 'packHotels')]

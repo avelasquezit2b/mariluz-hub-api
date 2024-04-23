@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Doctrine\DBAL\Types\Types;
 
 #[ORM\Entity(repositoryClass: VoucherRepository::class)]
 #[ApiResource(
@@ -52,6 +53,10 @@ class Voucher
     #[Groups(['voucherReduced', 'voucher'])]
     private ?Booking $booking = null;
     
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['voucherReduced', 'voucher'])]
+    private ?string $observations = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -106,6 +111,18 @@ class Voucher
     public function setBooking(?Booking $booking): static
     {
         $this->booking = $booking;
+
+        return $this;
+    }
+
+    public function getObservations(): ?string
+    {
+        return $this->observations;
+    }
+
+    public function setObservations(?string $observations): static
+    {
+        $this->observations = $observations;
 
         return $this;
     }
