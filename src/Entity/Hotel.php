@@ -65,7 +65,7 @@ class Hotel
     #[Groups(['hotel'])]
     private ?string $checkOut = null;
 
-    #[ORM\ManyToOne(inversedBy: 'hotels')]
+    #[ORM\ManyToOne(inversedBy: 'hotels', cascade: ['remove'])]
     #[Groups(['hotelReduced', 'hotel', 'page', 'productList'])]
     private ?Location $location = null;
 
