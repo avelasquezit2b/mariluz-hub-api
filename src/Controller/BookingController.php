@@ -134,7 +134,7 @@ class BookingController extends AbstractController
         try {
             $requestData = str_replace("?", "", utf8_decode(base64_decode($output['Ds_MerchantParameters'])));
             $requestData = json_decode($requestData, true);
-            $hotelBooking = $bookingRepository->find($requestData->id);
+            $hotelBooking = $bookingRepository->find(intval(ltrim($requestData['Ds_Order'], "0")));
 
             // $bookingHub->setLocator($bookingOfi->BookingResult->BookingCode);
             if ($requestData['Ds_Response'] < 100) {
@@ -328,6 +328,8 @@ class BookingController extends AbstractController
                 "totalPrice" => $booking->getTotalPrice(),
                 "paymentMethod" => $booking->getPaymentMethod(),
                 "date" => date("d-m-Y"),
+                "startDate" => $booking->getBookingLines()[0]->getCheckIn()->format('d/m/Y'),
+                "endDate" => $booking->getBookingLines()[0]->getCheckOut()->format('d/m/Y'),
             ];
 
             $fileName = 'Bono_Hotel.pdf';
