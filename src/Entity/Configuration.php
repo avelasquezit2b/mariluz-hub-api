@@ -94,6 +94,10 @@ class Configuration
     #[Groups(['configReduced', 'config'])]
     private ?bool $hasExtras = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['configReduced', 'config'])]
+    private ?string $bookingEmail = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -275,6 +279,18 @@ class Configuration
     public function setHasExtras(bool $hasExtras): static
     {
         $this->hasExtras = $hasExtras;
+
+        return $this;
+    }
+
+    public function getBookingEmail(): ?string
+    {
+        return $this->bookingEmail;
+    }
+
+    public function setBookingEmail(?string $bookingEmail): static
+    {
+        $this->bookingEmail = $bookingEmail;
 
         return $this;
     }

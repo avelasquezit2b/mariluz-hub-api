@@ -102,7 +102,7 @@ class BookingController extends AbstractController
     }
 
     #[Route('/hotel_booking', name: 'api_hotel_booking')]
-    public function booking(Request $request, MailerInterface $mailer, EntityManagerInterface $entityManager, BookingRepository $bookingRepository, HotelAvailabilityRepository $hotelAvailabilityRepository, HotelRepository $hotelRepository, DocumentController $documentController): Response
+    public function booking(Request $request, MailerInterface $mailer, EntityManagerInterface $entityManager, BookingRepository $bookingRepository, HotelAvailabilityRepository $hotelAvailabilityRepository, HotelRepository $hotelRepository, DocumentController $documentController, VoucherRepository $voucherRepository, Pdf $pdf,ConfigurationRepository $configurationRepository): Response
     {
         $request = file_get_contents('php://input');
         parse_str($request, $output);
@@ -130,7 +130,7 @@ class BookingController extends AbstractController
             $entityManager->persist($hotelBooking);
             $entityManager->flush();
 
-            // TO - DO Generar un Voucher a partir de los datos de la reserva (recibes los datos del cliente de la reserva)
+            // Generate a Voucher based on the booking data
 
             $newVoucher = new Voucher();
             $newVoucher->setToBePaidBy('H-MARILUZ TRAVEL TOUR S.L.');
@@ -139,32 +139,7 @@ class BookingController extends AbstractController
             $entityManager->persist($newVoucher);
             $entityManager->flush();
 
-            //
-
-            $pdf = new Pdf();
-            $email = (new TemplatedEmail())
-                ->from('adriarias@it2b.es')
-                ->to('adriarias@it2b.es')
-                ->subject('Gracias por tu reserva')
-                ->context([
-                    "name" => $hotelBooking->getName(),
-                    "bookingEmail" => $hotelBooking->getEmail(),
-                    "phone" => $hotelBooking->getPhone(),
-                    "id" => $hotelBooking->getId(),
-                    "product" => $hotelBooking->getHotel(),
-                    "rooms" => $hotelBooking->getRooms(),
-                    "totalPrice" => $hotelBooking->getTotalPrice(),
-                    "startDate" => date_format($hotelBooking->getCheckIn(), "d/m/Y"),
-                    "endDate" => date_format($hotelBooking->getCheckOut(), "d/m/Y"),
-                    "paymentMethod" => $hotelBooking->getPaymentMethod(),
-                    "date" => date("d-m-Y"),
-                ])
-                ->attach($documentController->pdfVoucherAction($pdf))
-                ->htmlTemplate('email/hotel_thank_you.html.twig');
-
-            if ($hotelBooking->getStatus() == 'booked') {
-                $mailer->send($email);
-            }
+            $this->send_voucher($newVoucher->getId(), $mailer, $pdf, $voucherRepository, $configurationRepository);
 
             return $this->json([
                 'response'  => $email
@@ -253,7 +228,7 @@ class BookingController extends AbstractController
     }
 
     #[Route('/activity_booking', name: 'api_activity_booking')]
-    public function activity_booking(Request $request, MailerInterface $mailer, EntityManagerInterface $entityManager, BookingRepository $bookingRepository, ActivityAvailabilityRepository $activityAvailabilityRepository, VoucherRepository $voucherRepository, Pdf $pdf): Response
+    public function activity_booking(Request $request, MailerInterface $mailer, EntityManagerInterface $entityManager, BookingRepository $bookingRepository, ActivityAvailabilityRepository $activityAvailabilityRepository, VoucherRepository $voucherRepository, Pdf $pdf, ConfigurationRepository $configurationRepository): Response
     {
         $request = file_get_contents('php://input');
         parse_str($request, $output);
@@ -292,38 +267,9 @@ class BookingController extends AbstractController
             $entityManager->persist($newVoucher);
             $entityManager->flush();
 
-            //
+            $this->send_voucher($newVoucher->getId(), $mailer, $pdf, $voucherRepository, $configurationRepository);
 
-            $this->send_voucher($newVoucher->getId(), $mailer, $pdf, $voucherRepository);
 
-            // $html = $this->renderView('document/voucher.html.twig', [
-            //     // Add any data needed for rendering the Twig template
-            // ]);
-
-            // $email = (new TemplatedEmail())
-            //     ->from('adriarias@it2b.es')
-            //     ->to('adriarias@it2b.es')
-            //     ->subject('Gracias por tu reserva')
-            //     ->context([
-            //         "name" => $activityBooking->getName(),
-            //         "bookingEmail" => $activityBooking->getEmail(),
-            //         "phone" => $activityBooking->getPhone(),
-            //         "id" => $activityBooking->getId(),
-            //         "product" => $activityBooking->getBookingLines()[0]->getActivity(),
-            //         "totalPrice" => $activityBooking->getTotalPrice(),
-            //         "paymentMethod" => $activityBooking->getPaymentMethod(),
-            //         "date" => date("d-m-Y"),
-            //     ])
-            //     ->attach($pdf->getOutputFromHtml($html), 'Bono_Actividad.pdf', 'application/pdf') 
-            //     ->htmlTemplate('email/activity_thank_you.html.twig');
-
-            // if ($activityBooking->getStatus() == 'booked') {
-            //     $mailer->send($email);
-            // }
-
-            // return $this->json([
-            //     'response'  => $email
-            // ]);
         } catch (SoapFault $e) {
             return $this->json([
                 'response'  => $e
@@ -363,18 +309,33 @@ class BookingController extends AbstractController
 
             $html = $this->renderView('document/voucher.html.twig', [
                 'to_be_paid_by' => $voucher->getToBePaidBy(),
-                'productTitle' => $voucher->getBooking()->getBookingLines()[0]->get
+                'productTitle' => $voucher->getBooking()->getBookingLines()[0]->getHotel()->getTitle(),
+                'productZone' => $voucher->getBooking()->getBookingLines()[0]->getHotel()->getZones()[0]->getName(),
+                'productLocation' => $voucher->getBooking()->getBookingLines()[0]->getHotel()->getLocation()->getName(),
+                'bookingId' => $voucher->getBooking()->getId(),
+                'bookingDate' => date("d-m-Y"),
+                'clientName' => $voucher->getBooking()->getClient()->getName(),
+                'checkIn' => $voucher->getBooking()->getBookingLines()[0]->getCheckIn()->format('d/m/Y'),
+                'checkOut' => $voucher->getBooking()->getBookingLines()[0]->getCheckOut()->format('d/m/Y'),
+                'companyName' => $company->getTitle(),
+                'companyCif' => $company->getCif(),
+                'companyAddress' => $company->getTitle(),
+                'companyPostalCode' => $company->getPostalCode(),
+                'companyCity' => $company->getCity(),
+                'companyProvince' => $company->getProvince(),
+                'companyCountry' => $company->getCountry(),
+                'companyPhone' => $company->getPhone(),
             ]);
 
             // Sending the email with the voucher attachment
 
             $email = (new TemplatedEmail())
-                ->from('adriarias@it2b.es')
-                ->to('adriarias@it2b.es')
+                ->from($company->getBookingEmail())
+                ->to($booking->getClient()->getEmail())
                 ->subject('Gracias por tu reserva')
                 ->context($context)
                 ->attach($pdf->getOutputFromHtml($html), $fileName, 'application/pdf')
-                ->htmlTemplate('email/activity_thank_you.html.twig');
+                ->htmlTemplate('email/hotel_thank_you.html.twig');
 
             if ($booking->getStatus() == 'booked') {
                 $mailer->send($email);
@@ -426,8 +387,8 @@ class BookingController extends AbstractController
             // Sending the email with the voucher attachment
 
             $email = (new TemplatedEmail())
-                ->from('adriarias@it2b.es')
-                ->to('adriarias@it2b.es')
+                ->from($company->getBookingEmail())
+                ->to($booking->getClient()->getEmail())
                 ->subject('Gracias por tu reserva')
                 ->context($context)
                 ->attach($pdf->getOutputFromHtml($html), $fileName, 'application/pdf')
