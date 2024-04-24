@@ -87,6 +87,7 @@ class BookingController extends AbstractController
 
             $hotelBooking = new Booking();
             $hotelBookingLine = new BookingLine();
+            $hotel = $hotelRepository->find($requestDecode->hotel);
 
             $hotelBooking->setEmail($requestDecode->email);
             $hotelBooking->setHasAcceptance($requestDecode->hasAcceptance);
@@ -95,7 +96,7 @@ class BookingController extends AbstractController
             $hotelBooking->setPaymentMethod($requestDecode->paymentMethod);
             $hotelBooking->setPhone($requestDecode->phone);
             $hotelBooking->setPromoCode($requestDecode->promoCode);
-            $hotelBooking->setStatus('preBooked');
+            $hotelBooking->setStatus($hotel->isIsOnRequest() ? 'onRequest' : 'preBooked');
             $hotelBooking->setTotalPrice($requestDecode->totalPrice);
             $entityManager->persist($hotelBooking);
 
@@ -103,7 +104,6 @@ class BookingController extends AbstractController
             $hotelBookingLine->setCheckOut(new \DateTime($requestDecode->checkOut));
             $hotelBookingLine->setData($formattedRooms);
             $hotelBookingLine->setTotalPrice($requestDecode->totalPrice);
-            $hotel = $hotelRepository->find($requestDecode->hotel);
             $hotelBookingLine->setHotel($hotel);
             $hotelBookingLine->setBooking($hotelBooking);
             $entityManager->persist($hotelBookingLine);
@@ -187,6 +187,8 @@ class BookingController extends AbstractController
             foreach ($requestDecode->data as $data) {
                 $formattedActivity = [
                     'availability' => $data->availableSchedule->id,
+                    'schedule' => $data->availableSchedule->activitySchedule->startTime,
+                    'modality' => $data->availableSchedule->activitySchedule->activitySeason->activityFee->modality->title,
                     'clientTypes' => []
                 ];
                 $activityAvailability = $activityAvailabilityRepository->find($data->availableSchedule->id);
@@ -215,6 +217,7 @@ class BookingController extends AbstractController
 
             $activityBooking = new Booking();
             $activityBookingLine = new BookingLine();
+            $activity = $activityRepository->find($requestDecode->activity);
 
             $activityBooking->setEmail($requestDecode->email);
             $activityBooking->setHasAcceptance($requestDecode->hasAcceptance);
@@ -223,7 +226,7 @@ class BookingController extends AbstractController
             $activityBooking->setPaymentMethod($requestDecode->paymentMethod);
             $activityBooking->setPhone($requestDecode->phone);
             $activityBooking->setPromoCode($requestDecode->promoCode);
-            $activityBooking->setStatus('preBooked');
+            $activityBooking->setStatus($activity->isIsOnRequest() ? 'onRequest' : 'preBooked');
             $activityBooking->setTotalPrice($requestDecode->totalPrice);
             $entityManager->persist($activityBooking);
 
@@ -231,7 +234,6 @@ class BookingController extends AbstractController
             $activityBookingLine->setCheckOut(new \DateTime($requestDecode->checkOut));
             $activityBookingLine->setData($formattedActivity);
             $activityBookingLine->setTotalPrice($requestDecode->totalPrice);
-            $activity = $activityRepository->find($requestDecode->activity);
             $activityBookingLine->setActivity($activity);
             $activityBookingLine->setBooking($activityBooking);
             $entityManager->persist($activityBookingLine);

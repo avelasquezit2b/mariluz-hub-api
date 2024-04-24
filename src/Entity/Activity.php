@@ -111,7 +111,7 @@ class Activity
     private Collection $activityFees;
 
     #[ORM\OneToMany(mappedBy: 'activity', targetEntity: MediaObject::class, cascade: ['remove'])]
-    #[Groups(['activityReduced', 'activity', 'page', 'productList'])]
+    #[Groups(['activityReduced', 'activity', 'page', 'productList', 'booking'])]
     #[ORM\OrderBy(["position" => "ASC"])]
     #[ApiSubresource]
     private Collection $media;
@@ -157,11 +157,11 @@ class Activity
     private ?string $vennturId = null;
 
     #[ORM\ManyToOne(inversedBy: 'activities', cascade: ['persist'])]
-    #[Groups(['activityReduced', 'activity', 'page', 'productList'])]
+    #[Groups(['activityReduced', 'activity', 'page', 'productList', 'booking'])]
     private ?Location $location = null;
 
     #[ORM\ManyToMany(targetEntity: Zone::class, inversedBy: 'activities')]
-    #[Groups(['activityReduced', 'activity', 'page', 'productList'])]
+    #[Groups(['activityReduced', 'activity', 'page', 'productList', 'booking'])]
     private Collection $zones;
 
     #[ORM\ManyToMany(targetEntity: ProductListModule::class, mappedBy: 'activities')]
