@@ -6,6 +6,7 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\DateFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\RangeFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
 use App\Repository\ActivityAvailabilityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -36,7 +37,9 @@ use Symfony\Component\Serializer\Annotation\Groups;
 )]
 #[ApiFilter(DateFilter::class, properties: ['date'])]
 #[ApiFilter(SearchFilter::class, properties: ['activitySchedule.activitySeason.activityFee.activity' => 'exact', 'activitySchedule.activitySeason.activityFee.activity.location.name' => 'exact'])]
+#[ApiFilter(RangeFilter::class, properties: ['quota'])]
 #[ApiFilter(OrderFilter::class, properties: ['activitySchedule.startTime' => 'ASC'])]
+#[ORM\HasLifecycleCallbacks]
 class ActivityAvailability
 {
     #[ORM\Id]
@@ -65,9 +68,23 @@ class ActivityAvailability
     #[Groups(['activityAvailabilityReduced', 'activityAvailability'])]
     private ?int $maxQuota = null;
 
+    #[ORM\Column(nullable: true)]
+    #[Groups(['activityAvailabilityReduced', 'activityAvailability'])]
+    private ?int $totalBookings = 0;
+
     public function __construct()
     {
         $this->activityPrices = new ArrayCollection();
+    }
+
+    #[ORM\PreUpdate]
+    public function onPreUpdate($request)
+    {
+        if ($this->getQuota() > $this->getMaxQuota()) {
+            $this->setQuota($this->getMaxQuota());
+        } else if (($this->getMaxQuota() - $this->getTotalBookings()) != $this->getQuota()) {
+            $this->setQuota(($this->getMaxQuota() - $this->getTotalBookings()));
+        }
     }
 
     public function getId(): ?int
@@ -131,6 +148,18 @@ class ActivityAvailability
     public function setMaxQuota(?int $maxQuota): static
     {
         $this->maxQuota = $maxQuota;
+
+        return $this;
+    }
+
+    public function getTotalBookings(): ?int
+    {
+        return $this->totalBookings;
+    }
+
+    public function setTotalBookings(?int $totalBookings): static
+    {
+        $this->totalBookings = $totalBookings;
 
         return $this;
     }

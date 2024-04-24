@@ -58,6 +58,10 @@ class RoomDiscount
     #[Groups(['roomDiscountReduced', 'roomDiscount'])]
     private ?RoomCondition $roomCondition = null;
 
+    #[ORM\Column(nullable: true)]
+    #[Groups(['roomDiscountReduced', 'roomDiscount', 'hotelFeeReduced', 'hotelAvailability'])]
+    private ?bool $isAdult = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -131,6 +135,18 @@ class RoomDiscount
     public function setRoomCondition(?RoomCondition $roomCondition): static
     {
         $this->roomCondition = $roomCondition;
+
+        return $this;
+    }
+
+    public function isIsAdult(): ?bool
+    {
+        return $this->isAdult;
+    }
+
+    public function setIsAdult(?bool $isAdult): static
+    {
+        $this->isAdult = $isAdult;
 
         return $this;
     }

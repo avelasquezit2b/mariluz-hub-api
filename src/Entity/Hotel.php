@@ -42,7 +42,7 @@ class Hotel
     private ?int $id = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['hotelReduced', 'hotel', 'page', 'supplier', 'pack', 'productList', 'hotelBooking', 'booking'])]
+    #[Groups(['hotelReduced', 'hotel', 'page', 'supplier', 'pack', 'productList', 'booking'])]
     private ?string $title = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -166,6 +166,43 @@ class Hotel
 
     #[ORM\OneToMany(mappedBy: 'hotel', targetEntity: BookingLine::class)]
     private Collection $bookingLines;
+
+    #[ORM\Column(nullable: true)]
+    #[Groups(['hotel'])]
+    private ?bool $hasSupplierAvailability = null;
+
+    #[ORM\Column(nullable: true)]
+    #[Groups(['hotel'])]
+    private ?bool $hasTransferAvailability = null;
+
+    #[ORM\Column(nullable: true)]
+    #[Groups(['hotel'])]
+    private ?bool $isOnRequest = null;
+
+    #[ORM\Column(nullable: true)]
+    #[Groups(['hotel'])]
+    private ?bool $hasSendEmailClient = null;
+
+    #[ORM\Column(nullable: true)]
+    #[Groups(['hotel'])]
+    private ?bool $hasSendEmailAgency = null;
+
+    #[ORM\Column(nullable: true)]
+    #[Groups(['hotel'])]
+    private ?bool $hasSendEmailSupplier = null;
+
+    #[ORM\Column(nullable: true)]
+    #[Groups(['hotel'])]
+    private ?int $daysToPay = null;
+
+    #[ORM\Column(nullable: true)]
+    #[Groups(['hotel'])]
+    private ?int $daysToPayBeforeStay = null;
+
+    #[ORM\Column(nullable: true)]
+    #[Groups(['hotel'])]
+    private ?bool $isCredit = null;
+    
 
     public function __construct()
     {
@@ -773,4 +810,111 @@ class Hotel
         return $this;
     }
 
+    public function isHasSupplierAvailability(): ?bool
+    {
+        return $this->hasSupplierAvailability;
+    }
+
+    public function setHasSupplierAvailability(?bool $hasSupplierAvailability): static
+    {
+        $this->hasSupplierAvailability = $hasSupplierAvailability;
+
+        return $this;
+    }
+
+    public function isHasTransferAvailability(): ?bool
+    {
+        return $this->hasTransferAvailability;
+    }
+
+    public function setHasTransferAvailability(?bool $hasTransferAvailability): static
+    {
+        $this->hasTransferAvailability = $hasTransferAvailability;
+
+        return $this;
+    }
+
+    public function isIsOnRequest(): ?bool
+    {
+        return $this->isOnRequest;
+    }
+
+    public function setIsOnRequest(?bool $isOnRequest): static
+    {
+        $this->isOnRequest = $isOnRequest;
+
+        return $this;
+    }
+
+    public function isHasSendEmailClient(): ?bool
+    {
+        return $this->hasSendEmailClient;
+    }
+
+    public function setHasSendEmailClient(?bool $hasSendEmailClient): static
+    {
+        $this->hasSendEmailClient = $hasSendEmailClient;
+
+        return $this;
+    }
+
+    public function isHasSendEmailAgency(): ?bool
+    {
+        return $this->hasSendEmailAgency;
+    }
+
+    public function setHasSendEmailAgency(?bool $hasSendEmailAgency): static
+    {
+        $this->hasSendEmailAgency = $hasSendEmailAgency;
+
+        return $this;
+    }
+
+    public function isHasSendEmailSupplier(): ?bool
+    {
+        return $this->hasSendEmailSupplier;
+    }
+
+    public function setHasSendEmailSupplier(?bool $hasSendEmailSupplier): static
+    {
+        $this->hasSendEmailSupplier = $hasSendEmailSupplier;
+
+        return $this;
+    }
+
+    public function getDaysToPay(): ?int
+    {
+        return $this->daysToPay;
+    }
+
+    public function setDaysToPay(?int $daysToPay): static
+    {
+        $this->daysToPay = $daysToPay;
+
+        return $this;
+    }
+
+    public function getDaysToPayBeforeStay(): ?int
+    {
+        return $this->daysToPayBeforeStay;
+    }
+
+    public function setDaysToPayBeforeStay(?int $daysToPayBeforeStay): static
+    {
+        $this->daysToPayBeforeStay = $daysToPayBeforeStay;
+
+        return $this;
+    }
+
+    public function isIsCredit(): ?bool
+    {
+        return $this->isCredit;
+    }
+
+    public function setIsCredit(?bool $isCredit): static
+    {
+        $this->isCredit = $isCredit;
+
+        return $this;
+    }
 }

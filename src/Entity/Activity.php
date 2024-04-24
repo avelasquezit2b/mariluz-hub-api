@@ -42,7 +42,7 @@ class Activity
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['activityReduced', 'activity', 'supplierReduced', 'supplier', 'pack', 'page', 'productList', 'bookingLine', 'bookingLineReduced'])]
+    #[Groups(['activityReduced', 'activity', 'supplierReduced', 'supplier', 'pack', 'page', 'productList', 'booking'])]
     private ?string $title = null;
 
     #[ORM\Column(length: 255)]
@@ -130,7 +130,7 @@ class Activity
 
     #[ORM\Column(nullable: true)]
     #[Groups(['activity'])]
-    private ?bool $isUnderPetition = null;
+    private ?bool $isOnRequest = null;
 
     #[ORM\Column(nullable: true)]
     #[Groups(['activity'])]
@@ -556,14 +556,14 @@ class Activity
         return $this;
     }
 
-    public function isIsUnderPetition(): ?bool
+    public function isIsOnRequest(): ?bool
     {
-        return $this->isUnderPetition;
+        return $this->isOnRequest;
     }
 
-    public function setIsUnderPetition(?bool $isUnderPetition): static
+    public function setIsOnRequest(?bool $isOnRequest): static
     {
-        $this->isUnderPetition = $isUnderPetition;
+        $this->isOnRequest = $isOnRequest;
 
         return $this;
     }

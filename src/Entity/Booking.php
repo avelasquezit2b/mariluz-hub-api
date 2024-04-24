@@ -39,11 +39,11 @@ class Booking
     private ?int $id = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
-    #[Groups(['bookingReduced', 'booking'])]
+    // #[Groups(['bookingReduced', 'booking'])]
     private ?\DateTimeInterface $checkIn = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
-    #[Groups(['bookingReduced', 'booking'])]
+    // #[Groups(['bookingReduced', 'booking'])]
     private ?\DateTimeInterface $checkOut = null;
 
     #[ORM\Column(length: 255)]
@@ -75,7 +75,7 @@ class Booking
     private ?string $paymentMethod = null;
 
     #[ORM\Column(type: Types::ARRAY, nullable: true)]
-    #[Groups(['bookingReduced', 'booking'])]
+    // #[Groups(['bookingReduced', 'booking'])]
     private ?array $data = null;
 
     #[ORM\Column]
