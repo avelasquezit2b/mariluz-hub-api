@@ -54,6 +54,10 @@ class PensionTypePrice
     #[Groups(['pensionTypePricesReduced', 'pensionTypePrices', 'hotelFeeReduced', 'hotelAvailability'])]
     private ?CancellationType $cancellationType = null;
 
+    #[ORM\Column(length: 25, nullable: true)]
+    #[Groups(['pensionTypePricesReduced', 'pensionTypePrices', 'hotelFeeReduced'])]
+    private ?string $commission = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -115,6 +119,18 @@ class PensionTypePrice
     public function setCancellationType(?CancellationType $cancellationType): static
     {
         $this->cancellationType = $cancellationType;
+
+        return $this;
+    }
+
+    public function getCommission(): ?string
+    {
+        return $this->commission;
+    }
+
+    public function setCommission(?string $commission): static
+    {
+        $this->commission = $commission;
 
         return $this;
     }

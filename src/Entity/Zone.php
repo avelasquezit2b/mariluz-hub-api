@@ -38,7 +38,7 @@ class Zone
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['zoneReduced', 'zone', 'activityReduced', 'activity', 'hotelReduced', 'hotel', 'packReduced', 'pack', 'extra', 'page', 'productList'])]
+    #[Groups(['zoneReduced', 'zone', 'activityReduced', 'activity', 'hotelReduced', 'hotel', 'packReduced', 'pack', 'extra', 'page', 'productList', 'booking'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 50, nullable: true)]

@@ -71,7 +71,7 @@ class HotelAvailability
 
     #[ORM\Column(nullable: true)]
     #[Groups(['hotelAvailabilityReduced', 'hotelAvailability'])]
-    private ?int $totalBookings = null;
+    private ?int $totalBookings = 0;
 
     public function __construct()
     {
@@ -82,6 +82,8 @@ class HotelAvailability
     {
         if ($this->getQuota() > $this->getMaxQuota()) {
             $this->setQuota($this->getMaxQuota());
+        } else if (($this->getMaxQuota() - $this->getTotalBookings()) != $this->getQuota()) {
+            $this->setQuota(($this->getMaxQuota() - $this->getTotalBookings()));
         }
     }
 

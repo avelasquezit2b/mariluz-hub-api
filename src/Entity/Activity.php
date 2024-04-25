@@ -42,7 +42,7 @@ class Activity
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['activityReduced', 'activity', 'supplierReduced', 'supplier', 'pack', 'page', 'productList', 'bookingLine', 'bookingLineReduced'])]
+    #[Groups(['activityReduced', 'activity', 'supplierReduced', 'supplier', 'pack', 'page', 'productList', 'booking'])]
     private ?string $title = null;
 
     #[ORM\Column(length: 255)]
@@ -111,7 +111,7 @@ class Activity
     private Collection $activityFees;
 
     #[ORM\OneToMany(mappedBy: 'activity', targetEntity: MediaObject::class, cascade: ['remove'])]
-    #[Groups(['activityReduced', 'activity', 'page', 'productList'])]
+    #[Groups(['activityReduced', 'activity', 'page', 'productList', 'booking'])]
     #[ORM\OrderBy(["position" => "ASC"])]
     #[ApiSubresource]
     private Collection $media;
@@ -130,7 +130,7 @@ class Activity
 
     #[ORM\Column(nullable: true)]
     #[Groups(['activity'])]
-    private ?bool $isUnderPetition = null;
+    private ?bool $isOnRequest = null;
 
     #[ORM\Column(nullable: true)]
     #[Groups(['activity'])]
@@ -157,11 +157,11 @@ class Activity
     private ?string $vennturId = null;
 
     #[ORM\ManyToOne(inversedBy: 'activities', cascade: ['persist'])]
-    #[Groups(['activityReduced', 'activity', 'page', 'productList'])]
+    #[Groups(['activityReduced', 'activity', 'page', 'productList', 'booking'])]
     private ?Location $location = null;
 
     #[ORM\ManyToMany(targetEntity: Zone::class, inversedBy: 'activities')]
-    #[Groups(['activityReduced', 'activity', 'page', 'productList'])]
+    #[Groups(['activityReduced', 'activity', 'page', 'productList', 'booking'])]
     private Collection $zones;
 
     #[ORM\ManyToMany(targetEntity: ProductListModule::class, mappedBy: 'activities')]
@@ -556,14 +556,14 @@ class Activity
         return $this;
     }
 
-    public function isIsUnderPetition(): ?bool
+    public function isIsOnRequest(): ?bool
     {
-        return $this->isUnderPetition;
+        return $this->isOnRequest;
     }
 
-    public function setIsUnderPetition(?bool $isUnderPetition): static
+    public function setIsOnRequest(?bool $isOnRequest): static
     {
-        $this->isUnderPetition = $isUnderPetition;
+        $this->isOnRequest = $isOnRequest;
 
         return $this;
     }

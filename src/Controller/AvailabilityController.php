@@ -41,7 +41,8 @@ class AvailabilityController extends AbstractController
                 if (in_array($currentDayOfWeek, $requestDecode->schedule->weekDays)) {
                     $activityAvailability = new ActivityAvailability();
                     $activityAvailability->setDate(\DateTime::createFromFormat('U', ($currentDate)));
-                    $activityAvailability->setQuota(0);
+                    $activityAvailability->setTotalBookings(0);
+                    $activityAvailability->setQuota($requestDecode->schedule->quota);
                     $activityAvailability->setMaxQuota($requestDecode->schedule->quota);
                     $activityAvailability->setActivitySchedule($activitySchedule);
 
@@ -76,7 +77,8 @@ class AvailabilityController extends AbstractController
             while ($currentDate <= $endDate) {        
                 $hotelAvailability = new HotelAvailability();
                 $hotelAvailability->setDate(\DateTime::createFromFormat('U', ($currentDate)));
-                $hotelAvailability->setQuota(0);
+                $hotelAvailability->setTotalBookings(0);
+                $hotelAvailability->setQuota($requestDecode->room->quota);
                 $hotelAvailability->setMaxQuota($requestDecode->room->quota);
                 $hotelAvailability->setRoomCondition($roomCondition);
 
