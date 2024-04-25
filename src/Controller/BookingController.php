@@ -301,6 +301,9 @@ class BookingController extends AbstractController
                 "totalPrice" => $booking->getTotalPrice(),
                 "paymentMethod" => $booking->getPaymentMethod(),
                 "date" => date("d-m-Y"),
+                "startDate" => $booking->getCheckIn()->format('d/m/Y'),
+                "endDate" => $booking->getCheckOut()->format('d/m/Y'),
+                
             ];
 
             $fileName = 'Bono_Hotel.pdf';
