@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Repository\ClientRepository;
+use App\Repository\ConfigurationRepository;
 use App\Repository\SupplierRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -14,18 +15,25 @@ use Symfony\Component\HttpFoundation\Request;
 class EmailController extends AbstractController
 {
     #[Route('/email')]
-    public function sendEmail(Request $request, MailerInterface $mailer): Response
+    public function sendEmail(Request $request, MailerInterface $mailer, ConfigurationRepository $configurationRepository): Response
     {
         $request = json_decode($request->getContent());
+        $company = $configurationRepository->find(1);
+
+        if ($request->product) {
+            $emailSubject = 'Petición sobre: ' . $request->product;
+        } else {
+            $emailSubject = 'Hemos recibido un mensaje!';
+        }
 
         $email = (new TemplatedEmail())
-            ->from('adriarias@it2b.es')
-            ->to('adriarias@it2b.es')
+            ->from($request->email)
+            ->to($company->getBookingEmail())
             //->cc('cc@example.com')
             //->bcc('bcc@example.com')
             //->replyTo('fabien@example.com')
             //->priority(Email::PRIORITY_HIGH)
-            ->subject('Correo de prueba')
+            ->subject($emailSubject)
             ->context([
                 "userEmail" => $request->email,
                 "name" => $request->name,
@@ -57,7 +65,7 @@ class EmailController extends AbstractController
         //     $name = $client->getName();
         //     $filename = 'client_';
         // } else {
-            $filename = '';
+        $filename = '';
         // }
 
         $email = (new TemplatedEmail())
