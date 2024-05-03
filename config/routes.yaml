@@ -40,3 +40,8 @@ api_print_pdf:
   path: '/print_pdf'
   methods:  [POST]
   controller: App\Controller\DocumentController::pdfAction
+
+api_list_hotels:
+  path: '/list_hotels'
+  methods:  [POST]
+  controller: App\Controller\IntegrationController::listHotels
