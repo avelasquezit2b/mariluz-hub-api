@@ -13,7 +13,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ORM\Entity(repositoryClass: ZoneRepository::class)]
 #[ApiResource(
     attributes: [
-        "order" => ["id" => "ASC"],
+        "order" => ["id" => "DESC"],
         "normalization_context" => ["groups" => ["zoneReduced"]]
     ],
     collectionOperations: [

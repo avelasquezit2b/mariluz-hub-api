@@ -15,7 +15,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ORM\Entity(repositoryClass: PickupRepository::class)]
 #[ApiResource(
     attributes: [
-        "order" => ["id" => "ASC"],
+        "order" => ["id" => "DESC"],
         "normalization_context" => ["groups" => ["pickupReduced"]]
     ],
     collectionOperations: [

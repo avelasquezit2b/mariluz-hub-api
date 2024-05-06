@@ -15,8 +15,9 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ActivityRepository::class)]
 #[ApiResource(
+    paginationEnabled: false,
     attributes: [
-        "order" => ["id" => "ASC"],
+        "order" => ["id" => "DESC"],
         "normalization_context" => ["groups" => ["activityReduced"]]
     ],
     collectionOperations: [
@@ -87,7 +88,7 @@ class Activity
 
     #[ORM\Column]
     #[Groups(['activity'])]
-    private ?bool $isActive = null;
+    private ?bool $isActive = false;
 
     #[ORM\ManyToMany(targetEntity: Category::class, inversedBy: 'activities')]
     #[Groups(['activityReduced', 'activity'])]
@@ -178,6 +179,12 @@ class Activity
     #[Groups(['activityReduced', 'activity', 'page', 'productList'])]
     private $price;
 
+    #[Groups(['activityReduced', 'activity', 'page', 'productList'])]
+    private $languages;
+
+    #[Groups(['activityReduced', 'activity', 'page', 'productList'])]
+    private $duration;
+
     #[ORM\OneToMany(mappedBy: 'activity', targetEntity: PackPrice::class)]
     private Collection $packPrices;
 
@@ -191,6 +198,24 @@ class Activity
     #[ORM\OneToOne(inversedBy: 'activity', cascade: ['persist', 'remove'])]
     #[Groups(['activity', 'activityReduced'])]
     private ?Seo $seo = null;
+
+    // #[ORM\Column(length: 25, nullable: true)]
+    // private ?string $duration = null;
+
+    #[ORM\Column(length: 50, nullable: true)]
+    #[Groups(['activityReduced', 'activity', 'page', 'productList'])]
+    private ?string $tiqetsId = null;
+
+    #[ORM\Column(length: 50, nullable: true)]
+    #[Groups(['activityReduced', 'activity', 'page', 'productList'])]
+    private ?string $latitude = null;
+
+    #[ORM\Column(length: 50, nullable: true)]
+    #[Groups(['activityReduced', 'activity', 'page', 'productList'])]
+    private ?string $longitude = null;
+
+    // #[ORM\Column(length: 25, nullable: true)]
+    // private ?string $price = null;
 
     public function __construct()
     {
@@ -793,6 +818,31 @@ class Activity
         return $price;
     }
 
+    public function getLanguages(): ?array
+    {
+        $languages = [];
+        foreach ($this->getModalities() as $modality) {
+            foreach ($modality->getLanguages() as $language) {
+                if (!in_array($language, $languages)) {
+                    array_push($languages, $language->getName());
+                }
+            }
+        }
+        return $languages;
+    }
+
+    public function getDuration(): ?string
+    {
+        $duration = '';
+        foreach ($this->getModalities() as $modality) {
+            if ($modality->getDuration()) {
+                $duration = $modality->getDuration();
+            }
+        }
+
+        return $duration;
+    }
+
     /**
      * @return Collection<int, PackPrice>
      */
@@ -876,4 +926,59 @@ class Activity
 
         return $this;
     }
+
+    // public function getDuration(): ?string
+    // {
+    //     return $this->duration;
+    // }
+
+    // public function setDuration(?string $duration): static
+    // {
+    //     $this->duration = $duration;
+
+    //     return $this;
+    // }
+
+    public function getTiqetsId(): ?string
+    {
+        return $this->tiqetsId;
+    }
+
+    public function setTiqetsId(?string $tiqetsId): static
+    {
+        $this->tiqetsId = $tiqetsId;
+
+        return $this;
+    }
+
+    public function getLatitude(): ?string
+    {
+        return $this->latitude;
+    }
+
+    public function setLatitude(?string $latitude): static
+    {
+        $this->latitude = $latitude;
+
+        return $this;
+    }
+
+    public function getLongitude(): ?string
+    {
+        return $this->longitude;
+    }
+
+    public function setLongitude(?string $longitude): static
+    {
+        $this->longitude = $longitude;
+
+        return $this;
+    }
+
+    // public function setPrice(?string $price): static
+    // {
+    //     $this->price = $price;
+
+    //     return $this;
+    // }
 }

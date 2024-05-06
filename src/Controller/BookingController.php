@@ -41,6 +41,8 @@ class BookingController extends AbstractController
         try {
             $formattedRooms = [];
             $hotelAvailabilities = [];
+            $hotel = $hotelRepository->find($requestDecode->hotel);
+
             foreach ($requestDecode->data as $room) {
                 $formattedRoom = [
                     'clientTypes' => [],
@@ -68,26 +70,28 @@ class BookingController extends AbstractController
                         'quantity' => $value->quantity,
                         'price' => $value->price,
                         'discount' => $value->discount,
-                        'clientType' => $value->clientType
+                        'clientType' => $value->clientType,
+                        'ages' => $value->ages
                     ];
                 }
                 array_push($formattedRooms, $formattedRoom);
                 foreach ($room->roomType->availabilities as $availability) {
                     $hotelAvailability = $hotelAvailabilityRepository->find($availability);
                     array_push($hotelAvailabilities, $hotelAvailability);
-                    if ($hotelAvailability->quota > 0) {
-                        $hotelAvailability->setQuota($hotelAvailability->getQuota() - 1);
-                        $hotelAvailability->setTotalBookings($hotelAvailability->getTotalBookings() + 1);
-                        $entityManager->persist($hotelAvailability);
-                    } else {
-                        throw new BadRequestHttpException('No hay disponibilidad para las fechas seleccionadas');
+                    if (!$hotel->isIsOnRequest()) {
+                        if ($hotelAvailability->quota > 0) {
+                            $hotelAvailability->setQuota($hotelAvailability->getQuota() - 1);
+                            $hotelAvailability->setTotalBookings($hotelAvailability->getTotalBookings() + 1);
+                            $entityManager->persist($hotelAvailability);
+                        } else {
+                            throw new BadRequestHttpException('No hay disponibilidad para las fechas seleccionadas');
+                        }
                     }
                 }
             }
 
             $hotelBooking = new Booking();
             $hotelBookingLine = new BookingLine();
-            $hotel = $hotelRepository->find($requestDecode->hotel);
 
             $hotelBooking->setEmail($requestDecode->email);
             $hotelBooking->setHasAcceptance($requestDecode->hasAcceptance);
@@ -97,6 +101,7 @@ class BookingController extends AbstractController
             $hotelBooking->setPhone($requestDecode->phone);
             $hotelBooking->setPromoCode($requestDecode->promoCode);
             $hotelBooking->setStatus($hotel->isIsOnRequest() ? 'onRequest' : 'preBooked');
+            $hotelBooking->setPaymentStatus('pending');
             $hotelBooking->setTotalPrice($requestDecode->totalPrice);
             $entityManager->persist($hotelBooking);
 
@@ -139,14 +144,15 @@ class BookingController extends AbstractController
             // $bookingHub->setLocator($bookingOfi->BookingResult->BookingCode);
             if ($requestData['Ds_Response'] < 100) {
                 $hotelBooking->setStatus('booked');
+                $hotelBooking->setPaymentStatus('paid');
             } else {
-                $hotelBooking->setStatus('paymentError - ' . $requestData['Ds_Response']);
-                foreach ($hotelBooking->getRooms() as $room) {
+                $hotelBooking->setStatus('error');
+                $hotelBooking->setPaymentStatus($requestData['Ds_Response']);
+                foreach ($hotelBooking->getBookingLines()[0]->getData() as $room) {
                     foreach ($room['availabilities'] as $availability) {
                         $hotelAvailability = $hotelAvailabilityRepository->find($availability);
                         $hotelAvailability->setQuota($hotelAvailability->getQuota() + 1);
                         $hotelAvailability->setTotalBookings($hotelAvailability->getTotalBookings() - 1);
-                        $hotelAvailability->removeHotelBooking($hotelBooking);
                         $entityManager->persist($hotelAvailability);
                     }
                 }
@@ -157,17 +163,20 @@ class BookingController extends AbstractController
 
             // Generate a Voucher based on the booking data
 
-            $newVoucher = new Voucher();
-            $newVoucher->setToBePaidBy('H-MARILUZ TRAVEL TOUR S.L.');
-            $newVoucher->setBooking($hotelBooking);
-
-            $entityManager->persist($newVoucher);
-            $entityManager->flush();
-
-            $this->send_voucher($newVoucher->getId(), $mailer, $pdf, $voucherRepository, $configurationRepository);
+            if ($hotelBooking->getStatus() == 'booked') {
+                $newVoucher = new Voucher();
+                $newVoucher->setToBePaidBy('H-MARILUZ TRAVEL TOUR S.L.');
+                $newVoucher->setBooking($hotelBooking);
+    
+                $entityManager->persist($newVoucher);
+                $entityManager->flush();
+    
+                $this->send_voucher($newVoucher->getId(), $mailer, $pdf, $voucherRepository, $configurationRepository);
+            }
+            
 
             return $this->json([
-                'response'  => $email
+                'response'  => $hotelBooking
             ]);
         } catch (SoapFault $e) {
             return $this->json([
@@ -184,6 +193,8 @@ class BookingController extends AbstractController
         try {
             $formattedRooms = [];
             $activityAvailabilities = [];
+            $activity = $activityRepository->find($requestDecode->activity);
+
             foreach ($requestDecode->data as $data) {
                 $formattedActivity = [
                     'availability' => $data->availableSchedule->id,
@@ -200,13 +211,15 @@ class BookingController extends AbstractController
                         'price' => $value->price,
                         'clientType' => $value->clientType
                     ];
-                    if ($value->quantity <= $activityAvailability->getQuota()) {
-                        $activityAvailability->setQuota($activityAvailability->getQuota() - $value->quantity);
-                        $activityAvailability->setTotalBookings($activityAvailability->getTotalBookings() + $value->quantity);
-                        $entityManager->persist($activityAvailability);
-                    } else {
-                        throw new BadRequestHttpException('No hay disponibilidad para las fechas seleccionadas');
-                    }
+                    if (!$activity->isIsOnRequest()) {
+                        if ($value->quantity <= $activityAvailability->getQuota()) {
+                            $activityAvailability->setQuota($activityAvailability->getQuota() - $value->quantity);
+                            $activityAvailability->setTotalBookings($activityAvailability->getTotalBookings() + $value->quantity);
+                            $entityManager->persist($activityAvailability);
+                        } else {
+                            throw new BadRequestHttpException('No hay disponibilidad para las fechas seleccionadas');
+                        }
+                    } 
                 }
                 // array_push($formattedRooms, $formattedRoom);
                 // foreach ($room->roomType->availabilities as $availability) {
@@ -217,7 +230,6 @@ class BookingController extends AbstractController
 
             $activityBooking = new Booking();
             $activityBookingLine = new BookingLine();
-            $activity = $activityRepository->find($requestDecode->activity);
 
             $activityBooking->setEmail($requestDecode->email);
             $activityBooking->setHasAcceptance($requestDecode->hasAcceptance);
@@ -227,6 +239,7 @@ class BookingController extends AbstractController
             $activityBooking->setPhone($requestDecode->phone);
             $activityBooking->setPromoCode($requestDecode->promoCode);
             $activityBooking->setStatus($activity->isIsOnRequest() ? 'onRequest' : 'preBooked');
+            $activityBooking->setPaymentStatus('pending');
             $activityBooking->setTotalPrice($requestDecode->totalPrice);
             $entityManager->persist($activityBooking);
 
@@ -271,14 +284,15 @@ class BookingController extends AbstractController
 
             if ($requestData['Ds_Response'] < 100) {
                 $activityBooking->setStatus('booked');
+                $activityBooking->setPaymentStatus('paid');
             } else {
-                $activityBooking->setStatus('paymentError - ' . $requestData['Ds_Response']);
+                $activityBooking->setStatus('error');
+                $activityBooking->setPaymentStatus($requestData['Ds_Response']);
                 foreach ($activityBooking->getData() as $data) {
                     foreach ($data['availabilities'] as $availability) {
                         $activityAvailability = $activityAvailabilityRepository->find($availability);
                         $activityAvailability->setQuota($activityAvailability->getQuota() + 1);
                         $activityAvailability->setTotalBookings($activityAvailability->getTotalBookings() - 1);
-                        $activityAvailability->removeActivityBooking($activityBooking);
                         $entityManager->persist($activityAvailability);
                     }
                 }
@@ -304,6 +318,32 @@ class BookingController extends AbstractController
                 'response'  => $e
             ]);
         }
+    }
+
+    #[Route('/change_to_prebooked/{id}', name: 'api_change_to_prebooked')]
+    public function change_to_prebooked(EntityManagerInterface $entityManager, HotelAvailabilityRepository $hotelAvailabilityRepository, BookingRepository $bookingRepository, string $id): Response
+    {
+        $booking = $bookingRepository->find($id);
+
+        if ($booking->getStatus() == 'onRequest') {
+            foreach ($booking->getBookingLines()[0]->getData() as $room) {
+                foreach ($room['availabilities'] as $availability) {
+                    $hotelAvailability = $hotelAvailabilityRepository->find($availability);
+                    $hotelAvailability->setQuota($hotelAvailability->getQuota() - 1);
+                    $hotelAvailability->setTotalBookings($hotelAvailability->getTotalBookings() + 1);
+                    $entityManager->persist($hotelAvailability);
+                }    
+            }
+
+            $booking->setStatus('preBooked');
+        }
+
+        $entityManager->persist($booking);
+        $entityManager->flush();
+
+        return $this->json([
+            'response'  => $booking
+        ]); 
     }
 
     #[Route('/send_thank_you_email/{id}', name: 'api_send_thank_you_email')]

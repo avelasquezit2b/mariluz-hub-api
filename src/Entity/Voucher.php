@@ -13,7 +13,7 @@ use Doctrine\DBAL\Types\Types;
 #[ORM\Entity(repositoryClass: VoucherRepository::class)]
 #[ApiResource(
     attributes: [
-        "order" => ["id" => "ASC"],
+        "order" => ["id" => "DESC"],
         "normalization_context" => ["groups" => ["voucherReduced"]]
     ],
     collectionOperations: [
