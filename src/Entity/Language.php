@@ -12,7 +12,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ORM\Entity(repositoryClass: LanguageRepository::class)]
 #[ApiResource(
     attributes: [
-        "order" => ["id" => "ASC"],
+        "order" => ["id" => "DESC"],
         "normalization_context" => ["groups" => ["language"]]
     ],
     collectionOperations: [
@@ -44,11 +44,11 @@ class Language
     #[Groups(['language'])]
     private ?string $shortName = null;
 
-    #[ORM\ManyToMany(targetEntity: Activity::class, mappedBy: 'languages')]
-    private Collection $activities;
+    // #[ORM\ManyToMany(targetEntity: Activity::class, mappedBy: 'languages')]
+    // private Collection $activities;
 
-    #[ORM\ManyToMany(targetEntity: Modality::class, mappedBy: 'languages')]
-    private Collection $modalities;
+    // #[ORM\ManyToMany(targetEntity: Modality::class, mappedBy: 'languages')]
+    // private Collection $modalities;
 
     public function __construct()
     {

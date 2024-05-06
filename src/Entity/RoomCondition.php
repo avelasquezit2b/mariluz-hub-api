@@ -72,6 +72,14 @@ class RoomCondition
     #[ORM\OneToMany(mappedBy: 'roomCondition', targetEntity: HotelAvailability::class, cascade: ['remove'])]
     private Collection $hotelAvailabilities;
 
+    #[ORM\Column(nullable: true)]
+    #[Groups(['roomConditionReduced', 'roomCondition', 'hotelFeeReduced', 'hotelAvailability'])]
+    private ?int $minNightsSupplement = null;
+
+    #[ORM\Column(length: 25, nullable: true)]
+    #[Groups(['roomConditionReduced', 'roomCondition', 'hotelFeeReduced', 'hotelAvailability'])]
+    private ?string $nightsSupplement = null;
+
     public function __construct()
     {
         $this->pensionTypePrices = new ArrayCollection();
@@ -242,6 +250,30 @@ class RoomCondition
                 $hotelAvailability->setRoomCondition(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getMinNightsSupplement(): ?int
+    {
+        return $this->minNightsSupplement;
+    }
+
+    public function setMinNightsSupplement(?int $minNightsSupplement): static
+    {
+        $this->minNightsSupplement = $minNightsSupplement;
+
+        return $this;
+    }
+
+    public function getNightsSupplement(): ?string
+    {
+        return $this->nightsSupplement;
+    }
+
+    public function setNightsSupplement(?string $nightsSupplement): static
+    {
+        $this->nightsSupplement = $nightsSupplement;
 
         return $this;
     }

@@ -16,7 +16,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: PackRepository::class)]
 #[ApiResource(
     attributes: [
-        "order" => ["id" => "ASC"],
+        "order" => ["id" => "DESC"],
         "normalization_context" => ["groups" => ["packReduced"]]
     ],
     collectionOperations: [

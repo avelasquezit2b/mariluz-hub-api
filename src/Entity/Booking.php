@@ -14,7 +14,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ApiResource(
     paginationEnabled: false,
     attributes: [
-        "order" => ["id" => "ASC"],
+        "order" => ["id" => "DESC"],
         "normalization_context" => ["groups" => ["bookingReduced"]]
     ],
     collectionOperations: [
@@ -93,6 +93,13 @@ class Booking
     #[ORM\OneToMany(mappedBy: 'booking', targetEntity: BookingLine::class)]
     #[Groups(['bookingReduced', 'booking', 'voucher'])]
     private Collection $bookingLines;
+
+    #[ORM\Column(length: 25, nullable: true)]
+    #[Groups(['bookingReduced', 'booking'])]
+    private ?string $paymentStatus = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $onRequestPayment = null;
 
     public function __construct()
     {
@@ -286,6 +293,30 @@ class Booking
                 $bookingLine->setBooking(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getPaymentStatus(): ?string
+    {
+        return $this->paymentStatus;
+    }
+
+    public function setPaymentStatus(?string $paymentStatus): static
+    {
+        $this->paymentStatus = $paymentStatus;
+
+        return $this;
+    }
+
+    public function getOnRequestPayment(): ?string
+    {
+        return $this->onRequestPayment;
+    }
+
+    public function setOnRequestPayment(?string $onRequestPayment): static
+    {
+        $this->onRequestPayment = $onRequestPayment;
 
         return $this;
     }

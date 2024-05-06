@@ -58,6 +58,7 @@ class RoomType
 
     #[ORM\OneToMany(mappedBy: 'roomType', targetEntity: MediaObject::class, cascade: ['remove'])]
     #[Groups(['roomTypeReduced', 'roomType', 'hotel', 'hotelAvailability'])]
+    #[ORM\OrderBy(["position" => "ASC"])]
     private Collection $media;
 
     #[ORM\Column(nullable: true)]
@@ -83,6 +84,14 @@ class RoomType
     #[ORM\Column(length: 25, nullable: true)]
     #[Groups(['hotel'])]
     private ?string $price = null;
+
+    #[ORM\Column(nullable: true)]
+    #[Groups(['roomTypeReduced', 'roomType', 'hotel', 'hotelAvailability'])]
+    private ?int $minBabiesCapacity = null;
+
+    #[ORM\Column(nullable: true)]
+    #[Groups(['roomTypeReduced', 'roomType', 'hotel', 'hotelAvailability'])]
+    private ?int $maxBabiesCapacity = null;
 
     public function __construct()
     {
@@ -271,6 +280,30 @@ class RoomType
     public function setPrice(?string $price): static
     {
         $this->price = $price;
+
+        return $this;
+    }
+
+    public function getMinBabiesCapacity(): ?int
+    {
+        return $this->minBabiesCapacity;
+    }
+
+    public function setMinBabiesCapacity(?int $minBabiesCapacity): static
+    {
+        $this->minBabiesCapacity = $minBabiesCapacity;
+
+        return $this;
+    }
+
+    public function getMaxBabiesCapacity(): ?int
+    {
+        return $this->maxBabiesCapacity;
+    }
+
+    public function setMaxBabiesCapacity(?int $maxBabiesCapacity): static
+    {
+        $this->maxBabiesCapacity = $maxBabiesCapacity;
 
         return $this;
     }
