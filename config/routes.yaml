@@ -45,3 +45,8 @@ api_list_hotels:
   path: '/list_hotels'
   methods:  [POST]
   controller: App\Controller\IntegrationController::listHotels
+
+api_import_hotels:
+  path: '/import_hotels'
+  methods:  [POST]
+  controller: App\Controller\IntegrationController::importHotels

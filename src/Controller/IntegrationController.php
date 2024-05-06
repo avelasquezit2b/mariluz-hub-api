@@ -8,6 +8,7 @@ use App\Entity\Zone;
 use App\Entity\Language;
 use App\Entity\MediaObject;
 use App\Entity\Modality;
+use Symfony\Component\HttpFoundation\Request;
 use App\Repository\ActivityRepository;
 use App\Repository\LocationRepository;
 use App\Repository\ZoneRepository;
@@ -42,7 +43,7 @@ class IntegrationController extends AbstractController
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => 'POST',
             CURLOPT_POSTFIELDS => '{
-  "query": "query {\\thotelX { hotels(criteria: {access: \\"2\\",maxSize: 25}, token: \\"\\") { token count edges { node { createdAt updatedAt hotelData { hotelCode hotelName categoryCode chainCode location { address zipCode city country coordinates { latitude longitude } closestDestination { code available texts { text language } type parent } } contact { email telephone fax web } propertyType { propertyCode name } descriptions { type texts { language text } } medias { code url } rooms { edges { node { code roomData { code roomCode allAmenities { edges { node { amenityData { code amenityCode } } } } } } } } allAmenities { edges { node { amenityData { code amenityCode } } } } } } } } } }"
+  "query": "query {\\thotelX { hotels(criteria: {access: \\"26465\\", destinationCodes: [\"PLYPALM\", \"SACO\", \"ALCU\", \"SPONSA\", \"CBONA\", \"CMILL\", \"PICAF\", \"CBLANC\", \"SANTANYI\", \"ILLET\", \"MAGA\", \"CRAT\", \"PAGUE\", \"MURO\", \"PUIGPUNYEN\", \"CALAD\", \"CBOSCH\", \"FORCAT\"]}, token: \\"\\") { token count edges { node { createdAt updatedAt hotelData { hotelCode hotelName categoryCode chainCode location { address zipCode city country coordinates { latitude longitude } closestDestination { code available texts { text language } type parent } } contact { email telephone fax web } propertyType { propertyCode name } descriptions { type texts { language text } } medias { code url } rooms { edges { node { code roomData { code roomCode allAmenities { edges { node { amenityData { code amenityCode } } } } } } } } allAmenities { edges { node { amenityData { code amenityCode } } } } } } } } } }"
 }',
             CURLOPT_HTTPHEADER => array(
                 'Authorization: Apikey 4794442a-a4dc-4660-5083-64360879e063',
@@ -58,6 +59,16 @@ class IntegrationController extends AbstractController
 
         return $this->json([
             'response'  => $response
+        ]);
+    }
+
+    #[Route('/import_hotels', name: 'app_import_hotels')]
+    public function importHotels(Request $request): Response
+    {
+        $data = json_decode($request->getContent());
+
+        return $this->json([
+            'response'  => $data
         ]);
     }
 
