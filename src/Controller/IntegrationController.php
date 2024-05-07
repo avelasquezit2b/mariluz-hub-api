@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Activity;
+use App\Entity\Hotel;
 use App\Entity\Location;
 use App\Entity\Zone;
 use App\Entity\Language;
@@ -63,12 +64,46 @@ class IntegrationController extends AbstractController
     }
 
     #[Route('/import_hotels', name: 'app_import_hotels')]
-    public function importHotels(Request $request): Response
+    public function importHotels(EntityManagerInterface $entityManager, Request $request): Response
     {
-        $data = json_decode($request->getContent());
+        $data = json_decode($request->getContent(), true);
+
+        foreach ($data as $hotel) {
+            $newHotel = new Hotel();
+
+            $newHotel->setTitle($hotel['title']);
+            // $newHotel->setLocation($hotel['destiny']);
+            // $newHotel->setTravelgateId($hotel['id']);
+            // $newHotel->addMedias($hotel['medias']);
+            $newHotel->setRating($hotel['stars']);
+            $newHotel->setExtendedDescription($hotel['description']);
+            $newHotel->setAddress($hotel['zone']);
+
+            // foreach ($product['images'] as $image) {
+            //     $mediaObject = new MediaObject();
+            //     $mediaObject->setExternalUrl($image['extra_large']);
+            //     $mediaObject->setType('img');
+            //     $mediaObject->setPosition($i);
+            //     $mediaObject->setActivity($activity);
+            //     $entityManager->persist($mediaObject);
+            //     $i++;
+            // }
+
+            foreach ($hotel['medias'] as $image) {
+                $newMediaObject = new MediaObject();
+                $newMediaObject->setExternalUrl($image);
+                $newMediaObject->setType('img');
+                $newMediaObject->setHotel($newHotel);
+                $entityManager->persist($newMediaObject);
+            }
+
+            $entityManager->persist($newHotel);
+        }
+
+        $entityManager->flush();
 
         return $this->json([
-            'response'  => $data
+            'response'  => $newHotel
         ]);
     }
 
@@ -80,19 +115,19 @@ class IntegrationController extends AbstractController
             $curl = curl_init();
 
             curl_setopt_array($curl, array(
-            CURLOPT_URL => 'https://api.tiqets.com/v2/products?city_id='.$city.'&page_size=100&lang=es',
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => '',
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 0,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => 'GET',
-            CURLOPT_HTTPHEADER => array(
-                'Authorization: Bearer kf6uciPXPueQhVvGNuO4qys2OiX91zg2',
-                'Content-Type: application/json'
-            ),
-            CURLOPT_USERAGENT => "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.3) Gecko/20070309 Firefox/2.0.0.3"
+                CURLOPT_URL => 'https://api.tiqets.com/v2/products?city_id=' . $city . '&page_size=100&lang=es',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'GET',
+                CURLOPT_HTTPHEADER => array(
+                    'Authorization: Bearer kf6uciPXPueQhVvGNuO4qys2OiX91zg2',
+                    'Content-Type: application/json'
+                ),
+                CURLOPT_USERAGENT => "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.3) Gecko/20070309 Firefox/2.0.0.3"
             ));
 
             $response = curl_exec($curl);
@@ -147,13 +182,13 @@ class IntegrationController extends AbstractController
                 if (!$isUpdate) {
                     $zone = $zoneRepository->findOneBy(array('name' => $product['city_name']));
                     $location = $locationRepository->findOneBy(array('name' => 'Mallorca'));
-        
+
                     $activity->setLocation($location);
 
                     $modality = new Modality();
                     $modality->setTitle($product['title']);
                     $modality->setDuration($product['duration']);
-        
+
                     $modality->setPrice($product['price']);
                     foreach ($product['languages'] as $languageCode) {
                         $language = $languageRepository->findOneBy(array('shortName' => $languageCode));
@@ -161,9 +196,9 @@ class IntegrationController extends AbstractController
                             $modality->addLanguage($language);
                         }
                     }
-        
+
                     $activity->addModality($modality);
-                    
+
                     if ($zone) {
                         $activity->addZone($zone);
                     } else {
@@ -187,16 +222,16 @@ class IntegrationController extends AbstractController
                 } else {
                     $modality = $activity->getModalities()[0];
                     $modality->setDuration($product['duration']);
-        
+
                     $modality->setPrice($product['price']);
                     $entityManager->persist($modality);
-                } 
+                }
 
                 $entityManager->persist($activity);
                 $entityManager->flush();
             }
         }
-        
+
 
         return $this->json([
             'response'  => true
