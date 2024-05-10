@@ -38,7 +38,7 @@ class RoomCondition
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'roomConditions')]
-    #[Groups(['roomConditionReduced', 'roomCondition', 'hotelAvailability', 'hotelAvailabilityReduced'])]
+    #[Groups(['roomConditionReduced', 'roomCondition', 'hotelFeeReduced', 'hotelAvailability', 'hotelAvailabilityReduced'])]
     private ?RoomType $roomType = null;
 
     #[ORM\Column(nullable: true)]

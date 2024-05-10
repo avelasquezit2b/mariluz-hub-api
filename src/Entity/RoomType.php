@@ -33,11 +33,11 @@ class RoomType
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['roomTypeReduced', 'roomType', 'hotel'])]
+    #[Groups(['roomTypeReduced', 'roomType', 'hotel', 'hotelFeeReduced'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['roomTypeReduced', 'roomType', 'hotel', 'hotelAvailability','hotelAvailabilityReduced'])]
+#[Groups(['roomTypeReduced', 'roomType', 'hotel', 'hotelAvailability','hotelAvailabilityReduced', 'hotelFeeReduced'])]
     private ?string $title = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -66,7 +66,7 @@ class RoomType
     private ?int $minAdultsCapacity = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['roomTypeReduced', 'roomType', 'hotel', 'hotelAvailability'])]
+    #[Groups(['roomTypeReduced', 'roomType', 'hotel', 'hotelAvailability', 'hotelFeeReduced'])]
     private ?int $maxAdultsCapacity = null;
 
     #[ORM\Column(nullable: true)]
@@ -74,7 +74,7 @@ class RoomType
     private ?int $minKidsCapacity = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['roomTypeReduced', 'roomType', 'hotel', 'hotelAvailability'])]
+    #[Groups(['roomTypeReduced', 'roomType', 'hotel', 'hotelAvailability', 'hotelFeeReduced'])]
     private ?int $maxKidsCapacity = null;
 
     #[ORM\Column(nullable: true)]
@@ -90,7 +90,7 @@ class RoomType
     private ?int $minBabiesCapacity = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['roomTypeReduced', 'roomType', 'hotel', 'hotelAvailability'])]
+    #[Groups(['roomTypeReduced', 'roomType', 'hotel', 'hotelAvailability', 'hotelFeeReduced'])]
     private ?int $maxBabiesCapacity = null;
 
     public function __construct()
