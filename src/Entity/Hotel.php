@@ -205,6 +205,9 @@ class Hotel
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $bookingEmail = null;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $internalNotes = null;
     
 
     public function __construct()
@@ -929,6 +932,18 @@ class Hotel
     public function setBookingEmail(?string $bookingEmail): static
     {
         $this->bookingEmail = $bookingEmail;
+
+        return $this;
+    }
+
+    public function getInternalNotes(): ?string
+    {
+        return $this->internalNotes;
+    }
+
+    public function setInternalNotes(?string $internalNotes): static
+    {
+        $this->internalNotes = $internalNotes;
 
         return $this;
     }

@@ -214,6 +214,9 @@ class Activity
     #[Groups(['activityReduced', 'activity', 'page', 'productList'])]
     private ?string $longitude = null;
 
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $internalNotes = null;
+
     // #[ORM\Column(length: 25, nullable: true)]
     // private ?string $price = null;
 
@@ -981,4 +984,16 @@ class Activity
 
     //     return $this;
     // }
+
+    public function getInternalNotes(): ?string
+    {
+        return $this->internalNotes;
+    }
+
+    public function setInternalNotes(?string $internalNotes): static
+    {
+        $this->internalNotes = $internalNotes;
+
+        return $this;
+    }
 }

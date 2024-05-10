@@ -106,6 +106,9 @@ class Booking
     #[Groups(['bookingReduced', 'booking'])]
     private ?\DateTimeImmutable $createdAt = null;
 
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $internalNotes = null;
+
     public function __construct()
     {
         $this->bookingLines = new ArrayCollection();
@@ -339,6 +342,18 @@ class Booking
         } else {
             $this->createdAt = $createdAt;
         }
+
+        return $this;
+    }
+
+    public function getInternalNotes(): ?string
+    {
+        return $this->internalNotes;
+    }
+
+    public function setInternalNotes(?string $internalNotes): static
+    {
+        $this->internalNotes = $internalNotes;
 
         return $this;
     }
