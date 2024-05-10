@@ -35,7 +35,7 @@ class Booking
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['bookingReduced', 'booking', 'voucher'])]
+    #[Groups(['bookingReduced', 'booking', 'voucher', 'voucherReduced'])]
     private ?int $id = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
@@ -47,7 +47,7 @@ class Booking
     private ?\DateTimeInterface $checkOut = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['bookingReduced', 'booking'])]
+    #[Groups(['bookingReduced', 'booking', 'voucherReduced'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255, nullable: true)]
