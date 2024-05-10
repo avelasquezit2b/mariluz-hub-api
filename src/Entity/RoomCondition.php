@@ -80,6 +80,9 @@ class RoomCondition
     #[Groups(['roomConditionReduced', 'roomCondition', 'hotelFeeReduced', 'hotelAvailability'])]
     private ?string $nightsSupplement = null;
 
+    #[ORM\Column(length: 25, nullable: true)]
+    private ?string $supplementType = null;
+
     public function __construct()
     {
         $this->pensionTypePrices = new ArrayCollection();
@@ -274,6 +277,18 @@ class RoomCondition
     public function setNightsSupplement(?string $nightsSupplement): static
     {
         $this->nightsSupplement = $nightsSupplement;
+
+        return $this;
+    }
+
+    public function getSupplementType(): ?string
+    {
+        return $this->supplementType;
+    }
+
+    public function setSupplementType(?string $supplementType): static
+    {
+        $this->supplementType = $supplementType;
 
         return $this;
     }

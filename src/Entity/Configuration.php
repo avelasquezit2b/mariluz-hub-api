@@ -98,6 +98,10 @@ class Configuration
     #[Groups(['configReduced', 'config'])]
     private ?string $bookingEmail = null;
 
+    #[ORM\Column(nullable: true)]
+    #[Groups(['configReduced', 'config'])]
+    private ?bool $roundUpPrices = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -291,6 +295,18 @@ class Configuration
     public function setBookingEmail(?string $bookingEmail): static
     {
         $this->bookingEmail = $bookingEmail;
+
+        return $this;
+    }
+
+    public function isRoundUpPrices(): ?bool
+    {
+        return $this->roundUpPrices;
+    }
+
+    public function setRoundUpPrices(?bool $roundUpPrices): static
+    {
+        $this->roundUpPrices = $roundUpPrices;
 
         return $this;
     }

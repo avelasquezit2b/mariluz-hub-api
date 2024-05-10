@@ -99,7 +99,12 @@ class Booking
     private ?string $paymentStatus = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['bookingReduced', 'booking'])]
     private ?string $onRequestPayment = null;
+
+    #[ORM\Column(nullable: true)]
+    #[Groups(['bookingReduced', 'booking'])]
+    private ?\DateTimeImmutable $createdAt = null;
 
     public function __construct()
     {
@@ -317,6 +322,23 @@ class Booking
     public function setOnRequestPayment(?string $onRequestPayment): static
     {
         $this->onRequestPayment = $onRequestPayment;
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(?\DateTimeImmutable $createdAt): static
+    {
+        //set automatically the created_at date
+        if ($createdAt == null) {
+            $this->createdAt = new \DateTime();
+        } else {
+            $this->createdAt = $createdAt;
+        }
 
         return $this;
     }

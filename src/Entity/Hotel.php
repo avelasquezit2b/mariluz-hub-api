@@ -202,6 +202,9 @@ class Hotel
     #[ORM\Column(nullable: true)]
     #[Groups(['hotel'])]
     private ?bool $isCredit = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $bookingEmail = null;
     
 
     public function __construct()
@@ -914,6 +917,18 @@ class Hotel
     public function setIsCredit(?bool $isCredit): static
     {
         $this->isCredit = $isCredit;
+
+        return $this;
+    }
+
+    public function getBookingEmail(): ?string
+    {
+        return $this->bookingEmail;
+    }
+
+    public function setBookingEmail(?string $bookingEmail): static
+    {
+        $this->bookingEmail = $bookingEmail;
 
         return $this;
     }
