@@ -89,9 +89,13 @@ class BookingLine
         return $this;
     }
 
-    public function getCheckOut(): ?\DateTimeInterface
+    public function getCheckOut()
     {
-        return $this->checkOut;
+        if($this->checkOut){
+            return $this->checkOut->format('d-m-Y');
+        } else {
+            return $this->checkOut;
+        }
     }
 
     public function setCheckOut(?\DateTimeInterface $checkOut): static

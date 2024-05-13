@@ -84,6 +84,14 @@ class RoomCondition
     #[Groups(['roomConditionReduced', 'roomCondition', 'hotelFeeReduced', 'hotelAvailability'])]
     private ?string $supplementType = null;
 
+    #[ORM\Column(nullable: true)]
+    #[Groups(['roomConditionReduced', 'roomCondition', 'hotelFeeReduced', 'hotelAvailability'])]
+    private ?bool $onRequest = null;
+
+    #[ORM\Column(length: 25, nullable: true)]
+    #[Groups(['roomConditionReduced', 'roomCondition', 'hotelFeeReduced', 'hotelAvailability'])]
+    private ?string $nightSupplementCost = null;
+
     public function __construct()
     {
         $this->pensionTypePrices = new ArrayCollection();
@@ -290,6 +298,30 @@ class RoomCondition
     public function setSupplementType(?string $supplementType): static
     {
         $this->supplementType = $supplementType;
+
+        return $this;
+    }
+
+    public function isOnRequest(): ?bool
+    {
+        return $this->onRequest;
+    }
+
+    public function setOnRequest(?bool $onRequest): static
+    {
+        $this->onRequest = $onRequest;
+
+        return $this;
+    }
+
+    public function getNightSupplementCost(): ?string
+    {
+        return $this->nightSupplementCost;
+    }
+
+    public function setNightSupplementCost(?string $nightSupplementCost): static
+    {
+        $this->nightSupplementCost = $nightSupplementCost;
 
         return $this;
     }

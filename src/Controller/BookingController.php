@@ -479,7 +479,7 @@ class BookingController extends AbstractController
                 "paymentMethod" => $booking->getPaymentMethod(),
                 "date" => $booking->getCreatedAt(),
                 "startDate" => $booking->getBookingLines()[0]->getCheckIn(),
-                "endDate" => $booking->getBookingLines()[0]->getCheckOut()->format('d/m/Y'),
+                "endDate" => $booking->getBookingLines()[0]->getCheckOut(),
             ];
 
             $fileName = 'Bono_Hotel.pdf';
@@ -495,7 +495,7 @@ class BookingController extends AbstractController
                 'bookingDate' => $booking->getCreatedAt(),
                 'clientName' => $booking->getClient()->getName(),
                 'checkIn' => $booking->getBookingLines()[0]->getCheckIn(),
-                'checkOut' => $booking->getBookingLines()[0]->getCheckOut()->format('d/m/Y'),
+                'checkOut' => $booking->getBookingLines()[0]->getCheckOut(),
                 "rooms" => $booking->getBookingLines()[0]->getData(),
                 "observations" => $booking->getObservations(),
                 'companyName' => $company->getTitle(),
@@ -556,7 +556,7 @@ class BookingController extends AbstractController
                 'bookingDate' => date("d-m-Y"),
                 'clientName' => $voucher->getBooking()->getClient()->getName(),
                 'checkIn' => $voucher->getBooking()->getBookingLines()[0]->getCheckIn(),
-                'checkOut' => $voucher->getBooking()->getBookingLines()[0]->getCheckOut()->format('d/m/Y'),
+                'checkOut' => $voucher->getBooking()->getBookingLines()[0]->getCheckOut(),
                 'companyName' => $company->getTitle(),
                 'companyCif' => $company->getCif(),
                 'companyAddress' => $company->getTitle(),
@@ -604,7 +604,7 @@ class BookingController extends AbstractController
                 "paymentMethod" => $booking->getPaymentMethod(),
                 "date" => $booking->getCreatedAt(),
                 "startDate" => $booking->getBookingLines()[0]->getCheckIn(),
-                "endDate" => $booking->getBookingLines()[0]->getCheckOut()->format('d/m/Y'),
+                "endDate" => $booking->getBookingLines()[0]->getCheckOut(),
                 "message" => 'Reserva confirmada'
             ];
 
@@ -621,7 +621,7 @@ class BookingController extends AbstractController
                 'bookingDate' => $booking->getCreatedAt(),
                 'clientName' => $booking->getClient()->getName(),
                 'checkIn' => $booking->getBookingLines()[0]->getCheckIn(),
-                'checkOut' => $booking->getBookingLines()[0]->getCheckOut()->format('d/m/Y'),
+                'checkOut' => $booking->getBookingLines()[0]->getCheckOut(),
                 "rooms" => $booking->getBookingLines()[0]->getData(),
                 "totalPriceCost" => $booking->getTotalPriceCost(),
                 "observations" => $booking->getObservations(),
@@ -682,8 +682,8 @@ class BookingController extends AbstractController
                 'bookingId' => $voucher->getBooking()->getId(),
                 'bookingDate' => date("d-m-Y"),
                 'clientName' => $voucher->getBooking()->getClient()->getName(),
-                'checkIn' => $voucher->getBooking()->getBookingLines()[0]->getCheckIn()->format('d/m/Y'),
-                'checkOut' => $voucher->getBooking()->getBookingLines()[0]->getCheckOut()->format('d/m/Y'),
+                'checkIn' => $voucher->getBooking()->getBookingLines()[0]->getCheckIn(),
+                'checkOut' => $voucher->getBooking()->getBookingLines()[0]->getCheckOut(),
                 'companyName' => $company->getTitle(),
                 'companyCif' => $company->getCif(),
                 'companyAddress' => $company->getTitle(),
@@ -713,4 +713,15 @@ class BookingController extends AbstractController
             ]);
         }
     }
+
+    #[Route('/get_voucher_by_booking/{id}', name: 'api_get_voucher_by_booking')]
+    public function getVoucherByBookingId(String $id, VoucherRepository $voucherRepository): Response
+    {
+        $voucher = $voucherRepository->findOneBy(array('booking' => $id));
+
+        return $this->json([
+            'response'  => $voucher
+        ]);
+    }    
+
 }

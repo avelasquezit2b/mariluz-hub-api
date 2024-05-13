@@ -115,6 +115,14 @@ class Booking
     #[Groups(['bookingReduced', 'booking'])]
     private ?string $totalPriceCost = null;
 
+    #[ORM\Column(nullable: true)]
+    #[Groups(['bookingReduced', 'booking'])]
+    private ?bool $clientConfirmationSent = null;
+
+    #[ORM\Column(nullable: true)]
+    #[Groups(['bookingReduced', 'booking'])]
+    private ?bool $supplierConfirmationSent = null;
+
     public function __construct()
     {
         $this->bookingLines = new ArrayCollection();
@@ -378,6 +386,30 @@ class Booking
     public function setTotalPriceCost(?string $totalPriceCost): static
     {
         $this->totalPriceCost = $totalPriceCost;
+
+        return $this;
+    }
+
+    public function isClientConfirmationSent(): ?bool
+    {
+        return $this->clientConfirmationSent;
+    }
+
+    public function setClientConfirmationSent(?bool $clientConfirmationSent): static
+    {
+        $this->clientConfirmationSent = $clientConfirmationSent;
+
+        return $this;
+    }
+
+    public function isSupplierConfirmationSent(): ?bool
+    {
+        return $this->supplierConfirmationSent;
+    }
+
+    public function setSupplierConfirmationSent(?bool $supplierConfirmationSent): static
+    {
+        $this->supplierConfirmationSent = $supplierConfirmationSent;
 
         return $this;
     }

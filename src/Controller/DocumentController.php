@@ -39,7 +39,7 @@ class DocumentController extends AbstractController
             'bookingDate' => $booking->getCreatedAt(),
             'clientName' => $booking->getClient()->getName(),
             'checkIn' => $booking->getBookingLines()[0]->getCheckIn(),
-            'checkOut' => $booking->getBookingLines()[0]->getCheckOut()->format('d/m/Y'),
+            'checkOut' => $booking->getBookingLines()[0]->getCheckOut(),
             "rooms" => $booking->getBookingLines()[0]->getData(),
             "observations" => $booking->getObservations(),
             'companyName' => $company->getTitle(),
