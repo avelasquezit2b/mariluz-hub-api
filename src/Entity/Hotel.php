@@ -42,7 +42,7 @@ class Hotel
     private ?int $id = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['hotelReduced', 'hotel', 'page', 'supplier', 'pack', 'productList', 'booking'])]
+    #[Groups(['hotelReduced', 'hotel', 'page', 'supplier', 'pack', 'productList', 'booking','bookingReduced'])]
     private ?string $title = null;
 
     #[ORM\Column(length: 255, nullable: true)]

@@ -12,6 +12,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: SupplierRepository::class)]
 #[ApiResource(
+    paginationEnabled: false,
     attributes: [
         "order" => ["id" => "DESC"],
         "normalization_context" => ["groups" => ["supplierReduced"]]

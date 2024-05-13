@@ -341,9 +341,14 @@ class Booking
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTimeImmutable
+    public function getCreatedAt()
     {
-        return $this->createdAt;
+        if($this->createdAt){
+            return $this->createdAt->format('d-m-Y');
+        } else {
+            return $this->createdAt;
+        }
+        
     }
 
     public function setCreatedAt(?\DateTimeImmutable $createdAt): static

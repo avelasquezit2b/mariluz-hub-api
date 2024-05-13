@@ -53,7 +53,7 @@ class BookingLine
     private ?array $data = null;
 
     #[ORM\ManyToOne(inversedBy: 'bookingLines')]
-    #[Groups(['bookingLineReduced', 'bookingLine', 'booking', 'voucherReduced', 'voucher'])]
+    #[Groups(['bookingLineReduced', 'bookingLine', 'booking', 'bookingReduced', 'voucherReduced', 'voucher'])]
     private ?Hotel $hotel = null;
 
     #[ORM\ManyToOne(inversedBy: 'bookingLines')]
@@ -73,9 +73,13 @@ class BookingLine
         return $this->id;
     }
 
-    public function getCheckIn(): ?\DateTimeInterface
+    public function getCheckIn()
     {
-        return $this->checkIn;
+        if ($this->checkIn) {
+            return $this->checkIn->format('d-m-Y');
+        } else {
+            return $this->checkIn;
+        }
     }
 
     public function setCheckIn(?\DateTimeInterface $checkIn): static
