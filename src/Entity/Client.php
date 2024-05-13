@@ -31,6 +31,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
     ],
 )]
 #[ApiFilter(SearchFilter::class, properties: ['id' => 'exact', 'email' => 'exact'])]
+#[ORM\HasLifecycleCallbacks]
 class Client
 {
     #[ORM\Id]
@@ -72,6 +73,12 @@ class Client
         $this->communicationTemplates = new ArrayCollection();
         $this->bills = new ArrayCollection();
         $this->bookings = new ArrayCollection();
+    }
+
+    #[ORM\PrePersist]
+    public function onPrePersist()
+    {
+        $this->createdAt = new \DateTimeImmutable('now');
     }
 
     public function getId(): ?int
@@ -122,12 +129,7 @@ class Client
 
     public function setCreatedAt(\DateTimeImmutable $createdAt): self
     {
-        //set automatically the created_at date
-        if ($createdAt == null) {
-            $this->createdAt = new \DateTime();
-        } else {
-            $this->createdAt = $createdAt;
-        }
+        $this->createdAt = $createdAt;
 
         return $this;
     }

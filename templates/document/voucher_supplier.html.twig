@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>{{bookingId}}-bono</title>
+    <title>{{bookingId}}-confirmación</title>
 </head>
 
 <style>
@@ -46,7 +46,7 @@
 				<tr>
 					<td colspan="3">
 						<div>
-							<h1>Bono de Servicios</h1>
+							<h1>Confirmación de Reserva</h1>
 						</div>
 					</td>
 				</tr>
@@ -108,7 +108,7 @@
 				{% for room in rooms %}
 					<tr>
 						<td colspan="2">
-							<div style="margin-bottom:.5rem">
+							<div style="margin-bottom:.5rem; margin-top:.5rem">
 								<span>Clientes: </span>
 								<strong>{{room.clientName}}</strong>
 							</div>
@@ -140,9 +140,55 @@
 								<span>Salida: </span>
 								<strong>{{checkOut}}</strong>
 							</div>
-							<div style="margin-bottom:2rem;">
+							<div style="margin-bottom:.5rem;">
 								<span>Servicio: </span>
 								<strong>000{{loop.index}}</strong>
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<td colspan="2">
+
+						</td>
+						<td>
+							<div>
+								<span>{{room.clientTypes.adults.quantity}} Adultos </span>
+								<strong>x {{room.nights}}d. x {{((room.clientTypes.adults.priceCost+room.clientTypes.adults.supplementCost)-room.clientTypes.adults.discountCost)/room.clientTypes.adults.quantity}}€ = {{((room.clientTypes.adults.priceCost+room.clientTypes.adults.supplementCost)-room.clientTypes.adults.discountCost)}}€</strong>
+							</div>
+							{% for discountNumber in room.clientTypes.adults.discountNumber %}
+								{% if discountNumber.active %}
+									<span style="display: block">Descuento {{discountNumber.number}}º Adulto {{discountNumber.percentage}} %</span>
+								{% endif %}
+							{% endfor %}
+							{% if room.clientTypes.kids.quantity > 0 %}
+								<div style="margin-top:.25rem">
+									<span>{{room.clientTypes.kids.quantity}} Niños</span>
+									<strong>x {{room.nights}}d. x {{((room.clientTypes.kids.priceCost+room.clientTypes.kids.supplementCost)-room.clientTypes.kids.discountCost)/room.clientTypes.kids.quantity}}€ = {{((room.clientTypes.kids.priceCost+room.clientTypes.kids.supplementCost)-room.clientTypes.kids.discountCost)}}€</strong>
+								</div>
+								{% for key, value in room.clientTypes.kids.ranges %}
+									{% for discountNumber in room.clientTypes.kids.ranges[key].discountNumber %}
+										{% if discountNumber.active %}
+											<span style="display: block">Descuento {{discountNumber.number}}º Niño {{key}} años {{discountNumber.percentage}} %</span>
+										{% endif %}
+									{% endfor %}
+								{% endfor %}
+							{% endif %}
+							{% if room.clientTypes.babies.quantity > 0 %}
+								<div style="margin-top:.25rem">
+									<span>{{room.clientTypes.babies.quantity}} Bebes</span>
+									<strong>x {{room.nights}}d. x {{((room.clientTypes.babies.priceCost+room.clientTypes.babies.supplementCost)-room.clientTypes.babies.discountCost)/room.clientTypes.babies.quantity}}€ = {{((room.clientTypes.babies.priceCost+room.clientTypes.babies.supplementCost)-room.clientTypes.babies.discountCost)}}€</strong>
+								</div>
+								{% for key, value in room.clientTypes.babies.ranges %}
+									{% for discountNumber in room.clientTypes.babies.ranges[key].discountNumber %}
+										{% if discountNumber.active %}
+											<span style="display: block">Descuento {{discountNumber.number}}º Bebe {{key}} años {{discountNumber.percentage}} %</span>
+										{% endif %}
+									{% endfor %}
+								{% endfor %}
+							{% endif %}
+							<div style="border: 2px solid black; padding: 5px; margin-bottom: .5rem">
+								<span>Importe Reserva / Booking Amount =  </span>
+								<strong> {{room.totalPriceCost}}€</strong>
 							</div>
 						</td>
 					</tr>

@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Repository\VoucherRepository;
+use App\Repository\ConfigurationRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -20,17 +21,40 @@ class DocumentController extends AbstractController
     }
 
     #[Route('/print_voucher/{id}')]
-    public function pdfVoucherAction(Pdf $pdf, VoucherRepository $voucherRepository, string $id)
+    public function pdfVoucherAction(Pdf $pdf, VoucherRepository $voucherRepository, ConfigurationRepository $configurationRepository, string $id)
     {
         $bookingVoucher = $voucherRepository->find($id);
+        $booking = $bookingVoucher->getBooking();
+        $company = $configurationRepository->find(1);
+        $supplier = $booking->getBookingLines()[0]->getHotel()->getSupplier();
 
         $html = $this->renderView('document/voucher.html.twig', [
             'to_be_paid_by' => $bookingVoucher->getToBePaidBy(),
             'hotel' => $bookingVoucher->getHotel(),
-            'booking' => $bookingVoucher->getBooking()
+            'booking' => $bookingVoucher->getBooking(),
+            'productTitle' => $booking->getBookingLines()[0]->getHotel()->getTitle(),
+            'productZone' => $booking->getBookingLines()[0]->getHotel()->getZones()[0]->getName(),
+            'productLocation' => $booking->getBookingLines()[0]->getHotel()->getLocation()->getName(),
+            'bookingId' => $booking->getId(),
+            'bookingDate' => $booking->getCreatedAt()->format('d/m/Y'),
+            'clientName' => $booking->getClient()->getName(),
+            'checkIn' => $booking->getBookingLines()[0]->getCheckIn()->format('d/m/Y'),
+            'checkOut' => $booking->getBookingLines()[0]->getCheckOut()->format('d/m/Y'),
+            "rooms" => $booking->getBookingLines()[0]->getData(),
+            "observations" => $booking->getObservations(),
+            'companyName' => $company->getTitle(),
+            'companyCif' => $company->getCif(),
+            'companyAddress' => $company->getTitle(),
+            'companyPostalCode' => $company->getPostalCode(),
+            'companyCity' => $company->getCity(),
+            'companyProvince' => $company->getProvince(),
+            'companyCountry' => $company->getCountry(),
+            'companyPhone' => $company->getPhone(),
+            'supplierPhone' => $supplier->getBookingPhone(),
+            'supplierTitle' => $supplier->getName()
         ]);
 
-        $filename = 'pdf.pdf';
+        $filename = $booking->getId().'-bono.pdf';
 
         return new Response(
             $pdf->getOutputFromHtml($html),

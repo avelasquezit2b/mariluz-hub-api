@@ -64,6 +64,10 @@ class BookingLine
     #[Groups(['bookingLineReduced', 'bookingLine', 'booking', 'voucherReduced', 'voucher'])]
     private ?Booking $booking = null;
 
+    #[ORM\Column(length: 25, nullable: true)]
+    #[Groups(['bookingLineReduced', 'bookingLine', 'booking', 'voucherReduced', 'voucher'])]
+    private ?string $totalPriceCost = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -149,6 +153,18 @@ class BookingLine
     public function setBooking(?Booking $booking): static
     {
         $this->booking = $booking;
+
+        return $this;
+    }
+
+    public function getTotalPriceCost(): ?string
+    {
+        return $this->totalPriceCost;
+    }
+
+    public function setTotalPriceCost(?string $totalPriceCost): static
+    {
+        $this->totalPriceCost = $totalPriceCost;
 
         return $this;
     }

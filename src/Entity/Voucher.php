@@ -29,6 +29,7 @@ use Doctrine\DBAL\Types\Types;
         // "delete" => ["security" => "is_granted('ROLE_ADMIN') or object.owner == user"],
     ],
 )]
+#[ORM\HasLifecycleCallbacks]
 class Voucher
 {
     #[ORM\Id]
@@ -57,6 +58,12 @@ class Voucher
     #[Groups(['voucherReduced', 'voucher'])]
     private ?string $observations = null;
 
+    #[ORM\PrePersist]
+    public function onPrePersist()
+    {
+        $this->createdAt = new \DateTimeImmutable('now');
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -81,12 +88,7 @@ class Voucher
 
     public function setCreatedAt(\DateTimeImmutable $createdAt): static
     {
-        //set automatically the created_at date
-        if ($createdAt == null) {
-            $this->createdAt = new \DateTime();
-        } else {
-            $this->createdAt = $createdAt;
-        }
+        $this->createdAt = $createdAt;
 
         return $this;
     }

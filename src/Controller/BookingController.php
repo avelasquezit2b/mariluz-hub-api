@@ -50,6 +50,7 @@ class BookingController extends AbstractController
                         'name' => $room->pensionType->pensionType->title,
                         'code' => $room->pensionType->pensionType->code,
                         'price' => $room->pensionType->price,
+                        'cost' => $room->pensionType->cost
                         // 'id' => $room->pensionType->id
                     ],
                     'cancellationType' => [
@@ -62,6 +63,15 @@ class BookingController extends AbstractController
                         'code' => $room->roomType->roomCondition->roomType->maxAdultsCapacity . '+' . $room->roomType->roomCondition->roomType->maxKidsCapacity,
                         // 'id' => $room->roomType->id
                     ],
+                    'nights' => $room->nights,
+                    'supplementMinNight' => [
+                        'number' => $room->supplementMinNight->number,
+                        'supplement' => $room->supplementMinNight->supplement,
+                        'supplementType' => $room->supplementMinNight->supplementType,
+                    ],
+                    'totalPrice' => $room->totalPrice,
+                    'totalPriceCost' => $room->totalPriceCost,
+                    'clientName' => $room->clientName,
                     'availabilities' => $room->roomType->availabilities
                 ];
 
@@ -69,10 +79,52 @@ class BookingController extends AbstractController
                     $formattedRoom['clientTypes'][$key] = [
                         'quantity' => $value->quantity,
                         'price' => $value->price,
+                        'priceCost' => $value->priceCost,
                         'discount' => $value->discount,
+                        'discountCost' => $value->discountCost,
                         'clientType' => $value->clientType,
-                        'ages' => $value->ages
+                        'ages' => $value->ages,
+                        'supplement' => $value->supplement,
+                        'supplementCost' => $value->supplementCost
                     ];
+
+                    if (isset($value->supplementIndividual)) {
+                        $formattedRoom['clientTypes'][$key]['supplementIndividual'] = $value->supplementIndividual;        
+                    }
+
+                    if (isset($value->discountNumber)) {
+                        $discountNumbers = [];
+                        foreach ($value->discountNumber as $discountNumber) {
+                            $currentDiscountNumber = [
+                                'active' => true,
+                                'number' => $discountNumber->number,  
+                                'percentage' => $discountNumber->percentage
+                            ];
+                            array_push($discountNumbers, $currentDiscountNumber);
+                        }
+                        $formattedRoom['clientTypes'][$key]['discountNumber'] = $discountNumbers;
+                    }
+
+                    if (isset($value->ranges)) {
+                        $formattedRoom['clientTypes'][$key]['ranges'] = [];
+                        foreach ($value->ranges as $key2 => $value) {
+                            $formattedRoom['clientTypes'][$key]['ranges'][$key2] = [
+                                'quantity' => $value->quantity,
+                                'discountNumber' => []
+                            ];
+
+                            $discountNumbers = [];
+                            foreach ($value->discountNumber as $discountNumber) {
+                                $currentDiscountNumber = [
+                                    'active' => $discountNumber->active,
+                                    'number' => $discountNumber->number,  
+                                    'percentage' => $discountNumber->percentage
+                                ];
+                                array_push($discountNumbers, $currentDiscountNumber);
+                            }
+                            $formattedRoom['clientTypes'][$key]['ranges'][$key2]['discountNumber'] = $discountNumbers;
+                        }
+                    }
                 }
                 array_push($formattedRooms, $formattedRoom);
                 foreach ($room->roomType->availabilities as $availability) {
@@ -100,15 +152,21 @@ class BookingController extends AbstractController
             $hotelBooking->setPaymentMethod($requestDecode->paymentMethod);
             $hotelBooking->setPhone($requestDecode->phone);
             $hotelBooking->setPromoCode($requestDecode->promoCode);
-            $hotelBooking->setStatus($hotel->isIsOnRequest() ? 'onRequest' : 'preBooked');
+            if ($requestDecode->paymentMethod == 'R') {
+                $hotelBooking->setStatus('booked');
+            } else {
+                $hotelBooking->setStatus($hotel->isIsOnRequest() ? 'onRequest' : 'preBooked');
+            }
             $hotelBooking->setPaymentStatus('pending');
             $hotelBooking->setTotalPrice($requestDecode->totalPrice);
+            $hotelBooking->setTotalPriceCost($requestDecode->totalPriceCost);
             $entityManager->persist($hotelBooking);
 
             $hotelBookingLine->setCheckIn(new \DateTime($requestDecode->checkIn));
             $hotelBookingLine->setCheckOut(new \DateTime($requestDecode->checkOut));
             $hotelBookingLine->setData($formattedRooms);
             $hotelBookingLine->setTotalPrice($requestDecode->totalPrice);
+            $hotelBookingLine->setTotalPriceCost($requestDecode->totalPriceCost);
             $hotelBookingLine->setHotel($hotel);
             $hotelBookingLine->setBooking($hotelBooking);
             $entityManager->persist($hotelBookingLine);
@@ -171,7 +229,7 @@ class BookingController extends AbstractController
                 $entityManager->persist($newVoucher);
                 $entityManager->flush();
     
-                $this->send_voucher($newVoucher->getId(), $mailer, $pdf, $voucherRepository, $configurationRepository);
+                $this->send_voucher($newVoucher->getId(), 'all', $mailer, $pdf, $voucherRepository, $configurationRepository);
             }
             
 
@@ -310,7 +368,7 @@ class BookingController extends AbstractController
             $entityManager->persist($newVoucher);
             $entityManager->flush();
 
-            $this->send_voucher($newVoucher->getId(), $mailer, $pdf, $voucherRepository, $configurationRepository);
+            $this->send_voucher($newVoucher->getId(), 'all', $mailer, $pdf, $voucherRepository, $configurationRepository);
 
 
         } catch (SoapFault $e) {
@@ -346,17 +404,66 @@ class BookingController extends AbstractController
         ]); 
     }
 
-    #[Route('/send_thank_you_email/{id}', name: 'api_send_thank_you_email')]
-    public function send_voucher(int $id, MailerInterface $mailer, Pdf $pdf, VoucherRepository $voucherRepository, ConfigurationRepository $configurationRepository): Response
+    #[Route('/change_to_cancelled/{id}', name: 'api_change_to_cancelled')]
+    public function change_to_cancelled(EntityManagerInterface $entityManager, HotelAvailabilityRepository $hotelAvailabilityRepository, BookingRepository $bookingRepository, string $id): Response
     {
-        $voucher = $voucherRepository->find($id);
+        $booking = $bookingRepository->find($id);
 
-        $booking = $voucher->getBooking();
-        $company = $configurationRepository->find(1);
+        if ($booking->getStatus() == 'preBooked' || $booking->getStatus() == 'booked') {
+            foreach ($booking->getBookingLines()[0]->getData() as $room) {
+                foreach ($room['availabilities'] as $availability) {
+                    $hotelAvailability = $hotelAvailabilityRepository->find($availability);
+                    $hotelAvailability->setQuota($hotelAvailability->getQuota() + 1);
+                    $hotelAvailability->setTotalBookings($hotelAvailability->getTotalBookings() - 1);
+                    $entityManager->persist($hotelAvailability);
+                }    
+            }
 
-        // Checking what type of product it is so the email fits accordingly
-        
-        // HOTEL
+            $booking->setStatus('cancelled');
+        }
+
+        $entityManager->persist($booking);
+        $entityManager->flush();
+
+        return $this->json([
+            'response'  => $booking
+        ]); 
+    }
+
+    #[Route('/send_thank_you_email/{id}/{destinatary}', name: 'api_send_thank_you_email')]
+    public function send_voucher(int $id, string $destinatary, MailerInterface $mailer, Pdf $pdf, VoucherRepository $voucherRepository, ConfigurationRepository $configurationRepository): Response
+    {
+        if ($destinatary == 'all') {
+            $voucher = $voucherRepository->find($id);
+            $booking = $voucher->getBooking();
+            $company = $configurationRepository->find(1);
+            $supplier = $booking->getBookingLines()[0]->getHotel()->getSupplier();
+
+            if ($booking->getBookingLines()[0]->getHotel()->isHasSendEmailClient()) {
+                $this->send_client_voucher($voucher, $booking, $company, $supplier, $mailer, $pdf);
+            }
+            if ($booking->getBookingLines()[0]->getHotel()->isHasSendEmailSupplier()) {
+                $this->send_supplier_voucher($voucher, $booking, $company, $supplier, $mailer, $pdf);
+            }
+
+            return $this->json([
+                'response'  => 'success'
+            ]);
+        } else {
+            $voucher = $voucherRepository->findOneBy(array('booking' => $id));
+            $booking = $voucher->getBooking();
+            $company = $configurationRepository->find(1);
+            $supplier = $booking->getBookingLines()[0]->getHotel()->getSupplier();
+            if ($destinatary == 'client') {
+                return $this->send_client_voucher($voucher, $booking, $company, $supplier, $mailer, $pdf);
+            } else if ($destinatary == 'supplier') {
+                return $this->send_supplier_voucher($voucher, $booking, $company, $supplier, $mailer, $pdf);
+            }
+        }
+    }
+
+    public function send_client_voucher($voucher, $booking, $company, $supplier, MailerInterface $mailer, Pdf $pdf): Response
+    {
         if ($booking->getBookingLines()[0]->getHotel() != null) {
 
             // Creating the email content
@@ -367,9 +474,10 @@ class BookingController extends AbstractController
                 "phone" => $booking->getPhone(),
                 "id" => $booking->getId(),
                 "product" => $booking->getBookingLines()[0]->getHotel(),
+                "rooms" => $booking->getBookingLines()[0]->getData(),
                 "totalPrice" => $booking->getTotalPrice(),
                 "paymentMethod" => $booking->getPaymentMethod(),
-                "date" => date("d-m-Y"),
+                "date" => $booking->getCreatedAt()->format('d/m/Y'),
                 "startDate" => $booking->getBookingLines()[0]->getCheckIn()->format('d/m/Y'),
                 "endDate" => $booking->getBookingLines()[0]->getCheckOut()->format('d/m/Y'),
             ];
@@ -380,14 +488,16 @@ class BookingController extends AbstractController
 
             $html = $this->renderView('document/voucher.html.twig', [
                 'to_be_paid_by' => $voucher->getToBePaidBy(),
-                'productTitle' => $voucher->getBooking()->getBookingLines()[0]->getHotel()->getTitle(),
-                'productZone' => $voucher->getBooking()->getBookingLines()[0]->getHotel()->getZones()[0]->getName(),
-                'productLocation' => $voucher->getBooking()->getBookingLines()[0]->getHotel()->getLocation()->getName(),
-                'bookingId' => $voucher->getBooking()->getId(),
-                'bookingDate' => date("d-m-Y"),
-                'clientName' => $voucher->getBooking()->getClient()->getName(),
-                'checkIn' => $voucher->getBooking()->getBookingLines()[0]->getCheckIn()->format('d/m/Y'),
-                'checkOut' => $voucher->getBooking()->getBookingLines()[0]->getCheckOut()->format('d/m/Y'),
+                'productTitle' => $booking->getBookingLines()[0]->getHotel()->getTitle(),
+                'productZone' => $booking->getBookingLines()[0]->getHotel()->getZones()[0]->getName(),
+                'productLocation' => $booking->getBookingLines()[0]->getHotel()->getLocation()->getName(),
+                'bookingId' => $booking->getId(),
+                'bookingDate' => $booking->getCreatedAt()->format('d/m/Y'),
+                'clientName' => $booking->getClient()->getName(),
+                'checkIn' => $booking->getBookingLines()[0]->getCheckIn()->format('d/m/Y'),
+                'checkOut' => $booking->getBookingLines()[0]->getCheckOut()->format('d/m/Y'),
+                "rooms" => $booking->getBookingLines()[0]->getData(),
+                "observations" => $booking->getObservations(),
                 'companyName' => $company->getTitle(),
                 'companyCif' => $company->getCif(),
                 'companyAddress' => $company->getTitle(),
@@ -396,6 +506,8 @@ class BookingController extends AbstractController
                 'companyProvince' => $company->getProvince(),
                 'companyCountry' => $company->getCountry(),
                 'companyPhone' => $company->getPhone(),
+                'supplierPhone' => $supplier->getBookingPhone(),
+                'supplierTitle' => $supplier->getName()
             ]);
 
             // Sending the email with the voucher attachment
@@ -413,7 +525,7 @@ class BookingController extends AbstractController
             }
 
             return $this->json([
-                'response'  => $email
+                'response'  => 'send'
             ]);
 
         // ACTIVITY
@@ -470,7 +582,134 @@ class BookingController extends AbstractController
             }
 
             return $this->json([
-                'response'  => $email
+                'response'  => 'send'
+            ]);
+        }
+    }
+
+    public function send_supplier_voucher($voucher, $booking, $company, $supplier, MailerInterface $mailer, Pdf $pdf): Response
+    {
+        if ($booking->getBookingLines()[0]->getHotel() != null) {
+
+            // Creating the email content
+
+            $context = [
+                "name" => $booking->getName(),
+                "bookingEmail" => $booking->getEmail(),
+                "phone" => $booking->getPhone(),
+                "id" => $booking->getId(),
+                "product" => $booking->getBookingLines()[0]->getHotel(),
+                "rooms" => $booking->getBookingLines()[0]->getData(),
+                "totalPrice" => $booking->getTotalPrice(),
+                "paymentMethod" => $booking->getPaymentMethod(),
+                "date" => $booking->getCreatedAt()->format('d/m/Y'),
+                "startDate" => $booking->getBookingLines()[0]->getCheckIn()->format('d/m/Y'),
+                "endDate" => $booking->getBookingLines()[0]->getCheckOut()->format('d/m/Y'),
+                "message" => 'Reserva confirmada'
+            ];
+
+            $fileName = 'confirmacion_reserva'.$booking->getId().'.pdf';
+
+            // Creating the twig for the PDF with the booking data
+
+            $html = $this->renderView('document/voucher_supplier.html.twig', [
+                'to_be_paid_by' => $voucher->getToBePaidBy(),
+                'productTitle' => $booking->getBookingLines()[0]->getHotel()->getTitle(),
+                'productZone' => $booking->getBookingLines()[0]->getHotel()->getZones()[0]->getName(),
+                'productLocation' => $booking->getBookingLines()[0]->getHotel()->getLocation()->getName(),
+                'bookingId' => $booking->getId(),
+                'bookingDate' => $booking->getCreatedAt()->format('d/m/Y'),
+                'clientName' => $booking->getClient()->getName(),
+                'checkIn' => $booking->getBookingLines()[0]->getCheckIn()->format('d/m/Y'),
+                'checkOut' => $booking->getBookingLines()[0]->getCheckOut()->format('d/m/Y'),
+                "rooms" => $booking->getBookingLines()[0]->getData(),
+                "totalPriceCost" => $booking->getTotalPriceCost(),
+                "observations" => $booking->getObservations(),
+                'companyName' => $company->getTitle(),
+                'companyCif' => $company->getCif(),
+                'companyAddress' => $company->getTitle(),
+                'companyPostalCode' => $company->getPostalCode(),
+                'companyCity' => $company->getCity(),
+                'companyProvince' => $company->getProvince(),
+                'companyCountry' => $company->getCountry(),
+                'companyPhone' => $company->getPhone(),
+                'supplierPhone' => $supplier->getBookingPhone(),
+                'supplierTitle' => $supplier->getName()
+            ]);
+
+            // Sending the email with the voucher attachment
+
+            $email = (new TemplatedEmail())
+                ->from($company->getBookingEmail())
+                ->to($booking->getBookingLines()[0]->getHotel()->getBookingEmail() ? $booking->getBookingLines()[0]->getHotel()->getBookingEmail() : $supplier->getBookingEmail())
+                ->subject('Confirmación de reserva')
+                ->context($context)
+                ->attach($pdf->getOutputFromHtml($html), $fileName, 'application/pdf')
+                ->htmlTemplate('communications/supplier_booking_confirmed.html.twig');
+
+            if ($booking->getStatus() == 'booked') {
+                $mailer->send($email);
+            }
+
+            return $this->json([
+                'response'  => 'send'
+            ]);
+
+        // ACTIVITY
+        } else if ($booking->getBookingLines()[0]->getActivity() != null) {
+
+            // Creating the email content
+
+            $context = [
+                "name" => $booking->getName(),
+                "bookingEmail" => $booking->getEmail(),
+                "phone" => $booking->getPhone(),
+                "id" => $booking->getId(),
+                "product" => $booking->getBookingLines()[0]->getActivity(),
+                "totalPrice" => $booking->getTotalPrice(),
+                "paymentMethod" => $booking->getPaymentMethod(),
+                "date" => date("d-m-Y"),
+            ];
+            $fileName = 'Bono_Actividad.pdf';
+
+            // Creating the twig for the PDF with the booking data
+
+            $html = $this->renderView('document/voucher.html.twig', [
+                'to_be_paid_by' => $voucher->getToBePaidBy(),
+                'productTitle' => $voucher->getBooking()->getBookingLines()[0]->getActivity()->getTitle(),
+                'productZone' => $voucher->getBooking()->getBookingLines()[0]->getActivity()->getZones()[0]->getName(),
+                'productLocation' => $voucher->getBooking()->getBookingLines()[0]->getActivity()->getLocation()->getName(),
+                'bookingId' => $voucher->getBooking()->getId(),
+                'bookingDate' => date("d-m-Y"),
+                'clientName' => $voucher->getBooking()->getClient()->getName(),
+                'checkIn' => $voucher->getBooking()->getBookingLines()[0]->getCheckIn()->format('d/m/Y'),
+                'checkOut' => $voucher->getBooking()->getBookingLines()[0]->getCheckOut()->format('d/m/Y'),
+                'companyName' => $company->getTitle(),
+                'companyCif' => $company->getCif(),
+                'companyAddress' => $company->getTitle(),
+                'companyPostalCode' => $company->getPostalCode(),
+                'companyCity' => $company->getCity(),
+                'companyProvince' => $company->getProvince(),
+                'companyCountry' => $company->getCountry(),
+                'companyPhone' => $company->getPhone(),
+            ]);
+
+            // Sending the email with the voucher attachment
+
+            $email = (new TemplatedEmail())
+                ->from($company->getBookingEmail())
+                ->to($booking->getClient()->getEmail())
+                ->subject('Gracias por tu reserva')
+                ->context($context)
+                ->attach($pdf->getOutputFromHtml($html), $fileName, 'application/pdf')
+                ->htmlTemplate('email/activity_thank_you.html.twig');
+
+            if ($booking->getStatus() == 'booked') {
+                $mailer->send($email);
+            }
+
+            return $this->json([
+                'response'  => 'send'
             ]);
         }
     }

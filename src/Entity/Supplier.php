@@ -38,7 +38,7 @@ class Supplier
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['supplierReduced', 'supplier'])]
+    #[Groups(['supplierReduced', 'supplier', 'booking'])]
     private ?string $name = null;
 
     #[ORM\Column]
@@ -58,11 +58,11 @@ class Supplier
     private ?string $contactPhone = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['supplierReduced', 'supplier'])]
+    #[Groups(['supplierReduced', 'supplier', 'booking'])]
     private ?string $bookingEmail = null;
 
     #[ORM\Column(length: 50, nullable: true)]
-    #[Groups(['supplierReduced', 'supplier'])]
+    #[Groups(['supplierReduced', 'supplier', 'booking'])]
     private ?string $bookingPhone = null;
 
     #[ORM\Column(nullable: true)]

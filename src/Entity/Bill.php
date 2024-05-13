@@ -27,6 +27,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
         // "delete" => ["security" => "is_granted('ROLE_ADMIN') or object.owner == user"],
     ],
 )]
+#[ORM\HasLifecycleCallbacks]
 class Bill
 {
     #[ORM\Id]
@@ -67,6 +68,12 @@ class Bill
     #[Groups(['billReduced', 'bill'])]
     private ?Booking $booking = null;
 
+    #[ORM\PrePersist]
+    public function onPrePersist()
+    {
+        $this->createdAt = new \DateTimeImmutable('now');
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -79,12 +86,7 @@ class Bill
 
     public function setCreatedAt(\DateTimeImmutable $createdAt): static
     {
-        //set automatically the created_at date
-        if ($createdAt == null) {
-            $this->createdAt = new \DateTime();
-        } else {
-            $this->createdAt = $createdAt;
-        }
+        $this->createdAt = $createdAt;
 
         return $this;
     }

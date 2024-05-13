@@ -43,7 +43,7 @@ class PensionTypePrice
     private ?string $price = null;
 
     #[ORM\Column(length: 50, nullable: true)]
-    #[Groups(['pensionTypePricesReduced', 'pensionTypePrices', 'hotelFeeReduced'])]
+    #[Groups(['pensionTypePricesReduced', 'pensionTypePrices', 'hotelFeeReduced', 'hotelAvailability'])]
     private ?string $cost = null;
 
     #[ORM\ManyToOne(inversedBy: 'pensionTypePrices')]

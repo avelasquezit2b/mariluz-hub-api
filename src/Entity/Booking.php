@@ -30,6 +30,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
         // "delete" => ["security" => "is_granted('ROLE_ADMIN') or object.owner == user"],
     ],
 )]
+#[ORM\HasLifecycleCallbacks]
 class Booking
 {
     #[ORM\Id]
@@ -107,11 +108,22 @@ class Booking
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['bookingReduced', 'booking'])]
     private ?string $internalNotes = null;
+
+    #[ORM\Column(length: 25, nullable: true)]
+    #[Groups(['bookingReduced', 'booking'])]
+    private ?string $totalPriceCost = null;
 
     public function __construct()
     {
         $this->bookingLines = new ArrayCollection();
+    }
+
+    #[ORM\PrePersist]
+    public function onPrePersist()
+    {
+        $this->createdAt = new \DateTimeImmutable('now');
     }
 
     public function getId(): ?int
@@ -336,13 +348,8 @@ class Booking
 
     public function setCreatedAt(?\DateTimeImmutable $createdAt): static
     {
-        //set automatically the created_at date
-        if ($createdAt == null) {
-            $this->createdAt = new \DateTime();
-        } else {
-            $this->createdAt = $createdAt;
-        }
-
+        $this->createdAt = $createdAt;
+        
         return $this;
     }
 
@@ -354,6 +361,18 @@ class Booking
     public function setInternalNotes(?string $internalNotes): static
     {
         $this->internalNotes = $internalNotes;
+
+        return $this;
+    }
+
+    public function getTotalPriceCost(): ?string
+    {
+        return $this->totalPriceCost;
+    }
+
+    public function setTotalPriceCost(?string $totalPriceCost): static
+    {
+        $this->totalPriceCost = $totalPriceCost;
 
         return $this;
     }

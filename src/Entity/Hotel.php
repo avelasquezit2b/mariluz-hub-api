@@ -50,7 +50,7 @@ class Hotel
     private ?string $slug = null;
 
     #[ORM\ManyToOne(inversedBy: 'hotels')]
-    #[Groups(['hotel', 'supplier'])]
+    #[Groups(['hotel', 'supplier', 'booking'])]
     private ?Supplier $supplier = null;
 
     #[ORM\Column(length: 25, nullable: true)]
@@ -204,9 +204,11 @@ class Hotel
     private ?bool $isCredit = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['hotel'])]
     private ?string $bookingEmail = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['hotel'])]
     private ?string $internalNotes = null;
     
 

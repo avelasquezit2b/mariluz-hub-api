@@ -25,6 +25,7 @@ use Doctrine\ORM\Mapping as ORM;
         "delete",
     ],
 )]
+#[ORM\HasLifecycleCallbacks]
 class Page
 {
     #[ORM\Id]
@@ -71,6 +72,12 @@ class Page
         $this->sections = new ArrayCollection();
     }
 
+    #[ORM\PrePersist]
+    public function onPrePersist()
+    {
+        $this->createdAt = new \DateTimeImmutable('now');
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -107,12 +114,7 @@ class Page
 
     public function setCreatedAt(\DateTimeImmutable $createdAt): static
     {
-        //set automatically the created_at date
-        if ($createdAt == null) {
-            $this->createdAt = new \DateTime();
-        } else {
-            $this->createdAt = $createdAt;
-        }
+        $this->createdAt = $createdAt;
 
         return $this;
     }

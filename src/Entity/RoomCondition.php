@@ -81,6 +81,7 @@ class RoomCondition
     private ?string $nightsSupplement = null;
 
     #[ORM\Column(length: 25, nullable: true)]
+    #[Groups(['roomConditionReduced', 'roomCondition', 'hotelFeeReduced', 'hotelAvailability'])]
     private ?string $supplementType = null;
 
     public function __construct()
