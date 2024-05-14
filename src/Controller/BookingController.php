@@ -152,7 +152,7 @@ class BookingController extends AbstractController
             $hotelBooking->setPaymentMethod($requestDecode->paymentMethod);
             $hotelBooking->setPhone($requestDecode->phone);
             $hotelBooking->setPromoCode($requestDecode->promoCode);
-            if ($requestDecode->paymentMethod == 'R') {
+            if ($requestDecode->paymentMethod == 'R' && !$hotel->isIsOnRequest()) {
                 $hotelBooking->setStatus('booked');
             } else {
                 $hotelBooking->setStatus($hotel->isIsOnRequest() ? 'onRequest' : 'preBooked');
@@ -229,7 +229,7 @@ class BookingController extends AbstractController
                 $entityManager->persist($newVoucher);
                 $entityManager->flush();
     
-                $this->send_voucher($newVoucher->getId(), 'all', $mailer, $pdf, $voucherRepository, $configurationRepository);
+                $this->send_voucher($newVoucher->getId(), 'all', $mailer, $pdf, $voucherRepository, $configurationRepository, $entityManager);
             }
             
 
@@ -368,7 +368,7 @@ class BookingController extends AbstractController
             $entityManager->persist($newVoucher);
             $entityManager->flush();
 
-            $this->send_voucher($newVoucher->getId(), 'all', $mailer, $pdf, $voucherRepository, $configurationRepository);
+            $this->send_voucher($newVoucher->getId(), 'all', $mailer, $pdf, $voucherRepository, $configurationRepository, $entityManager);
 
 
         } catch (SoapFault $e) {
@@ -431,7 +431,7 @@ class BookingController extends AbstractController
     }
 
     #[Route('/send_thank_you_email/{id}/{destinatary}', name: 'api_send_thank_you_email')]
-    public function send_voucher(int $id, string $destinatary, MailerInterface $mailer, Pdf $pdf, VoucherRepository $voucherRepository, ConfigurationRepository $configurationRepository): Response
+    public function send_voucher(int $id, string $destinatary, MailerInterface $mailer, Pdf $pdf, VoucherRepository $voucherRepository, ConfigurationRepository $configurationRepository, EntityManagerInterface $entityManager): Response
     {
         if ($destinatary == 'all') {
             $voucher = $voucherRepository->find($id);
@@ -455,14 +455,14 @@ class BookingController extends AbstractController
             $company = $configurationRepository->find(1);
             $supplier = $booking->getBookingLines()[0]->getHotel()->getSupplier();
             if ($destinatary == 'client') {
-                return $this->send_client_voucher($voucher, $booking, $company, $supplier, $mailer, $pdf);
+                return $this->send_client_voucher($voucher, $booking, $company, $supplier, $mailer, $pdf, $entityManager);
             } else if ($destinatary == 'supplier') {
-                return $this->send_supplier_voucher($voucher, $booking, $company, $supplier, $mailer, $pdf);
+                return $this->send_supplier_voucher($voucher, $booking, $company, $supplier, $mailer, $pdf, $entityManager);
             }
         }
     }
 
-    public function send_client_voucher($voucher, $booking, $company, $supplier, MailerInterface $mailer, Pdf $pdf): Response
+    public function send_client_voucher($voucher, $booking, $company, $supplier, MailerInterface $mailer, Pdf $pdf, EntityManagerInterface $entityManager): Response
     {
         if ($booking->getBookingLines()[0]->getHotel() != null) {
 
@@ -522,6 +522,9 @@ class BookingController extends AbstractController
 
             if ($booking->getStatus() == 'booked') {
                 $mailer->send($email);
+                $booking->setClientConfirmationSent(true);
+                $entityManager->persist($booking);
+                $entityManager->flush();
             }
 
             return $this->json([
@@ -579,6 +582,9 @@ class BookingController extends AbstractController
 
             if ($booking->getStatus() == 'booked') {
                 $mailer->send($email);
+                $booking->setClientConfirmationSent(true);
+                $entityManager->persist($booking);
+                $entityManager->flush();
             }
 
             return $this->json([
@@ -587,7 +593,7 @@ class BookingController extends AbstractController
         }
     }
 
-    public function send_supplier_voucher($voucher, $booking, $company, $supplier, MailerInterface $mailer, Pdf $pdf): Response
+    public function send_supplier_voucher($voucher, $booking, $company, $supplier, MailerInterface $mailer, Pdf $pdf, EntityManagerInterface $entityManager): Response
     {
         if ($booking->getBookingLines()[0]->getHotel() != null) {
 
@@ -649,6 +655,9 @@ class BookingController extends AbstractController
 
             if ($booking->getStatus() == 'booked') {
                 $mailer->send($email);
+                $booking->setSupplierConfirmationSent(true);
+                $entityManager->persist($booking);
+                $entityManager->flush();
             }
 
             return $this->json([
@@ -706,6 +715,9 @@ class BookingController extends AbstractController
 
             if ($booking->getStatus() == 'booked') {
                 $mailer->send($email);
+                $booking->setSupplierConfirmationSent(true);
+                $entityManager->persist($booking);
+                $entityManager->flush();
             }
 
             return $this->json([

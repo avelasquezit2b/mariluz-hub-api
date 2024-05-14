@@ -215,6 +215,7 @@ class Activity
     private ?string $longitude = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['activityReduced', 'activity'])]
     private ?string $internalNotes = null;
 
     // #[ORM\Column(length: 25, nullable: true)]

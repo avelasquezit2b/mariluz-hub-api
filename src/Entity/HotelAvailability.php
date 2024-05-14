@@ -37,9 +37,9 @@ use Symfony\Component\Serializer\Annotation\Groups;
     ],
 )]
 #[ApiFilter(DateFilter::class, properties: ['date'])]
-#[ApiFilter(SearchFilter::class, properties: ['roomCondition.hotelSeason.hotelFee.hotel' => 'exact', 'roomCondition.hotelSeason.hotelFee.hotel.location.name' => 'exact'])]
+#[ApiFilter(SearchFilter::class, properties: ['roomCondition.hotelSeason.hotelFee.hotel' => 'exact', 'roomCondition.hotelSeason.hotelFee.hotel.zones.name' => 'exact'])]
 #[ApiFilter(RangeFilter::class, properties: ['quota'])]
-#[ApiFilter(BooleanFilter::class, properties: ['isAvailable'])]
+#[ApiFilter(BooleanFilter::class, properties: ['isAvailable', 'roomCondition.hotelSeason.hotelFee.hotel.isActive'])]
 #[ORM\HasLifecycleCallbacks]
 class HotelAvailability
 {

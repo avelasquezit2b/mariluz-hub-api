@@ -91,7 +91,7 @@ class Booking
     #[Groups(['bookingReduced', 'booking', 'voucher'])]
     private ?Client $client = null;
 
-    #[ORM\OneToMany(mappedBy: 'booking', targetEntity: BookingLine::class)]
+    #[ORM\OneToMany(mappedBy: 'booking', targetEntity: BookingLine::class, cascade: ['remove'])]
     #[Groups(['bookingReduced', 'booking', 'voucher'])]
     private Collection $bookingLines;
 

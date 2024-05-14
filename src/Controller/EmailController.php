@@ -21,14 +21,14 @@ class EmailController extends AbstractController
         $company = $configurationRepository->find(1);
 
         if ($request->product) {
-            $emailSubject = 'Petición sobre: ' . $request->product;
+            $emailSubject = ($request->isDatesRequest ? 'Petición fechas en: ' : 'Dudas sobre: ') . $request->product;
         } else {
             $emailSubject = 'Hemos recibido un mensaje!';
         }
 
         $email = (new TemplatedEmail())
-            ->from($request->email)
-            ->to($company->getBookingEmail())
+            ->from($company->getBookingEmail())
+            ->to('avelasquez@it2b.es')
             //->cc('cc@example.com')
             //->bcc('bcc@example.com')
             //->replyTo('fabien@example.com')

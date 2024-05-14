@@ -36,7 +36,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
     ],
 )]
 #[ApiFilter(DateFilter::class, properties: ['date'])]
-#[ApiFilter(SearchFilter::class, properties: ['activitySchedule.activitySeason.activityFee.activity' => 'exact', 'activitySchedule.activitySeason.activityFee.activity.location.name' => 'exact'])]
+#[ApiFilter(SearchFilter::class, properties: ['activitySchedule.activitySeason.activityFee.activity' => 'exact', 'activitySchedule.activitySeason.activityFee.activity.zones.name' => 'exact'])]
 #[ApiFilter(RangeFilter::class, properties: ['quota'])]
 #[ApiFilter(OrderFilter::class, properties: ['activitySchedule.startTime' => 'ASC'])]
 #[ORM\HasLifecycleCallbacks]
