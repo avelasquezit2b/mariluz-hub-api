@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\ChannelRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -52,6 +54,16 @@ class Channel
 
     #[ORM\ManyToOne(inversedBy: 'channels')]
     private ?Connector $connector = null;
+
+    #[ORM\OneToMany(mappedBy: 'channel', targetEntity: ChannelHotel::class)]
+    #[Groups(['channelReduced', 'channel'])]
+    private Collection $channelHotels;
+
+    public function __construct()
+    {
+        $this->channelHotels = new ArrayCollection();
+    }
+
 
     public function getId(): ?int
     {
@@ -117,4 +129,35 @@ class Channel
 
         return $this;
     }
+
+    /**
+     * @return Collection<int, ChannelHotel>
+     */
+    public function getChannelHotels(): Collection
+    {
+        return $this->channelHotels;
+    }
+
+    public function addChannelHotel(ChannelHotel $channelHotel): static
+    {
+        if (!$this->channelHotels->contains($channelHotel)) {
+            $this->channelHotels->add($channelHotel);
+            $channelHotel->setChannel($this);
+        }
+
+        return $this;
+    }
+
+    public function removeChannelHotel(ChannelHotel $channelHotel): static
+    {
+        if ($this->channelHotels->removeElement($channelHotel)) {
+            // set the owning side to null (unless already changed)
+            if ($channelHotel->getChannel() === $this) {
+                $channelHotel->setChannel(null);
+            }
+        }
+
+        return $this;
+    }
+
 }

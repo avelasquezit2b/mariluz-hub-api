@@ -210,7 +210,10 @@ class Hotel
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     #[Groups(['hotel'])]
     private ?string $internalNotes = null;
-    
+
+    #[ORM\OneToMany(mappedBy: 'hotel', targetEntity: ChannelHotel::class, cascade: ['remove'])]
+    #[Groups(['hotel', 'hotelReduced'])]
+    private Collection $channelHotels;
 
     public function __construct()
     {
@@ -226,6 +229,7 @@ class Hotel
         $this->packPrices = new ArrayCollection();
         $this->vouchers = new ArrayCollection();
         $this->bookingLines = new ArrayCollection();
+        $this->channelHotels = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -949,4 +953,35 @@ class Hotel
 
         return $this;
     }
+
+    /**
+     * @return Collection<int, ChannelHotel>
+     */
+    public function getChannelHotels(): Collection
+    {
+        return $this->channelHotels;
+    }
+
+    public function addChannelHotel(ChannelHotel $channelHotel): static
+    {
+        if (!$this->channelHotels->contains($channelHotel)) {
+            $this->channelHotels->add($channelHotel);
+            $channelHotel->setHotel($this);
+        }
+
+        return $this;
+    }
+
+    public function removeChannelHotel(ChannelHotel $channelHotel): static
+    {
+        if ($this->channelHotels->removeElement($channelHotel)) {
+            // set the owning side to null (unless already changed)
+            if ($channelHotel->getHotel() === $this) {
+                $channelHotel->setHotel(null);
+            }
+        }
+
+        return $this;
+    }
+
 }

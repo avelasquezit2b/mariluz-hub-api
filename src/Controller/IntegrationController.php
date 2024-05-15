@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Activity;
+use App\Entity\ChannelHotel;
 use App\Entity\Hotel;
 use App\Entity\Location;
 use App\Entity\Zone;
@@ -11,9 +12,11 @@ use App\Entity\MediaObject;
 use App\Entity\Modality;
 use Symfony\Component\HttpFoundation\Request;
 use App\Repository\ActivityRepository;
+use App\Repository\ChannelRepository;
 use App\Repository\LocationRepository;
 use App\Repository\ZoneRepository;
 use App\Repository\LanguageRepository;
+use App\Repository\ProductTagRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -46,7 +49,7 @@ class IntegrationController extends AbstractController
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => 'POST',
             CURLOPT_POSTFIELDS => '{
-  "query": "query {\\thotelX { hotels(criteria: {access: \\"'. $access .'\\", destinationCodes: [\"PLYPALM\", \"SACO\", \"ALCU\", \"SPONSA\", \"CBONA\", \"CMILL\", \"PICAF\", \"CBLANC\", \"SANTANYI\", \"ILLET\", \"MAGA\", \"CRAT\", \"PAGUE\", \"MURO\", \"PUIGPUNYEN\", \"CALAD\", \"CBOSCH\", \"FORCAT\"]}, token: \\"\\") { token count edges { node { createdAt updatedAt hotelData { hotelCode hotelName categoryCode chainCode location { address zipCode city country coordinates { latitude longitude } closestDestination { code available texts { text language } type parent } } contact { email telephone fax web } propertyType { propertyCode name } descriptions { type texts { language text } } medias { code url } rooms { edges { node { code roomData { code roomCode allAmenities { edges { node { amenityData { code amenityCode } } } } } } } } allAmenities { edges { node { amenityData { code amenityCode } } } } } } } } } }"
+  "query": "query {\\thotelX { hotels(criteria: {access: \\"' . $access . '\\", destinationCodes: [\"PLYPALM\", \"SACO\", \"ALCU\", \"SPONSA\", \"CBONA\", \"CMILL\", \"PICAF\", \"CBLANC\", \"SANTANYI\", \"ILLET\", \"MAGA\", \"CRAT\", \"PAGUE\", \"MURO\", \"PUIGPUNYEN\", \"CALAD\", \"CBOSCH\", \"FORCAT\"]}, token: \\"\\") { token count edges { node { createdAt updatedAt hotelData { hotelCode hotelName categoryCode chainCode location { address zipCode city country coordinates { latitude longitude } closestDestination { code available texts { text language } type parent } } contact { email telephone fax web } propertyType { propertyCode name } descriptions { type texts { language text } } medias { code url } rooms { edges { node { code roomData { code roomCode allAmenities { edges { node { amenityData { code amenityCode } } } } } } } } allAmenities { edges { node { amenityData { code amenityCode } } } } } } } } } }"
 }',
             CURLOPT_HTTPHEADER => array(
                 'Authorization: Apikey 4794442a-a4dc-4660-5083-64360879e063',
@@ -66,30 +69,25 @@ class IntegrationController extends AbstractController
     }
 
     #[Route('/import_hotels', name: 'app_import_hotels')]
-    public function importHotels(EntityManagerInterface $entityManager, Request $request): Response
+    public function importHotels(EntityManagerInterface $entityManager, Request $request, ChannelRepository $channelRepository, ProductTagRepository $productTagRepository): Response
     {
-        $data = json_decode($request->getContent(), true);
+        $dataDecode = json_decode($request->getContent(), true);
 
-        foreach ($data as $hotel) {
+        $hotels = $dataDecode['hotels'];
+        $channelId = $dataDecode['channel'];
+
+        $hotelProductTag = $productTagRepository->find(1);
+        $channel = $channelRepository->find($channelId);
+
+        foreach ($hotels as $hotel) {
             $newHotel = new Hotel();
 
-            $newHotel->setTitle($hotel['title']);
-            // $newHotel->setLocation($hotel['destiny']);
-            // $newHotel->setTravelgateId($hotel['id']);
-            // $newHotel->addMedias($hotel['medias']);
+            $newHotel->setTitle(ucwords(strtolower($hotel['title'])));
+            $newHotel->setSlug($this->slugify($hotel['title']));
+            $newHotel->setProductTag($hotelProductTag);
             $newHotel->setRating($hotel['stars']);
             $newHotel->setExtendedDescription($hotel['description']);
             $newHotel->setAddress($hotel['zone']);
-
-            // foreach ($product['images'] as $image) {
-            //     $mediaObject = new MediaObject();
-            //     $mediaObject->setExternalUrl($image['extra_large']);
-            //     $mediaObject->setType('img');
-            //     $mediaObject->setPosition($i);
-            //     $mediaObject->setActivity($activity);
-            //     $entityManager->persist($mediaObject);
-            //     $i++;
-            // }
 
             foreach ($hotel['medias'] as $image) {
                 $newMediaObject = new MediaObject();
@@ -98,6 +96,18 @@ class IntegrationController extends AbstractController
                 $newMediaObject->setHotel($newHotel);
                 $entityManager->persist($newMediaObject);
             }
+
+            $newChannelHotel = new ChannelHotel();
+
+            $newChannelHotel->setHotel($newHotel);
+            $newChannelHotel->setChannel($channel);
+
+            $newChannelHotel->setCode($hotel['id']);
+            // $newChannelHotel->setChannelCode();
+
+            
+            $entityManager->persist($newChannelHotel);
+
 
             $entityManager->persist($newHotel);
         }
@@ -238,5 +248,32 @@ class IntegrationController extends AbstractController
         return $this->json([
             'response'  => true
         ]);
+    }
+
+    public static function slugify($text, string $divider = '-')
+    {
+        // replace non letter or digits by divider
+        $text = preg_replace('~[^\pL\d]+~u', $divider, $text);
+
+        // transliterate
+        $text = iconv('utf-8', 'us-ascii//TRANSLIT', $text);
+
+        // remove unwanted characters
+        $text = preg_replace('~[^-\w]+~', '', $text);
+
+        // trim
+        $text = trim($text, $divider);
+
+        // remove duplicate divider
+        $text = preg_replace('~-+~', $divider, $text);
+
+        // lowercase
+        $text = strtolower($text);
+
+        if (empty($text)) {
+            return 'n-a';
+        }
+
+        return $text;
     }
 }
