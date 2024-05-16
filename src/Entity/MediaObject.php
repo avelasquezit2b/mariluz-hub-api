@@ -121,7 +121,7 @@ class MediaObject
     private ?Extra $extra = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['media_object:read', 'activityReduced', 'activity', 'hotel', 'roomType', 'theme', 'pack', 'extra', 'productList'])]
+    #[Groups(['media_object:read', 'activityReduced', 'activity', 'hotelReduced', 'hotel', 'roomType', 'themeReduced', 'theme', 'page', 'heroSlide', 'packReduced', 'pack', 'extra', 'productList', 'configReduced', 'booking'])]
     private ?string $externalUrl = null;
 
     #[ORM\OneToOne(mappedBy: 'logo', cascade: ['persist', 'remove'])]
