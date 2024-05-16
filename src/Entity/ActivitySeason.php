@@ -54,7 +54,7 @@ class ActivitySeason
     #[Groups(['activitySeasonReduced', 'activitySeason', 'activityFeeReduced'])]
     private array $ranges = [];
 
-    #[ORM\ManyToOne(inversedBy: 'activitySeasons', cascade: ['persist', 'remove'])]
+    #[ORM\ManyToOne(inversedBy: 'activitySeasons')]
     #[Groups(['activityAvailabilityReduced', 'activityAvailability'])]
     private ?ActivityFee $activityFee = null;
 
