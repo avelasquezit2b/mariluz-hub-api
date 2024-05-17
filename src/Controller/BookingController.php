@@ -440,10 +440,10 @@ class BookingController extends AbstractController
             $supplier = $booking->getBookingLines()[0]->getHotel()->getSupplier();
 
             if ($booking->getBookingLines()[0]->getHotel()->isHasSendEmailClient()) {
-                $this->send_client_voucher($voucher, $booking, $company, $supplier, $mailer, $pdf);
+                $this->send_client_voucher($voucher, $booking, $company, $supplier, $mailer, $pdf, $entityManager);
             }
             if ($booking->getBookingLines()[0]->getHotel()->isHasSendEmailSupplier()) {
-                $this->send_supplier_voucher($voucher, $booking, $company, $supplier, $mailer, $pdf);
+                $this->send_supplier_voucher($voucher, $booking, $company, $supplier, $mailer, $pdf, $entityManager);
             }
 
             return $this->json([
@@ -489,6 +489,7 @@ class BookingController extends AbstractController
             $html = $this->renderView('document/voucher.html.twig', [
                 'to_be_paid_by' => $voucher->getToBePaidBy(),
                 'productTitle' => $booking->getBookingLines()[0]->getHotel()->getTitle(),
+                'productAddress' => $booking->getBookingLines()[0]->getHotel()->getAddress(),
                 'productZone' => $booking->getBookingLines()[0]->getHotel()->getZones()[0]->getName(),
                 'productLocation' => $booking->getBookingLines()[0]->getHotel()->getLocation()->getName(),
                 'bookingId' => $booking->getId(),
@@ -497,7 +498,7 @@ class BookingController extends AbstractController
                 'checkIn' => $booking->getBookingLines()[0]->getCheckIn(),
                 'checkOut' => $booking->getBookingLines()[0]->getCheckOut(),
                 "rooms" => $booking->getBookingLines()[0]->getData(),
-                "observations" => $booking->getObservations(),
+                "observations" => $voucher->getObservations(),
                 'companyName' => $company->getTitle(),
                 'companyCif' => $company->getCif(),
                 'companyAddress' => $company->getTitle(),
@@ -553,6 +554,7 @@ class BookingController extends AbstractController
             $html = $this->renderView('document/voucher.html.twig', [
                 'to_be_paid_by' => $voucher->getToBePaidBy(),
                 'productTitle' => $voucher->getBooking()->getBookingLines()[0]->getActivity()->getTitle(),
+                'productAddress' => $booking->getBookingLines()[0]->getActivity()->getAddress(),
                 'productZone' => $voucher->getBooking()->getBookingLines()[0]->getActivity()->getZones()[0]->getName(),
                 'productLocation' => $voucher->getBooking()->getBookingLines()[0]->getActivity()->getLocation()->getName(),
                 'bookingId' => $voucher->getBooking()->getId(),
@@ -614,7 +616,7 @@ class BookingController extends AbstractController
                 "message" => 'Reserva confirmada'
             ];
 
-            $fileName = 'confirmacion_reserva'.$booking->getId().'.pdf';
+            $fileName = 'confirmacion_reserva_'.$booking->getId().'.pdf';
 
             // Creating the twig for the PDF with the booking data
 
@@ -630,7 +632,7 @@ class BookingController extends AbstractController
                 'checkOut' => $booking->getBookingLines()[0]->getCheckOut(),
                 "rooms" => $booking->getBookingLines()[0]->getData(),
                 "totalPriceCost" => $booking->getTotalPriceCost(),
-                "observations" => $booking->getObservations(),
+                "observations" => $voucher->getObservations(),
                 'companyName' => $company->getTitle(),
                 'companyCif' => $company->getCif(),
                 'companyAddress' => $company->getTitle(),

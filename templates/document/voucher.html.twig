@@ -56,12 +56,15 @@
 					</td>
 				</tr>
 				<tr class="spaceUnder">
-					<td colspan="2">
+					<td colspan="1">
 						<div style="margin-bottom:1rem">
 							Emitido para / Issued For
 						</div>
 						<div>
-							<strong>{{supplierTitle}}</strong>
+							<strong>{{productTitle}}</strong>
+						</div>
+						<div>
+							<span>{{productAddress}}</span>
 						</div>
 						<div>
 							<span>{{productZone}}</span>
@@ -72,12 +75,9 @@
 						<div>
 							<span>España</span>
 						</div>
-						<span>
-							Tel:
-						</span>
-						<span>
-							{{supplierPhone}}
-						</span>
+					</td>
+					<td colspan="1">
+
 					</td>
 					<td>
 						<div>
@@ -153,7 +153,7 @@
 							<span>Observaciones / Remarks</span>
 						</div>
 						<div style="margin-top:1rem">
-							<span>{{observations}}</span>
+							<span>{{observations|raw}}</span>
 						</div>
 						<div style="margin-top:1rem; font-style: italic">
 							<span>Esta reserva puede estar sujeta a tasas locales o municipales que no están incluidas en el precio y pueden variar sin previo aviso, el importe de dichas tasas deberá abonarse directamente en el establecimiento.</span>

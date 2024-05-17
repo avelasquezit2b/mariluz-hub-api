@@ -33,6 +33,7 @@ class DocumentController extends AbstractController
             'hotel' => $bookingVoucher->getHotel(),
             'booking' => $bookingVoucher->getBooking(),
             'productTitle' => $booking->getBookingLines()[0]->getHotel()->getTitle(),
+            'productAddress' => $booking->getBookingLines()[0]->getHotel()->getAddress(),
             'productZone' => $booking->getBookingLines()[0]->getHotel()->getZones()[0]->getName(),
             'productLocation' => $booking->getBookingLines()[0]->getHotel()->getLocation()->getName(),
             'bookingId' => $booking->getId(),
