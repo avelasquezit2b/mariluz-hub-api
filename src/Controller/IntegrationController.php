@@ -9,6 +9,7 @@ use App\Entity\Location;
 use App\Entity\Zone;
 use App\Entity\Language;
 use App\Entity\MediaObject;
+use DateTime;
 use App\Entity\Modality;
 use Symfony\Component\HttpFoundation\Request;
 use App\Repository\ActivityRepository;
@@ -105,7 +106,7 @@ class IntegrationController extends AbstractController
             $newChannelHotel->setCode($hotel['id']);
             // $newChannelHotel->setChannelCode();
 
-            
+
             $entityManager->persist($newChannelHotel);
 
 
@@ -275,5 +276,46 @@ class IntegrationController extends AbstractController
         }
 
         return $text;
+    }
+
+    #[Route('/search_hotels', name: 'app_search_hotels')]
+    public function searchHotels(Request $request): Response
+    {
+        $search = json_decode($request->getContent());
+
+        $checkIn = new DateTime($search->checkIn);
+        $checkOut = new DateTime($search->checkOut);
+
+        $curl = curl_init();
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => 'https://api.travelgatex.com',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS => '{
+                "query": "query {\thotelX { search( criteria: { checkIn: \"' . $checkIn->format('Y-m-d') . '\", checkOut: \"' . $checkOut->format('Y-m-d') . '\", occupancies: [ { paxes: [ { age: 30 }, { age: 30 } ] } ], hotels: [ \"' . $search->hotel . '\" ], currency: \"EUR\", markets: [ \"ES\" ], language: \"es\", nationality: \"ES\" }, settings: { client: \"it2b\", context: \"' . $search->channelCode . '\", timeout: 25000 }, filterSearch: { access: { includes: [ \"' . $search->access . '\" ] } }) { context errors { code type description } warnings { code type description } options { id accessCode supplierCode hotelCode hotelName boardCode paymentType status occupancies { id paxes { age } } rooms { occupancyRefId code description refundable roomPrice { price { currency binding net gross exchange { currency rate } } breakdown { start end price { currency binding net gross exchange { currency rate } minimumSellingPrice } } } beds { type count } ratePlans { start end code name } } price { currency binding net gross exchange { currency rate } minimumSellingPrice markups { channel currency binding net gross exchange { currency rate } rules { id name type value } } } supplements { start end code name description supplementType chargeType mandatory durationType quantity unit resort { code name description } price { currency binding net gross exchange { currency rate } } } surcharges { code chargeType description mandatory price { currency binding net gross exchange { currency rate } markups { channel currency binding net gross exchange { currency rate } } } } rateRules cancelPolicy { refundable cancelPenalties { deadline isCalculatedDeadline penaltyType currency value } } remarks } }\t}}"
+              }',
+            CURLOPT_HTTPHEADER => array(
+                "Accept: application/json",
+                "Connection: keep-alive",
+                'Authorization: Apikey 4794442a-a4dc-4660-5083-64360879e063',
+                'Content-Type: application/json'
+            ),
+            CURLOPT_USERAGENT => "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.3) Gecko/20070309 Firefox/2.0.0.3"
+        ));
+
+        $response = curl_exec($curl);
+
+        curl_close($curl);
+        $response = json_decode($response, true);
+        $resp = $response['data']['hotelX']['search']['options'];
+
+        return $this->json([
+            'hotels'  => $resp
+        ]);
     }
 }

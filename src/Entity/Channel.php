@@ -41,7 +41,7 @@ class Channel
     private ?string $name = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['channelReduced', 'channel'])]
+    #[Groups(['channelReduced', 'channel', 'hotel', 'hotelReduced'])]
     private ?string $channelKey = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -58,6 +58,10 @@ class Channel
     #[ORM\OneToMany(mappedBy: 'channel', targetEntity: ChannelHotel::class)]
     #[Groups(['channelReduced', 'channel'])]
     private Collection $channelHotels;
+
+    #[ORM\Column(length: 50, nullable: true)]
+    #[Groups(['channelReduced', 'channel', 'hotel', 'hotelReduced'])]
+    private ?string $code = null;
 
     public function __construct()
     {
@@ -156,6 +160,18 @@ class Channel
                 $channelHotel->setChannel(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getCode(): ?string
+    {
+        return $this->code;
+    }
+
+    public function setCode(?string $code): static
+    {
+        $this->code = $code;
 
         return $this;
     }
