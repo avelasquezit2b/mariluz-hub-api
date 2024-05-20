@@ -318,4 +318,42 @@ class IntegrationController extends AbstractController
             'hotels'  => $resp
         ]);
     }
+
+    #[Route('/prebooking_hotels', name: 'app_prebooking_hotels')]
+    public function prebookingHotels(Request $request): Response
+    {
+        $dataDecode = json_decode($request->getContent());
+
+        $curl = curl_init();
+
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => 'https://api.travelgatex.com/',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS => '{
+  "query": "query {\\thotelX { quote(criteria: { optionRefId: \\"'. $dataDecode->id .'\\" }, settings: { client: \\"it2b\\", context: \\"' . $dataDecode->channelCode . '\\", timeout: 5000 }) { errors { code type description } warnings { code type description } optionQuote { optionRefId status price { currency binding net gross exchange { currency rate } minimumSellingPrice } surcharges { chargeType price { currency binding net gross exchange { currency rate } minimumSellingPrice } description } cancelPolicy { refundable description cancelPenalties { deadline isCalculatedDeadline penaltyType currency value } } paymentType cardTypes remarks } }\\t}}"
+}',
+            CURLOPT_HTTPHEADER => array(
+                'Authorization: Apikey 4794442a-a4dc-4660-5083-64360879e063',
+                'TGX-Content-Type: graphqlx/json',
+                'Content-Type: application/json'
+            ),
+        ));
+
+        $response = curl_exec($curl);
+
+        curl_close($curl);
+        $response = json_decode($response, true);
+
+        // $resp = $response['data']['hotelX']['quote']['options'];
+
+        return $this->json([
+            'quote'  => $response
+        ]);
+    }
 }
