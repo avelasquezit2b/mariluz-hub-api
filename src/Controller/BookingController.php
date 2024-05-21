@@ -437,12 +437,12 @@ class BookingController extends AbstractController
             $voucher = $voucherRepository->find($id);
             $booking = $voucher->getBooking();
             $company = $configurationRepository->find(1);
-            $supplier = $booking->getBookingLines()[0]->getHotel()->getSupplier();
+            $supplier = $booking->getBookingLines()[0]->getHotel() ? $booking->getBookingLines()[0]->getHotel()->getSupplier() : $booking->getBookingLines()[0]->getActivity()->getSupplier();
 
-            if ($booking->getBookingLines()[0]->getHotel()->isHasSendEmailClient()) {
+            if ($booking->getBookingLines()[0]->getHotel()->isHasSendEmailClient() || $booking->getBookingLines()[0]->getActivity()->isHasSendEmailClient()) {
                 $this->send_client_voucher($voucher, $booking, $company, $supplier, $mailer, $pdf, $entityManager);
             }
-            if ($booking->getBookingLines()[0]->getHotel()->isHasSendEmailSupplier()) {
+            if ($booking->getBookingLines()[0]->getHotel()->isHasSendEmailSupplier() || $booking->getBookingLines()[0]->getActivity()->isHasSendEmailClient()) {
                 $this->send_supplier_voucher($voucher, $booking, $company, $supplier, $mailer, $pdf, $entityManager);
             }
 
@@ -453,7 +453,7 @@ class BookingController extends AbstractController
             $voucher = $voucherRepository->findOneBy(array('booking' => $id));
             $booking = $voucher->getBooking();
             $company = $configurationRepository->find(1);
-            $supplier = $booking->getBookingLines()[0]->getHotel()->getSupplier();
+            $supplier = $booking->getBookingLines()[0]->getHotel() ? $booking->getBookingLines()[0]->getHotel()->getSupplier() : $booking->getBookingLines()[0]->getActivity()->getSupplier();
             if ($destinatary == 'client') {
                 return $this->send_client_voucher($voucher, $booking, $company, $supplier, $mailer, $pdf, $entityManager);
             } else if ($destinatary == 'supplier') {
@@ -546,6 +546,8 @@ class BookingController extends AbstractController
                 "totalPrice" => $booking->getTotalPrice(),
                 "paymentMethod" => $booking->getPaymentMethod(),
                 "date" => date("d-m-Y"),
+                "startDate" => $booking->getBookingLines()[0]->getCheckIn(),
+                "endDate" => $booking->getBookingLines()[0]->getCheckOut(),
             ];
             $fileName = 'Bono_Actividad.pdf';
 
@@ -680,12 +682,15 @@ class BookingController extends AbstractController
                 "totalPrice" => $booking->getTotalPrice(),
                 "paymentMethod" => $booking->getPaymentMethod(),
                 "date" => date("d-m-Y"),
+                "startDate" => $booking->getBookingLines()[0]->getCheckIn(),
+                "endDate" => $booking->getBookingLines()[0]->getCheckOut(),
+                "message" => 'Reserva confirmada'
             ];
-            $fileName = 'Bono_Actividad.pdf';
+            $fileName = 'confirmacion_reserva_'.$booking->getId().'.pdf';
 
             // Creating the twig for the PDF with the booking data
 
-            $html = $this->renderView('document/voucher.html.twig', [
+            $html = $this->renderView('document/voucher_supplier.html.twig', [
                 'to_be_paid_by' => $voucher->getToBePaidBy(),
                 'productTitle' => $voucher->getBooking()->getBookingLines()[0]->getActivity()->getTitle(),
                 'productZone' => $voucher->getBooking()->getBookingLines()[0]->getActivity()->getZones()[0]->getName(),
@@ -709,11 +714,11 @@ class BookingController extends AbstractController
 
             $email = (new TemplatedEmail())
                 ->from($company->getBookingEmail())
-                ->to($booking->getClient()->getEmail())
-                ->subject('Gracias por tu reserva')
+                ->to($booking->getBookingLines()[0]->getActivity()->getBookingEmail() ? $booking->getBookingLines()[0]->getActivity()->getBookingEmail() : $supplier->getBookingEmail())
+                ->subject('Confirmación de reserva')
                 ->context($context)
                 ->attach($pdf->getOutputFromHtml($html), $fileName, 'application/pdf')
-                ->htmlTemplate('email/activity_thank_you.html.twig');
+                ->htmlTemplate('communications/supplier_booking_confirmed.html.twig');
 
             if ($booking->getStatus() == 'booked') {
                 $mailer->send($email);

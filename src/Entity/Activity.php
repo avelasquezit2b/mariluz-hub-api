@@ -33,7 +33,7 @@ use Doctrine\ORM\Mapping as ORM;
         // "delete" => ["security" => "is_granted('ROLE_ADMIN') or object.owner == user"],
     ],
 )]
-#[ApiFilter(SearchFilter::class, properties: ['id' => 'exact', 'title' => 'partial', 'slug' => 'exact'])]
+#[ApiFilter(SearchFilter::class, properties: ['id' => 'exact', 'title' => 'partial', 'slug' => 'exact', 'zones.id' => 'exact', 'categories.id' => 'exact', 'languages.id' => 'exact'])]
 class Activity
 {
     #[ORM\Id]
