@@ -47,7 +47,7 @@ class ChannelHotel
     private ?Hotel $hotel = null;
 
     #[ORM\ManyToOne(inversedBy: 'channelHotels')]
-    #[Groups(['channelHotelReduced', 'channelHotel'])]
+    #[Groups(['channelHotelReduced', 'channelHotel', 'hotel', 'hotelReduced'])]
     private ?Channel $channel = null;
 
     public function getId(): ?int
