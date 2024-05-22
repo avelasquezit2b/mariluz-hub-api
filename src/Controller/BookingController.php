@@ -68,7 +68,8 @@ class BookingController extends AbstractController
                     'totalPrice' => $room->totalPrice,
                     'totalPriceCost' => $room->totalPriceCost,
                     'clientName' => $room->clientName,
-                    'availabilities' => $room->roomType->availabilities
+                    'availabilities' => $room->roomType->availabilities,
+                    'refId' => $requestDecode->refId
                 ];
 
                 foreach ($room->clientTypes as $key => $value) {

@@ -55,11 +55,14 @@ class IntegrationController extends AbstractController
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => 'POST',
+            //             CURLOPT_POSTFIELDS => '{
+            //   "query": "query {\\thotelX { hotels(criteria: {access: \\"' . $access . '\\", destinationCodes: [\"PLYPALM\", \"SACO\", \"ALCU\", \"SPONSA\", \"CBONA\", \"CMILL\", \"PICAF\", \"CBLANC\", \"SANTANYI\", \"ILLET\", \"MAGA\", \"CRAT\", \"PAGUE\", \"MURO\", \"PUIGPUNYEN\", \"CALAD\", \"CBOSCH\", \"FORCAT\"]}, token: \\"\\") { token count edges { node { createdAt updatedAt hotelData { hotelCode hotelName categoryCode chainCode location { address zipCode city country coordinates { latitude longitude } closestDestination { code available texts { text language } type parent } } contact { email telephone fax web } propertyType { propertyCode name } descriptions { type texts { language text } } medias { code url } rooms { edges { node { code roomData { code roomCode allAmenities { edges { node { amenityData { code amenityCode } } } } } } } } allAmenities { edges { node { amenityData { code amenityCode } } } } } } } } } }"
+            // }',
             CURLOPT_POSTFIELDS => '{
-  "query": "query {\\thotelX { hotels(criteria: {access: \\"' . $access . '\\", destinationCodes: [\"PLYPALM\", \"SACO\", \"ALCU\", \"SPONSA\", \"CBONA\", \"CMILL\", \"PICAF\", \"CBLANC\", \"SANTANYI\", \"ILLET\", \"MAGA\", \"CRAT\", \"PAGUE\", \"MURO\", \"PUIGPUNYEN\", \"CALAD\", \"CBOSCH\", \"FORCAT\"]}, token: \\"\\") { token count edges { node { createdAt updatedAt hotelData { hotelCode hotelName categoryCode chainCode location { address zipCode city country coordinates { latitude longitude } closestDestination { code available texts { text language } type parent } } contact { email telephone fax web } propertyType { propertyCode name } descriptions { type texts { language text } } medias { code url } rooms { edges { node { code roomData { code roomCode allAmenities { edges { node { amenityData { code amenityCode } } } } } } } } allAmenities { edges { node { amenityData { code amenityCode } } } } } } } } } }"
-}',
+            "query": "query {\\thotelX { hotels(criteria: {access: \\"' . $access . '\\"}, token: \\"\\") { token count edges { node { createdAt updatedAt hotelData { hotelCode hotelName categoryCode chainCode location { address zipCode city country coordinates { latitude longitude } closestDestination { code available texts { text language } type parent } } contact { email telephone fax web } propertyType { propertyCode name } descriptions { type texts { language text } } medias { code url } rooms { edges { node { code roomData { code roomCode allAmenities { edges { node { amenityData { code amenityCode } } } } } } } } allAmenities { edges { node { amenityData { code amenityCode } } } } } } } } } }"
+        }',
             CURLOPT_HTTPHEADER => array(
-                'Authorization: Apikey 4794442a-a4dc-4660-5083-64360879e063',
+                'Authorization: Apikey test0000-0000-0000-0000-000000000000',
                 'TGX-Content-Type: graphqlx/json',
                 'Content-Type: application/json'
             ),
@@ -302,13 +305,17 @@ class IntegrationController extends AbstractController
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => 'POST',
+            // CURLOPT_POSTFIELDS => '{
+            //     "query": "query {\thotelX { search( criteria: { checkIn: \"' . $checkIn->format('Y-m-d') . '\", checkOut: \"' . $checkOut->format('Y-m-d') . '\", occupancies: [ { paxes: [ { age: 30 }, { age: 30 } ] } ], hotels: [ \"' . $search->hotel . '\" ], currency: \"EUR\", markets: [ \"ES\" ], language: \"es\", nationality: \"ES\" }, settings: { client: \"it2b\", context: \"' . $search->channelCode . '\", timeout: 25000 }, filterSearch: { access: { includes: [ \"' . $search->access . '\" ] } }) { context errors { code type description } warnings { code type description } options { id accessCode supplierCode hotelCode hotelName boardCode paymentType status occupancies { id paxes { age } } rooms { occupancyRefId code description refundable roomPrice { price { currency binding net gross exchange { currency rate } } breakdown { start end price { currency binding net gross exchange { currency rate } minimumSellingPrice } } } beds { type count } ratePlans { start end code name } } price { currency binding net gross exchange { currency rate } minimumSellingPrice markups { channel currency binding net gross exchange { currency rate } rules { id name type value } } } supplements { start end code name description supplementType chargeType mandatory durationType quantity unit resort { code name description } price { currency binding net gross exchange { currency rate } } } surcharges { code chargeType description mandatory price { currency binding net gross exchange { currency rate } markups { channel currency binding net gross exchange { currency rate } } } } rateRules cancelPolicy { refundable cancelPenalties { deadline isCalculatedDeadline penaltyType currency value } } remarks } }\t}}"
+            //   }',
             CURLOPT_POSTFIELDS => '{
-                "query": "query {\thotelX { search( criteria: { checkIn: \"' . $checkIn->format('Y-m-d') . '\", checkOut: \"' . $checkOut->format('Y-m-d') . '\", occupancies: [ { paxes: [ { age: 30 }, { age: 30 } ] } ], hotels: [ \"' . $search->hotel . '\" ], currency: \"EUR\", markets: [ \"ES\" ], language: \"es\", nationality: \"ES\" }, settings: { client: \"it2b\", context: \"' . $search->channelCode . '\", timeout: 25000 }, filterSearch: { access: { includes: [ \"' . $search->access . '\" ] } }) { context errors { code type description } warnings { code type description } options { id accessCode supplierCode hotelCode hotelName boardCode paymentType status occupancies { id paxes { age } } rooms { occupancyRefId code description refundable roomPrice { price { currency binding net gross exchange { currency rate } } breakdown { start end price { currency binding net gross exchange { currency rate } minimumSellingPrice } } } beds { type count } ratePlans { start end code name } } price { currency binding net gross exchange { currency rate } minimumSellingPrice markups { channel currency binding net gross exchange { currency rate } rules { id name type value } } } supplements { start end code name description supplementType chargeType mandatory durationType quantity unit resort { code name description } price { currency binding net gross exchange { currency rate } } } surcharges { code chargeType description mandatory price { currency binding net gross exchange { currency rate } markups { channel currency binding net gross exchange { currency rate } } } } rateRules cancelPolicy { refundable cancelPenalties { deadline isCalculatedDeadline penaltyType currency value } } remarks } }\t}}"
+                "query": "query {\thotelX { search( criteria: { checkIn: \"' . $checkIn->format('Y-m-d') . '\", checkOut: \"' . $checkOut->format('Y-m-d') . '\", occupancies: [ { paxes: [ { age: 30 }, { age: 30 } ] } ], hotels: [ \"1\" ], currency: \"EUR\", markets: [ \"ES\" ], language: \"es\", nationality: \"ES\" }, settings: { client: \"client_demo\", context: \"' . $search->channelCode . '\",testMode: true, timeout: 25000 }, filterSearch: { access: { includes: [ \"' . $search->access . '\" ] } }) { context errors { code type description } warnings { code type description } options { id accessCode supplierCode hotelCode hotelName boardCode paymentType status occupancies { id paxes { age } } rooms { occupancyRefId code description refundable roomPrice { price { currency binding net gross exchange { currency rate } } breakdown { start end price { currency binding net gross exchange { currency rate } minimumSellingPrice } } } beds { type count } ratePlans { start end code name } } price { currency binding net gross exchange { currency rate } minimumSellingPrice markups { channel currency binding net gross exchange { currency rate } rules { id name type value } } } supplements { start end code name description supplementType chargeType mandatory durationType quantity unit resort { code name description } price { currency binding net gross exchange { currency rate } } } surcharges { code chargeType description mandatory price { currency binding net gross exchange { currency rate } markups { channel currency binding net gross exchange { currency rate } } } } rateRules cancelPolicy { refundable cancelPenalties { deadline isCalculatedDeadline penaltyType currency value } } remarks } }\t}}"
               }',
+            //   Apikey 4794442a-a4dc-4660-5083-64360879e063'
             CURLOPT_HTTPHEADER => array(
                 "Accept: application/json",
                 "Connection: keep-alive",
-                'Authorization: Apikey 4794442a-a4dc-4660-5083-64360879e063',
+                'Authorization: Apikey test0000-0000-0000-0000-000000000000',
                 'Content-Type: application/json'
             ),
             CURLOPT_USERAGENT => "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.3) Gecko/20070309 Firefox/2.0.0.3"
@@ -349,7 +356,7 @@ class IntegrationController extends AbstractController
         "query": "query {\\thotelX { quote(criteria: { optionRefId: \\"' . $dataDecode->id . '\\" }, settings: { client: \\"it2b\\", context: \\"' . $dataDecode->channelCode . '\\", timeout: 5000 }) { errors { code type description } warnings { code type description } optionQuote { optionRefId status price { currency binding net gross exchange { currency rate } minimumSellingPrice } surcharges { chargeType price { currency binding net gross exchange { currency rate } minimumSellingPrice } description } cancelPolicy { refundable description cancelPenalties { deadline isCalculatedDeadline penaltyType currency value } } paymentType cardTypes remarks } }\\t}}"
         }',
             CURLOPT_HTTPHEADER => array(
-                'Authorization: Apikey 4794442a-a4dc-4660-5083-64360879e063',
+                'Authorization: Apikey test0000-0000-0000-0000-000000000000',
                 'TGX-Content-Type: graphqlx/json',
                 'Content-Type: application/json'
             ),
@@ -367,8 +374,8 @@ class IntegrationController extends AbstractController
         ]);
     }
 
-    #[Route('/booking_hotels', name: 'app_booking_hotels')]
-    public function bookingHotels(Request $request, BookingRepository $bookingRepository, HotelAvailabilityRepository $hotelAvailabilityRepository, EntityManagerInterface $entityManager, MailerInterface $mailer, Pdf $pdf, VoucherRepository $voucherRepository, ConfigurationRepository $configurationRepository,): Response
+    #[Route('/integration_hotel_booking', name: 'app_integration_hotel_booking')]
+    public function integrationHotelBooking(Request $request, BookingRepository $bookingRepository, HotelAvailabilityRepository $hotelAvailabilityRepository, EntityManagerInterface $entityManager, MailerInterface $mailer, Pdf $pdf, VoucherRepository $voucherRepository, ConfigurationRepository $configurationRepository,): Response
     {
 
         // TGX Book
@@ -379,10 +386,6 @@ class IntegrationController extends AbstractController
             $requestData = str_replace("?", "", utf8_decode(base64_decode($output['Ds_MerchantParameters'])));
             $requestData = json_decode($requestData, true);
             $hotelBooking = $bookingRepository->find(intval(ltrim($requestData['Ds_Order'], "0")));
-
-            return $this->json([
-                'response'  => $hotelBooking
-            ]);
 
             $curl = curl_init();
 
