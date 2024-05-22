@@ -14,7 +14,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ApiResource(
     paginationEnabled: false,
     attributes: [
-        "order" => ["id" => "DESC"],
+        "order" => ["name" => "ASC"],
         "normalization_context" => ["groups" => ["supplierReduced"]]
     ],
     collectionOperations: [

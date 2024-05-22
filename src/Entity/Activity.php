@@ -33,7 +33,7 @@ use Doctrine\ORM\Mapping as ORM;
         // "delete" => ["security" => "is_granted('ROLE_ADMIN') or object.owner == user"],
     ],
 )]
-#[ApiFilter(SearchFilter::class, properties: ['id' => 'exact', 'title' => 'partial', 'slug' => 'exact'])]
+#[ApiFilter(SearchFilter::class, properties: ['id' => 'exact', 'title' => 'partial', 'slug' => 'exact', 'zones.id' => 'exact', 'categories.id' => 'exact', 'languages.id' => 'exact'])]
 class Activity
 {
     #[ORM\Id]
@@ -43,7 +43,7 @@ class Activity
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['activityReduced', 'activity', 'supplierReduced', 'supplier', 'pack', 'page', 'productList', 'booking'])]
+    #[Groups(['activityReduced', 'activity', 'supplierReduced', 'supplier', 'pack', 'page', 'productList', 'booking', 'bookingReduced'])]
     private ?string $title = null;
 
     #[ORM\Column(length: 255)]

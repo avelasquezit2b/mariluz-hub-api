@@ -57,7 +57,7 @@ class BookingLine
     private ?Hotel $hotel = null;
 
     #[ORM\ManyToOne(inversedBy: 'bookingLines')]
-    #[Groups(['bookingLineReduced', 'bookingLine', 'booking', 'voucherReduced', 'voucher'])]
+    #[Groups(['bookingLineReduced', 'bookingLine', 'booking', 'bookingReduced', 'voucherReduced', 'voucher'])]
     private ?Activity $activity = null;
 
     #[ORM\ManyToOne(inversedBy: 'bookingLines')]
