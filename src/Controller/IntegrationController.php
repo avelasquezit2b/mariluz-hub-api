@@ -399,7 +399,7 @@ class IntegrationController extends AbstractController
                 CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
                 CURLOPT_CUSTOMREQUEST => 'POST',
                 CURLOPT_POSTFIELDS =>  '{
-                    "query": "mutation { hotelX { book( input: {optionRefId: \"' . $hotelBooking->getBookingLines()[0]->getData()['refId'] . '\", clientReference: \"jnyy\", deltaPrice: {amount: 10, percent: 10, applyBoth: true}, holder: {name: \"Jane\", surname: \"Doe\"}, remarks: \"This is just a test booking!\", rooms: {occupancyRefId: 1, paxes: [{name: \"Jane\", surname: \"Doe\", age: 30}]}} settings: {client: \"it2b\", auditTransactions: true, context: \"HOTELTEST\", testMode: true, timeout: 60000} ) { errors { code type description } warnings { code type description } booking { status price { currency binding net gross exchange { currency rate } } reference { bookingID client supplier hotel } holder { name surname } cancelPolicy { refundable cancelPenalties { deadline isCalculatedDeadline penaltyType currency value } } remarks hotel { hotelCode hotelName bookingDate start end boardCode occupancies { id paxes { age } } rooms { code description occupancyRefId price { currency binding net gross exchange { currency rate } } } } } } }}"
+                    "query": "mutation { hotelX { book( input: {optionRefId: \"' . $hotelBooking->getBookingLines()[0]->getData()[0]['refId'] . '\", clientReference: \"jnyy\", deltaPrice: {amount: 10, percent: 10, applyBoth: true}, holder: {name: \"Jane\", surname: \"Doe\"}, remarks: \"This is just a test booking!\", rooms: {occupancyRefId: 1, paxes: [{name: \"Jane\", surname: \"Doe\", age: 30}]}} settings: {client: \"client_demo\", auditTransactions: true, context: \"HOTELTEST\", testMode: true, timeout: 60000} ) { errors { code type description } warnings { code type description } booking { status price { currency binding net gross exchange { currency rate } } reference { bookingID client supplier hotel } holder { name surname } cancelPolicy { refundable cancelPenalties { deadline isCalculatedDeadline penaltyType currency value } } remarks hotel { hotelCode hotelName bookingDate start end boardCode occupancies { id paxes { age } } rooms { code description occupancyRefId price { currency binding net gross exchange { currency rate } } } } } } }}"
                 }',
                 CURLOPT_HTTPHEADER => array(
                     'Authorization: Apikey test0000-0000-0000-0000-000000000000',
@@ -424,14 +424,6 @@ class IntegrationController extends AbstractController
             } else {
                 $hotelBooking->setStatus('error');
                 $hotelBooking->setPaymentStatus($requestData['Ds_Response']);
-                foreach ($hotelBooking->getBookingLines()[0]->getData() as $room) {
-                    foreach ($room['availabilities'] as $availability) {
-                        $hotelAvailability = $hotelAvailabilityRepository->find($availability);
-                        $hotelAvailability->setQuota($hotelAvailability->getQuota() + 1);
-                        $hotelAvailability->setTotalBookings($hotelAvailability->getTotalBookings() - 1);
-                        $entityManager->persist($hotelAvailability);
-                    }
-                }
             }
 
             $entityManager->persist($hotelBooking);
@@ -439,20 +431,20 @@ class IntegrationController extends AbstractController
 
             // Generate a Voucher based on the booking data
 
-            if ($hotelBooking->getStatus() == 'booked') {
-                $newVoucher = new Voucher();
-                $newVoucher->setToBePaidBy('H-MARILUZ TRAVEL TOUR S.L.');
-                $newVoucher->setBooking($hotelBooking);
+            // if ($hotelBooking->getStatus() == 'booked') {
+            //     $newVoucher = new Voucher();
+            //     $newVoucher->setToBePaidBy('H-MARILUZ TRAVEL TOUR S.L.');
+            //     $newVoucher->setBooking($hotelBooking);
 
-                $entityManager->persist($newVoucher);
-                $entityManager->flush();
+            //     $entityManager->persist($newVoucher);
+            //     $entityManager->flush();
 
-                $bookingController->send_voucher($newVoucher->getId(), 'all', $mailer, $pdf, $voucherRepository, $configurationRepository, $entityManager);
-            }
+            //     $bookingController->send_voucher($newVoucher->getId(), 'all', $mailer, $pdf, $voucherRepository, $configurationRepository, $entityManager);
+            // }
 
 
             return $this->json([
-                'response'  => $hotelBooking
+                'response'  => $response
             ]);
         } catch (SoapFault $e) {
             return $this->json([

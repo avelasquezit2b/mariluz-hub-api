@@ -26,16 +26,17 @@ class DocumentController extends AbstractController
         $bookingVoucher = $voucherRepository->find($id);
         $booking = $bookingVoucher->getBooking();
         $company = $configurationRepository->find(1);
-        $supplier = $booking->getBookingLines()[0]->getHotel()->getSupplier();
+        $supplier = $booking->getBookingLines()[0]->getHotel() ? $booking->getBookingLines()[0]->getHotel()->getSupplier() : $booking->getBookingLines()[0]->getActivity()->getSupplier();
+        $product = $booking->getBookingLines()[0]->getHotel() ? $booking->getBookingLines()[0]->getHotel() : $booking->getBookingLines()[0]->getActivity();
 
         $html = $this->renderView('document/voucher.html.twig', [
             'to_be_paid_by' => $bookingVoucher->getToBePaidBy(),
             'hotel' => $bookingVoucher->getHotel(),
             'booking' => $bookingVoucher->getBooking(),
-            'productTitle' => $booking->getBookingLines()[0]->getHotel()->getTitle(),
-            'productAddress' => $booking->getBookingLines()[0]->getHotel()->getAddress(),
-            'productZone' => $booking->getBookingLines()[0]->getHotel()->getZones()[0]->getName(),
-            'productLocation' => $booking->getBookingLines()[0]->getHotel()->getLocation()->getName(),
+            'productTitle' => $product->getTitle(),
+            'productAddress' => $product->getAddress(),
+            'productZone' => $product->getZones()[0]->getName(),
+            'productLocation' => $product->getLocation()->getName(),
             'bookingId' => $booking->getId(),
             'bookingDate' => $booking->getCreatedAt(),
             'clientName' => $booking->getClient()->getName(),
