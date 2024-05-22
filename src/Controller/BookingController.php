@@ -7,7 +7,6 @@ use App\Entity\BookingLine;
 use App\Repository\HotelRepository;
 use App\Repository\HotelAvailabilityRepository;
 use App\Repository\BookingRepository;
-use App\Entity\Bill;
 use App\Entity\Voucher;
 use App\Repository\ActivityRepository;
 use App\Repository\ActivityAvailabilityRepository;
@@ -15,17 +14,14 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use App\Controller\DocumentController;
 use App\Repository\ConfigurationRepository;
 use App\Repository\VoucherRepository;
 use Knp\Snappy\Pdf;
-use phpDocumentor\Reflection\Types\Integer;
 
 class BookingController extends AbstractController
 {

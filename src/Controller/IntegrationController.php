@@ -5,23 +5,29 @@ namespace App\Controller;
 use App\Entity\Activity;
 use App\Entity\ChannelHotel;
 use App\Entity\Hotel;
-use App\Entity\Location;
 use App\Entity\Zone;
-use App\Entity\Language;
 use App\Entity\MediaObject;
 use DateTime;
 use App\Entity\Modality;
+use App\Entity\Voucher;
 use Symfony\Component\HttpFoundation\Request;
 use App\Repository\ActivityRepository;
+use App\Repository\BookingRepository;
 use App\Repository\ChannelRepository;
+use App\Repository\HotelAvailabilityRepository;
 use App\Repository\LocationRepository;
 use App\Repository\ZoneRepository;
 use App\Repository\LanguageRepository;
 use App\Repository\ProductTagRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use App\Controller\BookingController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Mailer\MailerInterface;
+use Knp\Snappy\Pdf;
+use App\Repository\VoucherRepository;
+use App\Repository\ConfigurationRepository;
 
 class IntegrationController extends AbstractController
 {
@@ -324,6 +330,10 @@ class IntegrationController extends AbstractController
     {
         $dataDecode = json_decode($request->getContent());
 
+        return $this->json([
+            'hotels'  => $dataDecode
+        ]);
+
         $curl = curl_init();
 
         curl_setopt_array($curl, array(
@@ -336,8 +346,8 @@ class IntegrationController extends AbstractController
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => 'POST',
             CURLOPT_POSTFIELDS => '{
-  "query": "query {\\thotelX { quote(criteria: { optionRefId: \\"'. $dataDecode->id .'\\" }, settings: { client: \\"it2b\\", context: \\"' . $dataDecode->channelCode . '\\", timeout: 5000 }) { errors { code type description } warnings { code type description } optionQuote { optionRefId status price { currency binding net gross exchange { currency rate } minimumSellingPrice } surcharges { chargeType price { currency binding net gross exchange { currency rate } minimumSellingPrice } description } cancelPolicy { refundable description cancelPenalties { deadline isCalculatedDeadline penaltyType currency value } } paymentType cardTypes remarks } }\\t}}"
-}',
+        "query": "query {\\thotelX { quote(criteria: { optionRefId: \\"' . $dataDecode->id . '\\" }, settings: { client: \\"it2b\\", context: \\"' . $dataDecode->channelCode . '\\", timeout: 5000 }) { errors { code type description } warnings { code type description } optionQuote { optionRefId status price { currency binding net gross exchange { currency rate } minimumSellingPrice } surcharges { chargeType price { currency binding net gross exchange { currency rate } minimumSellingPrice } description } cancelPolicy { refundable description cancelPenalties { deadline isCalculatedDeadline penaltyType currency value } } paymentType cardTypes remarks } }\\t}}"
+        }',
             CURLOPT_HTTPHEADER => array(
                 'Authorization: Apikey 4794442a-a4dc-4660-5083-64360879e063',
                 'TGX-Content-Type: graphqlx/json',
@@ -356,4 +366,150 @@ class IntegrationController extends AbstractController
             'quote'  => $response
         ]);
     }
+
+    #[Route('/booking_hotels', name: 'app_booking_hotels')]
+    public function bookingHotels(Request $request, BookingRepository $bookingRepository, HotelAvailabilityRepository $hotelAvailabilityRepository, EntityManagerInterface $entityManager, MailerInterface $mailer, Pdf $pdf, VoucherRepository $voucherRepository, ConfigurationRepository $configurationRepository,): Response
+    {
+
+        // TGX Book
+        try {
+
+            $request = file_get_contents('php://input');
+            parse_str($request, $output);
+            $requestData = str_replace("?", "", utf8_decode(base64_decode($output['Ds_MerchantParameters'])));
+            $requestData = json_decode($requestData, true);
+            $hotelBooking = $bookingRepository->find(intval(ltrim($requestData['Ds_Order'], "0")));
+
+            return $this->json([
+                'response'  => $hotelBooking
+            ]);
+
+            $curl = curl_init();
+
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => 'https://api.travelgatex.com/',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'POST',
+                CURLOPT_POSTFIELDS =>  '{
+                    "query": "mutation { hotelX { book( input: {optionRefId: \"' . $hotelBooking->getBookingLines()[0]->getData()['refId'] . '\", clientReference: \"jnyy\", deltaPrice: {amount: 10, percent: 10, applyBoth: true}, holder: {name: \"Jane\", surname: \"Doe\"}, remarks: \"This is just a test booking!\", rooms: {occupancyRefId: 1, paxes: [{name: \"Jane\", surname: \"Doe\", age: 30}]}} settings: {client: \"it2b\", auditTransactions: true, context: \"HOTELTEST\", testMode: true, timeout: 60000} ) { errors { code type description } warnings { code type description } booking { status price { currency binding net gross exchange { currency rate } } reference { bookingID client supplier hotel } holder { name surname } cancelPolicy { refundable cancelPenalties { deadline isCalculatedDeadline penaltyType currency value } } remarks hotel { hotelCode hotelName bookingDate start end boardCode occupancies { id paxes { age } } rooms { code description occupancyRefId price { currency binding net gross exchange { currency rate } } } } } } }}"
+                }',
+                CURLOPT_HTTPHEADER => array(
+                    'Authorization: Apikey test0000-0000-0000-0000-000000000000',
+                    'TGX-Content-Type: graphqlx/json',
+                    'Content-Type: application/json'
+                ),
+            ));
+
+            $response = curl_exec($curl);
+
+            curl_close($curl);
+            $response = json_decode($response, true);
+
+            // Create system Booking
+
+            $bookingController = new BookingController();
+
+            // $bookingHub->setLocator($bookingOfi->BookingResult->BookingCode);
+            if ($requestData['Ds_Response'] < 100) {
+                $hotelBooking->setStatus('booked');
+                $hotelBooking->setPaymentStatus('paid');
+            } else {
+                $hotelBooking->setStatus('error');
+                $hotelBooking->setPaymentStatus($requestData['Ds_Response']);
+                foreach ($hotelBooking->getBookingLines()[0]->getData() as $room) {
+                    foreach ($room['availabilities'] as $availability) {
+                        $hotelAvailability = $hotelAvailabilityRepository->find($availability);
+                        $hotelAvailability->setQuota($hotelAvailability->getQuota() + 1);
+                        $hotelAvailability->setTotalBookings($hotelAvailability->getTotalBookings() - 1);
+                        $entityManager->persist($hotelAvailability);
+                    }
+                }
+            }
+
+            $entityManager->persist($hotelBooking);
+            $entityManager->flush();
+
+            // Generate a Voucher based on the booking data
+
+            if ($hotelBooking->getStatus() == 'booked') {
+                $newVoucher = new Voucher();
+                $newVoucher->setToBePaidBy('H-MARILUZ TRAVEL TOUR S.L.');
+                $newVoucher->setBooking($hotelBooking);
+
+                $entityManager->persist($newVoucher);
+                $entityManager->flush();
+
+                $bookingController->send_voucher($newVoucher->getId(), 'all', $mailer, $pdf, $voucherRepository, $configurationRepository, $entityManager);
+            }
+
+
+            return $this->json([
+                'response'  => $hotelBooking
+            ]);
+        } catch (SoapFault $e) {
+            return $this->json([
+                'response'  => $e
+            ]);
+        }
+    }
+
+    //     #[Route('/hotel_booking', name: 'api_hotel_booking')]
+    //     public function booking(Request $request, MailerInterface $mailer, EntityManagerInterface $entityManager, BookingRepository $bookingRepository, HotelAvailabilityRepository $hotelAvailabilityRepository, HotelRepository $hotelRepository, DocumentController $documentController, VoucherRepository $voucherRepository, Pdf $pdf, ConfigurationRepository $configurationRepository): Response
+    //     {
+    //         $request = file_get_contents('php://input');
+    //         parse_str($request, $output);
+
+    //         try {
+    //             $requestData = str_replace("?", "", utf8_decode(base64_decode($output['Ds_MerchantParameters'])));
+    //             $requestData = json_decode($requestData, true);
+    //             $hotelBooking = $bookingRepository->find(intval(ltrim($requestData['Ds_Order'], "0")));
+
+    //             // $bookingHub->setLocator($bookingOfi->BookingResult->BookingCode);
+    //             if ($requestData['Ds_Response'] < 100) {
+    //                 $hotelBooking->setStatus('booked');
+    //                 $hotelBooking->setPaymentStatus('paid');
+    //             } else {
+    //                 $hotelBooking->setStatus('error');
+    //                 $hotelBooking->setPaymentStatus($requestData['Ds_Response']);
+    //                 foreach ($hotelBooking->getBookingLines()[0]->getData() as $room) {
+    //                     foreach ($room['availabilities'] as $availability) {
+    //                         $hotelAvailability = $hotelAvailabilityRepository->find($availability);
+    //                         $hotelAvailability->setQuota($hotelAvailability->getQuota() + 1);
+    //                         $hotelAvailability->setTotalBookings($hotelAvailability->getTotalBookings() - 1);
+    //                         $entityManager->persist($hotelAvailability);
+    //                     }
+    //                 }
+    //             }
+
+    //             $entityManager->persist($hotelBooking);
+    //             $entityManager->flush();
+
+    //             // Generate a Voucher based on the booking data
+
+    //             if ($hotelBooking->getStatus() == 'booked') {
+    //                 $newVoucher = new Voucher();
+    //                 $newVoucher->setToBePaidBy('H-MARILUZ TRAVEL TOUR S.L.');
+    //                 $newVoucher->setBooking($hotelBooking);
+
+    //                 $entityManager->persist($newVoucher);
+    //                 $entityManager->flush();
+
+    //                 $this->send_voucher($newVoucher->getId(), 'all', $mailer, $pdf, $voucherRepository, $configurationRepository, $entityManager);
+    //             }
+
+
+    //             return $this->json([
+    //                 'response'  => $hotelBooking
+    //             ]);
+    //         } catch (SoapFault $e) {
+    //             return $this->json([
+    //                 'response'  => $e
+    //             ]);
+    //         }
+    //     }
 }
