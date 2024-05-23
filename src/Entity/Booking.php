@@ -123,9 +123,13 @@ class Booking
     #[Groups(['bookingReduced', 'booking'])]
     private ?bool $supplierConfirmationSent = null;
 
+    #[ORM\OneToMany(mappedBy: 'booking', targetEntity: Tickets::class)]
+    private Collection $tickets;
+
     public function __construct()
     {
         $this->bookingLines = new ArrayCollection();
+        $this->tickets = new ArrayCollection();
     }
 
     #[ORM\PrePersist]
@@ -410,6 +414,36 @@ class Booking
     public function setSupplierConfirmationSent(?bool $supplierConfirmationSent): static
     {
         $this->supplierConfirmationSent = $supplierConfirmationSent;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Tickets>
+     */
+    public function getTickets(): Collection
+    {
+        return $this->tickets;
+    }
+
+    public function addTicket(Tickets $ticket): static
+    {
+        if (!$this->tickets->contains($ticket)) {
+            $this->tickets->add($ticket);
+            $ticket->setBooking($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTicket(Tickets $ticket): static
+    {
+        if ($this->tickets->removeElement($ticket)) {
+            // set the owning side to null (unless already changed)
+            if ($ticket->getBooking() === $this) {
+                $ticket->setBooking(null);
+            }
+        }
 
         return $this;
     }
