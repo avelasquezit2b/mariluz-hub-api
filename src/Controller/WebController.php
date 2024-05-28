@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Section;
+use App\Repository\MenuItemRepository;
 use App\Repository\SectionRepository;
 use App\Repository\ThemeRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -45,6 +46,22 @@ class WebController extends AbstractController
             $theme = $themeRepository->find($theme->id);
             $theme->setPosition($key);
             $this->entityManager->persist($theme);
+        }
+
+        $this->entityManager->flush();
+
+        return $this->json(['message' => 'Element positions updated successfully']);
+    }
+
+    #[Route('/menu_items/update_positions', name: 'api_update_menu_item_positions')]
+    public function updateMenuItemsPosition(Request $request, MenuItemRepository $menuItemRepository): JsonResponse
+    {
+        $requestDecode = json_decode($request->getContent());
+
+        foreach ($requestDecode->menuItems as $key=>$menuItem) {
+            $menuItem = $menuItemRepository->find($menuItem->id);
+            $menuItem->setPosition($key);
+            $this->entityManager->persist($menuItem);
         }
 
         $this->entityManager->flush();
