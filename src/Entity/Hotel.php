@@ -38,15 +38,15 @@ class Hotel
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['hotelReduced', 'hotel', 'supplier', 'hotelAvailabilityReduced'])]
+    #[Groups(['hotelReduced', 'hotel', 'supplier', 'hotelAvailabilityReduced', 'theme'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['hotelReduced', 'hotel', 'page', 'supplier', 'pack', 'productList', 'booking','bookingReduced'])]
+    #[Groups(['hotelReduced', 'hotel', 'page', 'supplier', 'pack', 'productList', 'booking','bookingReduced', 'theme'])]
     private ?string $title = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['hotelReduced', 'hotel', 'page', 'productList'])]
+    #[Groups(['hotelReduced', 'hotel', 'page', 'productList', 'theme'])]
     private ?string $slug = null;
 
     #[ORM\ManyToOne(inversedBy: 'hotels')]
@@ -66,7 +66,7 @@ class Hotel
     private ?string $checkOut = null;
 
     #[ORM\ManyToOne(inversedBy: 'hotels', cascade: ['remove'])]
-    #[Groups(['hotelReduced', 'hotel', 'page', 'productList', 'booking'])]
+    #[Groups(['hotelReduced', 'hotel', 'page', 'productList', 'booking', 'theme'])]
     private ?Location $location = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -82,11 +82,11 @@ class Hotel
     private ?string $longitude = null;
 
     #[ORM\ManyToMany(targetEntity: Zone::class, inversedBy: 'hotels')]
-    #[Groups(['hotelReduced', 'hotel', 'page', 'productList', 'booking'])]
+    #[Groups(['hotelReduced', 'hotel', 'page', 'productList', 'booking', 'theme'])]
     private Collection $zones;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['hotelReduced', 'hotel', 'page', 'productList'])]
+    #[Groups(['hotelReduced', 'hotel', 'page', 'productList', 'theme'])]
     private ?string $shortDescription = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
@@ -123,7 +123,7 @@ class Hotel
     private Collection $relatedHotels;
 
     #[ORM\OneToMany(mappedBy: 'hotel', targetEntity: MediaObject::class, cascade: ['remove'])]
-    #[Groups(['hotelReduced', 'hotel', 'page', 'productList', 'booking'])]
+    #[Groups(['hotelReduced', 'hotel', 'page', 'productList', 'booking', 'theme'])]
     #[ORM\OrderBy(["position" => "ASC"])]
     private Collection $media;
 
@@ -147,18 +147,20 @@ class Hotel
     private Collection $packModalities;
 
     #[ORM\ManyToMany(targetEntity: Theme::class, mappedBy: 'hotels')]
+    #[Groups(['hotel', 'hotelReduced'])]
     private Collection $themes;
+
     #[ORM\ManyToMany(targetEntity: ItineraryDay::class, mappedBy: 'hotels')]
     private Collection $itineraryDays;
 
-    #[Groups(['hotelReduced', 'hotel', 'page', 'productList'])]
+    #[Groups(['hotelReduced', 'hotel', 'page', 'productList', 'theme'])]
     private $price;
 
     #[ORM\OneToMany(mappedBy: 'hotel', targetEntity: PackPrice::class)]
     private Collection $packPrices;
 
     #[ORM\ManyToOne(inversedBy: 'hotels')]
-    #[Groups(['hotelReduced', 'hotel', 'page', 'productList'])]
+    #[Groups(['hotelReduced', 'hotel', 'page', 'productList', 'theme'])]
     private ?ProductTag $productTag = null;
 
     #[ORM\OneToMany(mappedBy: 'hotel', targetEntity: Voucher::class)]
@@ -671,6 +673,8 @@ class Hotel
             $this->themes->add($theme);
             $theme->addHotel($this);
         }
+
+        return $this;
     }
     
     /**

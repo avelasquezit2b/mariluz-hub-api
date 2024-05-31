@@ -65,7 +65,28 @@ class Theme
     private Collection $activities;
 
     #[ORM\ManyToMany(targetEntity: Hotel::class, inversedBy: 'themes')]
+    #[Groups(['themeReduced', 'theme', 'page'])]
     private Collection $hotels;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['themeReduced', 'theme', 'page'])]
+    private ?string $subtitle = null;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['themeReduced', 'theme', 'page'])]
+    private ?string $firstTextBlock = null;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['themeReduced', 'theme', 'page'])]
+    private ?string $secondTextBlock = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['themeReduced', 'theme', 'page'])]
+    private ?string $secondTextBlockTitle = null;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['themeReduced', 'theme', 'page'])]
+    private ?string $thirdTextBlock = null;
 
     public function __construct()
     {
@@ -248,6 +269,66 @@ class Theme
     public function removeHotel(Hotel $hotel): static
     {
         $this->hotels->removeElement($hotel);
+
+        return $this;
+    }
+
+    public function getSubtitle(): ?string
+    {
+        return $this->subtitle;
+    }
+
+    public function setSubtitle(?string $subtitle): static
+    {
+        $this->subtitle = $subtitle;
+
+        return $this;
+    }
+
+    public function getFirstTextBlock(): ?string
+    {
+        return $this->firstTextBlock;
+    }
+
+    public function setFirstTextBlock(?string $firstTextBlock): static
+    {
+        $this->firstTextBlock = $firstTextBlock;
+
+        return $this;
+    }
+
+    public function getSecondTextBlock(): ?string
+    {
+        return $this->secondTextBlock;
+    }
+
+    public function setSecondTextBlock(?string $secondTextBlock): static
+    {
+        $this->secondTextBlock = $secondTextBlock;
+
+        return $this;
+    }
+
+    public function getSecondTextBlockTitle(): ?string
+    {
+        return $this->secondTextBlockTitle;
+    }
+
+    public function setSecondTextBlockTitle(?string $secondTextBlockTitle): static
+    {
+        $this->secondTextBlockTitle = $secondTextBlockTitle;
+
+        return $this;
+    }
+
+    public function getThirdTextBlock(): ?string
+    {
+        return $this->thirdTextBlock;
+    }
+
+    public function setThirdTextBlock(?string $thirdTextBlock): static
+    {
+        $this->thirdTextBlock = $thirdTextBlock;
 
         return $this;
     }

@@ -128,6 +128,9 @@ class MediaObject
     #[Groups(['media_object:read'])]
     private ?Configuration $configuration = null;
 
+    #[ORM\OneToOne(mappedBy: 'media', cascade: ['persist', 'remove'])]
+    private ?ThemeImageDescription $themeImageDescription = null;
+
     public function __construct()
     {
 
@@ -348,6 +351,28 @@ class MediaObject
         }
 
         $this->configuration = $configuration;
+
+        return $this;
+    }
+
+    public function getThemeImageDescription(): ?ThemeImageDescription
+    {
+        return $this->themeImageDescription;
+    }
+
+    public function setThemeImageDescription(?ThemeImageDescription $themeImageDescription): static
+    {
+        // unset the owning side of the relation if necessary
+        if ($themeImageDescription === null && $this->themeImageDescription !== null) {
+            $this->themeImageDescription->setMedia(null);
+        }
+
+        // set the owning side of the relation if necessary
+        if ($themeImageDescription !== null && $themeImageDescription->getMedia() !== $this) {
+            $themeImageDescription->setMedia($this);
+        }
+
+        $this->themeImageDescription = $themeImageDescription;
 
         return $this;
     }
