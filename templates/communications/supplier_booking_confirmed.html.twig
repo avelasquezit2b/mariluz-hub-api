@@ -22,7 +22,7 @@
                                 <img class="logo" src="https://api.mariluz.hub2b.travel/media/logo-mariluz.png" alt="logo" style="width: 100%;">
                             </div>
                         </div>
-                        <div class="content-body" style="padding: 1rem; border: 2px solid transparent; min-height: 500px; text-align: center;">
+                        <div class="content-body" style="padding: 1rem; border: 2px solid transparent; min-height: 500px;">
                             {{message|raw}}
                         </div>
                     </td>
@@ -37,6 +37,35 @@
                     <td>
                         <div class="d-flex flex-column gap-4" style="text-align: center;">
                             <span style="font-size: 18px; font-weight: 600;">Departamento de reservas</span>
+                        </div>
+                        <div style="width: 100%;text-align: center;font-size:14px">
+                            <div>
+                                <strong>
+                                    {{companyName}}
+                                </strong>
+                            </div>
+                            <div>
+                                <span>
+                                    {{companyCif}}
+                                </span>
+                            </div>
+                            <span>
+                                {{companyAddress}}
+                            </span>
+                            <span>
+                                {{companyPostalCode}}
+                            </span>
+                            <div>
+                                <span>
+                                    {{companyCity}} {{companyProvince}} {{companyCountry}}
+                                </span>
+                                <span>
+                                    Tel:
+                                </span>
+                                <span>
+                                    {{companyPhone}}
+                                </span>
+                            </div>
                         </div>
                     </td>
                 </tr>

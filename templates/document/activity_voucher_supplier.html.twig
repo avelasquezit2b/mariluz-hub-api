@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{{bookingId}}-confirmación</title>
+</head>
+
+<style>
+
+	html,body {
+        height: 100%;
+        margin: 0;
+    }
+
+	tr.spaceUnder>td {
+		padding-bottom: 1em;
+	}
+
+	.shadow {
+		border: 2px solid black;
+		box-shadow: rgb(0, 0, 0) 5px 5px;
+	}
+
+	.divisor {
+		margin-top: 1rem;
+		margin-bottom: 1rem;
+		border-bottom: 1px solid #000;
+	}
+
+	.content {
+		height: 1254px;
+	}
+
+</style>
+<body>
+
+<div id="container">
+	<div class="content">
+		<table width="100%";>
+			<tbody>
+				<tr class="spaceUnder">
+					<td colspan="3" style="text-align: center">
+						<img class="logo" src="http://api.mariluz.hub2b.travel/media/logo-mariluz.png" alt="logo" style="width: 250px;">
+					</td>
+				</tr>
+				<tr>
+					<td colspan="3">
+						<div>
+							<h1>Confirmación de Reserva</h1>
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="3">
+						<div class="divisor"></div>
+					</td>
+				</tr>
+				<tr class="spaceUnder">
+					<td colspan="2">
+						<div style="margin-bottom:1rem">
+							Emitido para / Issued For
+						</div>
+						<div>
+							<strong>{{supplierTitle}}</strong>
+						</div>
+						<div>
+							<span>{{productZone}}</span>
+						</div>
+						<div>
+							<span>{{productLocation}}</span>
+						</div>
+						<div>
+							<span>España</span>
+						</div>
+						<span>
+							Tel:
+						</span>
+						<span>
+							{{supplierPhone}}
+						</span>
+					</td>
+					<td>
+						<div>
+							<span>Expediente / File</span>
+						</div>
+						<div style="margin-bottom:.5rem">
+							<strong>{{bookingId}}</strong>
+						</div>
+						<div>
+							<span>Fecha Emisión / Issue Date</span>
+						</div>
+						<div style="margin-bottom:.5rem">
+							<strong>{{bookingDate}}</strong>
+						</div>
+						<div>
+							<span>Pagadero por / To be Paid By</span>
+						</div>
+						<div>
+							<strong>{{to_be_paid_by}}</strong>
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="3">
+						<div class="divisor"></div>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="2">
+						<div style="margin-bottom:.5rem; margin-top:.5rem">
+							<span>Clientes: </span>
+							<strong>{{clientName}}</strong>
+						</div>
+						<div>
+							<span>Rogamos presten los siguientes servicios al titular del presente bono:</span>
+						</div>
+						<div style="margin-bottom:.5rem">
+							<strong>{{productTitle}}</strong>
+						</div>
+						<div style="margin-bottom:.5rem">
+							<span>Modalidad:</span>
+							<strong>{{modality}}</strong>
+						</div>
+						<div>
+							<span>Horario:</span>
+							<strong>{{schedule}}</strong>
+						</div>
+					</td>
+					<td>
+						<div style="margin-bottom:.5rem">
+							<span>Personas: </span>
+							<span>{{quantity}}</span>
+						</div>
+						<div style="margin-bottom:.5rem">
+							<span>Llegada: </span>
+							<strong>{{checkIn}}</strong>
+						</div>
+						<div style="margin-bottom:.5rem">
+							<span>Salida: </span>
+							<strong>{{checkOut}}</strong>
+						</div>
+						<div style="margin-bottom:.5rem;">
+							<span>Servicio: </span>
+							<strong>0001</strong>
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="2">
+					</td>
+					<td>
+						{% for clientType in clientTypes %}
+							<div style="margin-top:.25rem">
+								<span>{{clientType.quantity}} {{clientType.clientType}}</span>
+								<strong>x {{clientType.priceCost/clientType.quantity}}€ = {{clientType.priceCost}}€</strong>
+							</div>
+						{% endfor %}
+						<div style="border: 2px solid black; padding: 5px; margin-bottom: .5rem">
+							<span>Importe Reserva / Booking Amount =  </span>
+							<strong> {{totalPriceCost}}€</strong>
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="3">
+						<div style="margin-top:2rem;border-bottom: 1px solid black">
+							<span>Observaciones / Remarks</span>
+						</div>
+						<div style="margin-top:1rem">
+							<span>{{observations|raw}}</span>
+						</div>
+					</td>
+				</tr>
+				{# <tr style="margin-top:auto">
+					<td style="height:100% !important" colspan="3">
+						<div style="position:absolute;bottom:0;left:0;display:flex;justify-content:center">
+							<span>
+								C/ Jaume III, 27 - Ent 2ª Despacho 18 - 19
+							</span>
+							<span>
+								07012 Palma de Mallorca
+							</span>
+							<span>
+								BALEARES España
+							</span>
+							<span>
+								Tel:
+							</span>
+							<span>
+								971 42 51 10
+							</span>
+						</div>
+					</td>
+				</tr> #}
+			</tbody>
+		</table>
+	</div>
+	<div style="width: 100%;text-align: center;font-size:14px">
+		<div>
+			<strong>
+				{{companyName}}
+			</strong>
+		</div>
+		<div>
+			<span>
+				{{companyCif}}
+			</span>
+		</div>
+		<span>
+			{{companyAddress}}
+		</span>
+		<span>
+			{{companyPostalCode}} {{companyCity}}
+		</span>
+		<span>
+			{{companyProvince}} {{companyCountry}}
+		</span>
+		<span>
+			Tel:
+		</span>
+		<span>
+			{{companyPhone}}
+		</span>
+	</div>
+</div>
+</body>
+</html>

@@ -332,14 +332,10 @@ class IntegrationController extends AbstractController
         ]);
     }
 
-    #[Route('/prebooking_hotels', name: 'app_prebooking_hotels')]
-    public function prebookingHotels(Request $request): Response
+    #[Route('/integration_prebooking_hotels', name: 'app_integration_prebooking_hotels')]
+    public function integrationPrebookingHotels(Request $request): Response
     {
         $dataDecode = json_decode($request->getContent());
-
-        return $this->json([
-            'hotels'  => $dataDecode
-        ]);
 
         $curl = curl_init();
 
@@ -353,7 +349,7 @@ class IntegrationController extends AbstractController
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => 'POST',
             CURLOPT_POSTFIELDS => '{
-        "query": "query {\\thotelX { quote(criteria: { optionRefId: \\"' . $dataDecode->id . '\\" }, settings: { client: \\"it2b\\", context: \\"' . $dataDecode->channelCode . '\\", timeout: 5000 }) { errors { code type description } warnings { code type description } optionQuote { optionRefId status price { currency binding net gross exchange { currency rate } minimumSellingPrice } surcharges { chargeType price { currency binding net gross exchange { currency rate } minimumSellingPrice } description } cancelPolicy { refundable description cancelPenalties { deadline isCalculatedDeadline penaltyType currency value } } paymentType cardTypes remarks } }\\t}}"
+        "query": "query {\\thotelX { quote(criteria: { optionRefId: \\"' . $dataDecode->id . '\\" }, settings: { client: \\"client_demo\\", context: \\"' . $dataDecode->channelCode . '\\", timeout: 5000, testMode: true }) { errors { code type description } warnings { code type description } optionQuote { optionRefId status price { currency binding net gross exchange { currency rate } minimumSellingPrice } surcharges { chargeType price { currency binding net gross exchange { currency rate } minimumSellingPrice } description } cancelPolicy { refundable description cancelPenalties { deadline isCalculatedDeadline penaltyType currency value } } paymentType cardTypes remarks } }\\t}}"
         }',
             CURLOPT_HTTPHEADER => array(
                 'Authorization: Apikey test0000-0000-0000-0000-000000000000',
@@ -383,9 +379,9 @@ class IntegrationController extends AbstractController
 
             $request = file_get_contents('php://input');
             parse_str($request, $output);
-            $requestData = str_replace("?", "", utf8_decode(base64_decode($output['Ds_MerchantParameters'])));
-            $requestData = json_decode($requestData, true);
-            $hotelBooking = $bookingRepository->find(intval(ltrim($requestData['Ds_Order'], "0")));
+            // $requestData = str_replace("?", "", utf8_decode(base64_decode($output['Ds_MerchantParameters'])));
+            // $requestData = json_decode($requestData, true);
+            $hotelBooking = $bookingRepository->find(337);
 
             $curl = curl_init();
 
@@ -399,7 +395,7 @@ class IntegrationController extends AbstractController
                 CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
                 CURLOPT_CUSTOMREQUEST => 'POST',
                 CURLOPT_POSTFIELDS =>  '{
-                    "query": "mutation { hotelX { book( input: {optionRefId: \"' . $hotelBooking->getBookingLines()[0]->getData()[0]['refId'] . '\", clientReference: \"jnyy\", deltaPrice: {amount: 10, percent: 10, applyBoth: true}, holder: {name: \"Jane\", surname: \"Doe\"}, remarks: \"This is just a test booking!\", rooms: {occupancyRefId: 1, paxes: [{name: \"Jane\", surname: \"Doe\", age: 30}]}} settings: {client: \"client_demo\", auditTransactions: true, context: \"HOTELTEST\", testMode: true, timeout: 60000} ) { errors { code type description } warnings { code type description } booking { status price { currency binding net gross exchange { currency rate } } reference { bookingID client supplier hotel } holder { name surname } cancelPolicy { refundable cancelPenalties { deadline isCalculatedDeadline penaltyType currency value } } remarks hotel { hotelCode hotelName bookingDate start end boardCode occupancies { id paxes { age } } rooms { code description occupancyRefId price { currency binding net gross exchange { currency rate } } } } } } }}"
+                    "query": "mutation { hotelX { book( input: {optionRefId: \"' . $hotelBooking->getBookingLines()[0]->getData()[0]['refId'] . '\", clientReference: \"alfred\", deltaPrice: {amount: 10, percent: 10, applyBoth: true}, holder: {name: \"Jane\", surname: \"Doe\"}, remarks: \"This is just a test booking!\", rooms: {occupancyRefId: 1, paxes: [{name: \"Jane\", surname: \"Doe\", age: 30}, {name: \"Jane\", surname: \"Doe\", age: 30}]}} settings: {client: \"client_demo\", auditTransactions: true, context: \"HOTELTEST\", testMode: true, timeout: 60000} ) { errors { code type description } warnings { code type description } booking { status price { currency binding net gross exchange { currency rate } } reference { bookingID client supplier hotel } holder { name surname } cancelPolicy { refundable cancelPenalties { deadline isCalculatedDeadline penaltyType currency value } } remarks hotel { hotelCode hotelName bookingDate start end boardCode occupancies { id paxes { age } } rooms { code description occupancyRefId price { currency binding net gross exchange { currency rate } } } } } } }}"
                 }',
                 CURLOPT_HTTPHEADER => array(
                     'Authorization: Apikey test0000-0000-0000-0000-000000000000',
@@ -418,13 +414,13 @@ class IntegrationController extends AbstractController
             $bookingController = new BookingController();
 
             // $bookingHub->setLocator($bookingOfi->BookingResult->BookingCode);
-            if ($requestData['Ds_Response'] < 100) {
-                $hotelBooking->setStatus('booked');
-                $hotelBooking->setPaymentStatus('paid');
-            } else {
-                $hotelBooking->setStatus('error');
-                $hotelBooking->setPaymentStatus($requestData['Ds_Response']);
-            }
+            // if ($requestData['Ds_Response'] < 100) {
+            //     $hotelBooking->setStatus('booked');
+            //     $hotelBooking->setPaymentStatus('paid');
+            // } else {
+            //     $hotelBooking->setStatus('error');
+            //     $hotelBooking->setPaymentStatus($requestData['Ds_Response']);
+            // }
 
             $entityManager->persist($hotelBooking);
             $entityManager->flush();
