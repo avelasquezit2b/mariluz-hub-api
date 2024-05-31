@@ -53,6 +53,18 @@ class HeroSlide
     #[Groups(['heroSlideReduced', 'heroSlide', 'page'])]
     private ?string $promoLink = null;
 
+    #[ORM\Column(nullable: true)]
+    #[Groups(['heroSlideReduced', 'heroSlide', 'page'])]
+    private ?bool $hasGiftCard = null;
+
+    #[ORM\Column(nullable: true)]
+    #[Groups(['heroSlideReduced', 'heroSlide', 'page'])]
+    private ?bool $hasPolaroid = null;
+
+    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    #[Groups(['heroSlideReduced', 'heroSlide', 'page'])]
+    private ?MediaObject $additionalMedia = null;
+
     public function __construct()
     {
         $this->media = new ArrayCollection();
@@ -137,6 +149,42 @@ class HeroSlide
     public function setPromoLink(?string $promoLink): static
     {
         $this->promoLink = $promoLink;
+
+        return $this;
+    }
+
+    public function isHasGiftCard(): ?bool
+    {
+        return $this->hasGiftCard;
+    }
+
+    public function setHasGiftCard(?bool $hasGiftCard): static
+    {
+        $this->hasGiftCard = $hasGiftCard;
+
+        return $this;
+    }
+
+    public function isHasPolaroid(): ?bool
+    {
+        return $this->hasPolaroid;
+    }
+
+    public function setHasPolaroid(?bool $hasPolaroid): static
+    {
+        $this->hasPolaroid = $hasPolaroid;
+
+        return $this;
+    }
+
+    public function getAdditionalMedia(): ?MediaObject
+    {
+        return $this->additionalMedia;
+    }
+
+    public function setAdditionalMedia(?MediaObject $additionalMedia): static
+    {
+        $this->additionalMedia = $additionalMedia;
 
         return $this;
     }
