@@ -217,6 +217,9 @@ class Hotel
     #[Groups(['hotel', 'hotelReduced'])]
     private Collection $channelHotels;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $promoTag = null;
+
     public function __construct()
     {
         $this->zones = new ArrayCollection();
@@ -984,6 +987,18 @@ class Hotel
                 $channelHotel->setHotel(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getPromoTag(): ?string
+    {
+        return $this->promoTag;
+    }
+
+    public function setPromoTag(?string $promoTag): static
+    {
+        $this->promoTag = $promoTag;
 
         return $this;
     }

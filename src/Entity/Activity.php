@@ -220,6 +220,12 @@ class Activity
     #[Groups(['activityReduced', 'activity'])]
     private ?string $internalNotes = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $bookingEmail = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $promoTag = null;
+
     // #[ORM\Column(length: 25, nullable: true)]
     // private ?string $price = null;
 
@@ -996,6 +1002,30 @@ class Activity
     public function setInternalNotes(?string $internalNotes): static
     {
         $this->internalNotes = $internalNotes;
+
+        return $this;
+    }
+
+    public function getBookingEmail(): ?string
+    {
+        return $this->bookingEmail;
+    }
+
+    public function setBookingEmail(?string $bookingEmail): static
+    {
+        $this->bookingEmail = $bookingEmail;
+
+        return $this;
+    }
+
+    public function getPromoTag(): ?string
+    {
+        return $this->promoTag;
+    }
+
+    public function setPromoTag(?string $promoTag): static
+    {
+        $this->promoTag = $promoTag;
 
         return $this;
     }
