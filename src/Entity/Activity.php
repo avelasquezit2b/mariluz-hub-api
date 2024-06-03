@@ -221,9 +221,11 @@ class Activity
     private ?string $internalNotes = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['activity'])]
     private ?string $bookingEmail = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['activityReduced', 'activity', 'page', 'productList', 'theme'])]
     private ?string $promoTag = null;
 
     // #[ORM\Column(length: 25, nullable: true)]

@@ -218,6 +218,7 @@ class Hotel
     private Collection $channelHotels;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['hotel', 'hotelReduced', 'page', 'productList', 'theme'])]
     private ?string $promoTag = null;
 
     public function __construct()
