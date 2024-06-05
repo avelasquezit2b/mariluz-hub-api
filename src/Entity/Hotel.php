@@ -15,6 +15,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: HotelRepository::class)]
 #[ApiResource(
+    paginationItemsPerPage: 50,
     attributes: [
         "order" => ["id" => "DESC"],
         "normalization_context" => ["groups" => ["hotelReduced"]]
@@ -42,7 +43,7 @@ class Hotel
     private ?int $id = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['hotelReduced', 'hotel', 'page', 'supplier', 'pack', 'productList', 'booking','bookingReduced', 'theme'])]
+    #[Groups(['hotelReduced', 'hotel', 'page', 'supplier', 'pack', 'productList', 'booking', 'bookingReduced', 'theme'])]
     private ?string $title = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -680,7 +681,7 @@ class Hotel
 
         return $this;
     }
-    
+
     /**
      * @return Collection<int, ItineraryDay>
      */
@@ -718,7 +719,7 @@ class Hotel
     public function getPrice(): ?string
     {
         $price = null;
-        foreach($this->getRoomTypes() as $roomType) {
+        foreach ($this->getRoomTypes() as $roomType) {
             if (!$price) {
                 $price = $roomType->getPrice();
             } else if ($price > $roomType->getPrice()) {
@@ -1003,5 +1004,4 @@ class Hotel
 
         return $this;
     }
-
 }
