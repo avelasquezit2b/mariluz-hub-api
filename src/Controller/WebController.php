@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Section;
+use App\Repository\HeroSlideRepository;
 use App\Repository\MenuItemRepository;
 use App\Repository\SectionRepository;
 use App\Repository\ThemeRepository;
@@ -26,7 +27,7 @@ class WebController extends AbstractController
     {
         $requestDecode = json_decode($request->getContent());
 
-        foreach ($requestDecode->sections as $key=>$section) {
+        foreach ($requestDecode->sections as $key => $section) {
             $section = $sectionRepository->find($section->id);
             $section->setPosition($key);
             $this->entityManager->persist($section);
@@ -42,7 +43,7 @@ class WebController extends AbstractController
     {
         $requestDecode = json_decode($request->getContent());
 
-        foreach ($requestDecode->themes as $key=>$theme) {
+        foreach ($requestDecode->themes as $key => $theme) {
             $theme = $themeRepository->find($theme->id);
             $theme->setPosition($key);
             $this->entityManager->persist($theme);
@@ -58,10 +59,26 @@ class WebController extends AbstractController
     {
         $requestDecode = json_decode($request->getContent());
 
-        foreach ($requestDecode->menuItems as $key=>$menuItem) {
+        foreach ($requestDecode->menuItems as $key => $menuItem) {
             $menuItem = $menuItemRepository->find($menuItem->id);
             $menuItem->setPosition($key);
             $this->entityManager->persist($menuItem);
+        }
+
+        $this->entityManager->flush();
+
+        return $this->json(['message' => 'Element positions updated successfully']);
+    }
+
+    #[Route('/hero_slides/update_positions', name: 'api_update_hero_slide_positions')]
+    public function updateHeroSlidesPosition(Request $request, HeroSlideRepository $heroSlideRepository): JsonResponse
+    {
+        $requestDecode = json_decode($request->getContent());
+
+        foreach ($requestDecode->heroSlides as $key => $heroSlide) {
+            $heroSlide = $heroSlideRepository->find($heroSlide->id);
+            $heroSlide->setPosition($key);
+            $this->entityManager->persist($heroSlide);
         }
 
         $this->entityManager->flush();

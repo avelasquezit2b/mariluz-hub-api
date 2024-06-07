@@ -6,6 +6,7 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\HeroSlideRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -64,6 +65,10 @@ class HeroSlide
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     #[Groups(['heroSlideReduced', 'heroSlide', 'page'])]
     private ?MediaObject $additionalMedia = null;
+
+    #[ORM\Column(type: Types::SMALLINT, nullable: true)]
+    #[Groups(['heroSlideReduced', 'heroSlide', 'page'])]
+    private ?int $position = null;
 
     public function __construct()
     {
@@ -185,6 +190,18 @@ class HeroSlide
     public function setAdditionalMedia(?MediaObject $additionalMedia): static
     {
         $this->additionalMedia = $additionalMedia;
+
+        return $this;
+    }
+
+    public function getPosition(): ?int
+    {
+        return $this->position;
+    }
+
+    public function setPosition(?int $position): static
+    {
+        $this->position = $position;
 
         return $this;
     }

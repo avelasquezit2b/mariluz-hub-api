@@ -35,6 +35,7 @@ class HeroModule
 
     #[ORM\OneToMany(mappedBy: 'heroModule', targetEntity: HeroSlide::class)]
     #[Groups(['heroModuleReduced', 'heroModule', 'page'])]
+    #[ORM\OrderBy(["position" => "ASC"])]
     private Collection $heroSlides;
 
     #[ORM\OneToOne(mappedBy: 'heroModule', cascade: ['persist', 'remove'])]
