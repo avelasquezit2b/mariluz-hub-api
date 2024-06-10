@@ -62,6 +62,7 @@ class Theme
     private ?string $slug = null;
 
     #[ORM\ManyToMany(targetEntity: Activity::class, inversedBy: 'themes')]
+    #[Groups(['themeReduced', 'theme', 'page'])]
     private Collection $activities;
 
     #[ORM\ManyToMany(targetEntity: Hotel::class, inversedBy: 'themes')]
@@ -87,6 +88,10 @@ class Theme
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     #[Groups(['themeReduced', 'theme', 'page'])]
     private ?string $thirdTextBlock = null;
+
+    #[ORM\Column(type: Types::SMALLINT, nullable: true)]
+    #[Groups(['themeReduced', 'theme', 'page'])]
+    private ?int $position = null;
 
     public function __construct()
     {
@@ -329,6 +334,18 @@ class Theme
     public function setThirdTextBlock(?string $thirdTextBlock): static
     {
         $this->thirdTextBlock = $thirdTextBlock;
+
+        return $this;
+    }
+
+    public function getPosition(): ?int
+    {
+        return $this->position;
+    }
+
+    public function setPosition(?int $position): static
+    {
+        $this->position = $position;
 
         return $this;
     }
