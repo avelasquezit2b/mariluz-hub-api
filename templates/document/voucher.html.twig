@@ -24,7 +24,7 @@
 	.divisor {
 		margin-top: 1rem;
 		margin-bottom: 1rem;
-		border-bottom: 1px solid #000;
+		border-bottom: 1px solid #73B499;
 	}
 
 	.content {
@@ -40,13 +40,13 @@
 			<tbody>
 				<tr class="spaceUnder">
 					<td colspan="3" style="text-align: center">
-						<img class="logo" src="http://api.mariluz.hub2b.travel/media/logo-mariluz.png" alt="logo" style="width: 250px;">
+						<img class="logo" src="http://api.mariluz.hub2b.travel/media/logo-25.png" alt="logo" style="width: 250px;">
 					</td>
 				</tr>
 				<tr>
 					<td colspan="3">
 						<div>
-							<h1>Bono de Servicios</h1>
+							<h1 style="color:#73B499">Bono estancia</h1>
 						</div>
 					</td>
 				</tr>
@@ -58,22 +58,22 @@
 				<tr class="spaceUnder">
 					<td colspan="1">
 						<div style="margin-bottom:1rem">
-							Emitido para / Issued For
+							<span style="color:#73B499">Emitido para / Issued For</span>
 						</div>
 						<div>
-							<strong>{{productTitle}}</strong>
+							<strong style="color:#8B8B8B">{{productTitle}}</strong>
 						</div>
 						<div>
-							<span>{{productAddress}}</span>
+							<span style="color:#8B8B8B">{{productAddress}}</span>
 						</div>
 						<div>
-							<span>{{productZone}}</span>
+							<span style="color:#8B8B8B">{{productZone}}</span>
 						</div>
 						<div>
-							<span>{{productLocation}}</span>
+							<span style="color:#8B8B8B">{{productLocation}}</span>
 						</div>
 						<div>
-							<span>España</span>
+							<span style="color:#8B8B8B">España</span>
 						</div>
 					</td>
 					<td colspan="1">
@@ -81,22 +81,22 @@
 					</td>
 					<td>
 						<div>
-							<span>Expediente / File</span>
+							<span style="color:#73B499">Expediente / File</span>
 						</div>
 						<div style="margin-bottom:.5rem">
-							<strong>{{bookingId}}</strong>
+							<strong style="color:#8B8B8B">{{bookingId}}</strong>
 						</div>
 						<div>
-							<span>Fecha Emisión / Issue Date</span>
+							<span style="color:#73B499">Fecha Emisión / Issue Date</span>
 						</div>
 						<div style="margin-bottom:.5rem">
-							<strong>{{bookingDate}}</strong>
+							<strong style="color:#8B8B8B">{{bookingDate}}</strong>
 						</div>
 						<div>
-							<span>Pagadero por / To be Paid By</span>
+							<span style="color:#73B499">Pagadero por / To be Paid By</span>
 						</div>
 						<div>
-							<strong>{{to_be_paid_by}}</strong>
+							<strong style="color:#8B8B8B">{{to_be_paid_by}}</strong>
 						</div>
 					</td>
 				</tr>
@@ -109,54 +109,54 @@
 					<tr>
 						<td colspan="2">
 							<div style="margin-bottom:.5rem">
-								<span>Clientes: </span>
-								<strong>{{room.clientName}}</strong>
+								<span style="color:#73B499">Clientes: </span>
+								<strong style="color:#8B8B8B">{{room.clientName}}</strong>
 							</div>
 							<div>
-								<span>Rogamos presten los siguientes servicios al titular del presente bono:</span>
+								<span style="color:#73B499">Rogamos presten los siguientes servicios al titular del presente bono:</span>
 							</div>
 							<div style="margin-bottom:.5rem">
-								<strong>{{productTitle}}</strong>
+								<strong style="color:#8B8B8B">{{productTitle}}</strong>
 							</div>
 							<div style="margin-bottom:.5rem">
-								<span>Régimen:</span>
-								<strong>{{room.pensionType.code}}</strong>
+								<span style="color:#73B499">Régimen:</span>
+								<strong style="color:#8B8B8B">{{room.pensionType.code}}</strong>
 							</div>
 							<div>
-								<strong>1</strong>
-								<span>{{room.roomType.name}}</span>
+								<strong style="color:#73B499">1</strong>
+								<span style="color:#8B8B8B">{{room.roomType.name}}</span>
 							</div>
 						</td>
 						<td>
 							<div style="margin-bottom:.5rem">
-								<span>Personas: </span>
-								<span>{{room.clientTypes.adults.quantity+room.clientTypes.kids.quantity+room.clientTypes.babies.quantity}}</span>
+								<span style="color:#73B499">Personas: </span>
+								<span style="color:#8B8B8B">{{room.clientTypes.adults.quantity+room.clientTypes.kids.quantity+room.clientTypes.babies.quantity}}</span>
 							</div>
 							<div style="margin-bottom:.5rem">
-								<span>Llegada: </span>
-								<strong>{{checkIn}}</strong>
+								<span style="color:#73B499">Llegada: </span>
+								<strong style="color:#8B8B8B">{{checkIn}}</strong>
 							</div>
 							<div style="margin-bottom:.5rem">
-								<span>Salida: </span>
-								<strong>{{checkOut}}</strong>
+								<span style="color:#73B499">Salida: </span>
+								<strong style="color:#8B8B8B">{{checkOut}}</strong>
 							</div>
 							<div style="margin-bottom:2rem;">
-								<span>Servicio: </span>
-								<strong>000{{loop.index}}</strong>
+								<span style="color:#73B499">Servicio: </span>
+								<strong style="color:#8B8B8B">000{{loop.index}}</strong>
 							</div>
 						</td>
 					</tr>
 				{% endfor %}
 				<tr>
 					<td colspan="3">
-						<div style="margin-top:2rem;border-bottom: 1px solid black">
-							<span>Observaciones / Remarks</span>
+						<div style="margin-top:2rem;border-bottom: 1px solid #73B499">
+							<span style="color:#73B499">Observaciones / Remarks</span>
 						</div>
 						<div style="margin-top:1rem">
-							<span>{{observations|raw}}</span>
+							<span style="color:#8B8B8B">{{observations|raw}}</span>
 						</div>
 						<div style="margin-top:1rem; font-style: italic">
-							<span>Esta reserva puede estar sujeta a tasas locales o municipales que no están incluidas en el precio y pueden variar sin previo aviso, el importe de dichas tasas deberá abonarse directamente en el establecimiento.</span>
+							<span style="color:#8B8B8B">Esta reserva puede estar sujeta a tasas locales o municipales que no están incluidas en el precio y pueden variar sin previo aviso, el importe de dichas tasas deberá abonarse directamente en el establecimiento.</span>
 						</div>
 					</td>
 				</tr>
@@ -184,33 +184,33 @@
 			</tbody>
 		</table>
 	</div>
-	<div style="width: 100%;text-align: center;font-size:14px">
-		<div>
-			<strong>
-				{{companyName}}
-			</strong>
-		</div>
-		<div>
-			<span>
-				{{companyCif}}
-			</span>
-		</div>
-		<span>
-			{{companyAddress}}
-		</span>
-		<span>
-			{{companyPostalCode}} {{companyCity}}
-		</span>
-		<span>
-			{{companyProvince}} {{companyCountry}}
-		</span>
-		<span>
-			Tel:
-		</span>
-		<span>
-			{{companyPhone}}
-		</span>
-	</div>
 </div>
 </body>
+<div style="width: 100%;text-align: center;font-size:14px;background-color:#73B499;padding:0">
+	<div style="width: 100%;">
+		<strong style="width: 100%;color:#FAF4E8">
+			{{companyName}}
+		</strong>
+	</div>
+	<div>
+		<span style="color:#FAF4E8">
+			{{companyCif}}
+		</span>
+	</div>
+	<span style="color:#FAF4E8">
+		{{companyAddress}}
+	</span>
+	<span style="color:#FAF4E8">
+		{{companyPostalCode}} {{companyCity}}
+	</span>
+	<span style="color:#FAF4E8">
+		{{companyProvince}} {{companyCountry}}
+	</span>
+	<span style="color:#FAF4E8">
+		Tel:
+	</span>
+	<span style="color:#FAF4E8">
+		{{companyPhone}}
+	</span>
+</div>
 </html>
