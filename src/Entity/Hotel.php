@@ -6,6 +6,8 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiSubresource;
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\ExistsFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter;
 use App\Repository\HotelRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -33,7 +35,9 @@ use Doctrine\ORM\Mapping as ORM;
         // "delete" => ["security" => "is_granted('ROLE_ADMIN') or object.owner == user"],
     ],
 )]
-#[ApiFilter(SearchFilter::class, properties: ['slug' => 'exact', 'id' => 'exact'])]
+#[ApiFilter(SearchFilter::class, properties: ['slug' => 'exact', 'id' => 'exact', 'location.name' => 'exact', 'zones.name' => 'exact', 'channelHotels.code' => 'exact'])]
+#[ApiFilter(ExistsFilter::class, properties: ['channelHotels'])]
+#[ApiFilter(BooleanFilter::class, properties: ['isActive'])]
 class Hotel
 {
     #[ORM\Id]
