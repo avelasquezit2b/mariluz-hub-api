@@ -68,7 +68,7 @@ class BookingController extends AbstractController
                     'totalPrice' => $room->totalPrice,
                     'totalPriceCost' => $room->totalPriceCost,
                     'clientName' => $room->clientName,
-                    'availabilities' => $room->roomType->availabilities                
+                    'availabilities' => $room->roomType->availabilities
                 ];
 
                 if (isset($requestDecode->refId)) {
@@ -89,7 +89,7 @@ class BookingController extends AbstractController
                     ];
 
                     if (isset($value->supplementIndividual)) {
-                        $formattedRoom['clientTypes'][$key]['supplementIndividual'] = $value->supplementIndividual;        
+                        $formattedRoom['clientTypes'][$key]['supplementIndividual'] = $value->supplementIndividual;
                     }
 
                     if (isset($value->discountNumber)) {
@@ -97,7 +97,7 @@ class BookingController extends AbstractController
                         foreach ($value->discountNumber as $discountNumber) {
                             $currentDiscountNumber = [
                                 'active' => true,
-                                'number' => $discountNumber->number,  
+                                'number' => $discountNumber->number,
                                 'percentage' => $discountNumber->percentage
                             ];
                             array_push($discountNumbers, $currentDiscountNumber);
@@ -117,7 +117,7 @@ class BookingController extends AbstractController
                             foreach ($value->discountNumber as $discountNumber) {
                                 $currentDiscountNumber = [
                                     'active' => $discountNumber->active,
-                                    'number' => $discountNumber->number,  
+                                    'number' => $discountNumber->number,
                                     'percentage' => $discountNumber->percentage
                                 ];
                                 array_push($discountNumbers, $currentDiscountNumber);
@@ -238,13 +238,13 @@ class BookingController extends AbstractController
                 $newVoucher = new Voucher();
                 $newVoucher->setToBePaidBy('H-MARILUZ TRAVEL TOUR S.L.');
                 $newVoucher->setBooking($hotelBooking);
-    
+
                 $entityManager->persist($newVoucher);
                 $entityManager->flush();
-    
+
                 $this->send_voucher($newVoucher->getId(), 'all', $mailer, $pdf, $voucherRepository, $configurationRepository, $entityManager);
             }
-            
+
 
             return $this->json([
                 'response'  => $hotelBooking
@@ -291,7 +291,7 @@ class BookingController extends AbstractController
                         } else {
                             throw new BadRequestHttpException('No hay disponibilidad para las fechas seleccionadas');
                         }
-                    } 
+                    }
                 }
                 // array_push($formattedRooms, $formattedRoom);
                 // foreach ($room->roomType->availabilities as $availability) {
@@ -385,8 +385,6 @@ class BookingController extends AbstractController
             $entityManager->flush();
 
             $this->send_voucher($newVoucher->getId(), 'all', $mailer, $pdf, $voucherRepository, $configurationRepository, $entityManager);
-
-
         } catch (SoapFault $e) {
             return $this->json([
                 'response'  => $e
@@ -406,7 +404,7 @@ class BookingController extends AbstractController
                     $hotelAvailability->setQuota($hotelAvailability->getQuota() - 1);
                     $hotelAvailability->setTotalBookings($hotelAvailability->getTotalBookings() + 1);
                     $entityManager->persist($hotelAvailability);
-                }    
+                }
             }
 
             $booking->setStatus('booked');
@@ -427,7 +425,7 @@ class BookingController extends AbstractController
 
         return $this->json([
             'response'  => $booking
-        ]); 
+        ]);
     }
 
     #[Route('/change_to_cancelled/{id}', name: 'api_change_to_cancelled')]
@@ -442,7 +440,7 @@ class BookingController extends AbstractController
                     $hotelAvailability->setQuota($hotelAvailability->getQuota() + 1);
                     $hotelAvailability->setTotalBookings($hotelAvailability->getTotalBookings() - 1);
                     $entityManager->persist($hotelAvailability);
-                }    
+                }
             }
 
             $booking->setStatus('cancelled');
@@ -453,7 +451,7 @@ class BookingController extends AbstractController
 
         return $this->json([
             'response'  => $booking
-        ]); 
+        ]);
     }
 
     #[Route('/change_to_paid/{id}', name: 'api_change_to_paid')]
@@ -471,7 +469,7 @@ class BookingController extends AbstractController
 
         return $this->json([
             'response'  => $booking
-        ]); 
+        ]);
     }
 
     #[Route('/send_thank_you_email/{id}/{destinatary}', name: 'api_send_thank_you_email')]
@@ -509,7 +507,7 @@ class BookingController extends AbstractController
 
     public function send_client_voucher($voucher, $booking, $company, $supplier, MailerInterface $mailer, Pdf $pdf, EntityManagerInterface $entityManager): Response
     {
-        $fileName = 'bono_reserva_'.$booking->getId().'.pdf';
+        $fileName = 'bono_reserva_' . $booking->getId() . '.pdf';
 
         if ($booking->getBookingLines()[0]->getHotel()) {
 
@@ -558,12 +556,21 @@ class BookingController extends AbstractController
 
             // Sending the email with the voucher attachment
 
+            $footer = $this->renderView('document/footer.pdf.twig');
+
+            $options = [
+                'margin-top' => '0mm',
+                'margin-bottom' => '0mm',
+                'margin-right' => '0mm',
+                'margin-left' => '0mm'
+            ];
+
             $email = (new TemplatedEmail())
                 ->from($company->getBookingEmail())
                 ->to($booking->getClient()->getEmail())
                 ->subject('Gracias por tu reserva')
                 ->context($context)
-                ->attach($pdf->getOutputFromHtml($html), $fileName, 'application/pdf')
+                ->attach($pdf->getOutputFromHtml($html, $options), $fileName, 'application/pdf')
                 ->htmlTemplate('email/hotel_thank_you.html.twig');
 
             if ($booking->getStatus() == 'booked') {
@@ -574,10 +581,10 @@ class BookingController extends AbstractController
             }
 
             return $this->json([
-                'response'  => 'send'
+                'response'  => $footer
             ]);
 
-        // ACTIVITY
+            // ACTIVITY
         } else if ($booking->getBookingLines()[0]->getActivity()) {
 
             // Creating the email content
@@ -627,12 +634,20 @@ class BookingController extends AbstractController
 
             // Sending the email with the voucher attachment
 
+            $footer = $this->renderView('AppBundle:documents:footer.pdf.twig');
+
+            $options = [
+                'footer-html' => $footer
+                // 'footer-spacing' => 0
+            ];
+
+
             $email = (new TemplatedEmail())
                 ->from($company->getBookingEmail())
                 ->to($booking->getClient()->getEmail())
                 ->subject('Gracias por tu reserva')
                 ->context($context)
-                ->attach($pdf->getOutputFromHtml($html), $fileName, 'application/pdf')
+                ->attach($pdf->getOutputFromHtml($html, $options), $fileName, 'application/pdf')
                 ->htmlTemplate('email/activity_thank_you.html.twig');
 
             if ($booking->getStatus() == 'booked') {
@@ -643,7 +658,7 @@ class BookingController extends AbstractController
             }
 
             return $this->json([
-                'response'  => 'send'
+                'response'  => $footer
             ]);
         }
     }
@@ -677,7 +692,7 @@ class BookingController extends AbstractController
                 "message" => '<div style="text-align: center; font-size: 16px"><p>Buenos días,</p><p>Adjuntamos nueva reserva.</p><p>Muchas gracias por todo y un cordial saludo,</p></div>'
             ];
 
-            $fileName = 'confirmacion_reserva_'.$booking->getId().'.pdf';
+            $fileName = 'confirmacion_reserva_' . $booking->getId() . '.pdf';
 
             // Creating the twig for the PDF with the booking data
 
@@ -728,7 +743,7 @@ class BookingController extends AbstractController
                 'response'  => 'send'
             ]);
 
-        // ACTIVITY
+            // ACTIVITY
         } else if ($booking->getBookingLines()[0]->getActivity()) {
 
             // Creating the email content
@@ -754,7 +769,7 @@ class BookingController extends AbstractController
                 'companyPhone' => $company->getPhone(),
                 "message" => '<div style="text-align: center; font-size: 16px"><p>Buenos días,</p><p>Adjuntamos nueva reserva.</p><p>Muchas gracias por todo y un cordial saludo,</p></div>'
             ];
-            $fileName = 'confirmacion_reserva_'.$booking->getId().'.pdf';
+            $fileName = 'confirmacion_reserva_' . $booking->getId() . '.pdf';
 
             // Creating the twig for the PDF with the booking data
 
@@ -823,7 +838,7 @@ class BookingController extends AbstractController
         return $this->json([
             'response'  => $voucher
         ]);
-    }   
+    }
 
     #[Route('/send_transfer/{id}', name: 'api_send_transfer')]
     public function sendTransfer(int $id, MailerInterface $mailer, BookingRepository $bookingRepository, ConfigurationRepository $configurationRepository): Response
@@ -831,7 +846,7 @@ class BookingController extends AbstractController
         $booking = $bookingRepository->find($id);
         $company = $configurationRepository->find(1);
         $product = $booking->getBookingLines()[0]->getHotel() ? $booking->getBookingLines()[0]->getHotel() : $booking->getBookingLines()[0]->getActivity();
-        
+
         $dayToPayAux = new \DateTime($booking->getCreatedAt());
         $lastDayToPayAux = new \DateTime($booking->getBookingLines()[0]->getCheckIn());
         if ($product->getDaysToPayBeforeStay()) {
@@ -852,7 +867,7 @@ class BookingController extends AbstractController
             $dayToPay = $lastDayToPay;
         }
 
-        
+
         $context = [
             // "name" => $booking->getName(),
             // "bookingEmail" => $booking->getEmail(),
@@ -874,12 +889,12 @@ class BookingController extends AbstractController
             'companyPhone' => $company->getPhone(),
             "message" => '<div style="font-size: 16px">
             <p>Buenos días,</p>
-            <p>Le informamos que hemos recibido su reserva correctamente. Para tramitar el pago por transferencia antes del <strong>'. $dayToPay .'</strong>, le adjuntamos nuestros datos bancarios, o bien llamar al 971 425 110 si desean realizar el pago con tarjeta.</p>
-            <p>Agradeceríamos indicarán el número de reserva <strong>'. $booking->getId() .'</strong> en el concepto del ingreso.</p>
-            <p style="text-align: center">Total a pagar: <strong>'.$booking->getTotalPrice().'€</strong></p>
+            <p>Le informamos que hemos recibido su reserva correctamente. Para tramitar el pago por transferencia antes del <strong>' . $dayToPay . '</strong>, le adjuntamos nuestros datos bancarios, o bien llamar al 971 425 110 si desean realizar el pago con tarjeta.</p>
+            <p>Agradeceríamos indicarán el número de reserva <strong>' . $booking->getId() . '</strong> en el concepto del ingreso.</p>
+            <p style="text-align: center">Total a pagar: <strong>' . $booking->getTotalPrice() . '€</strong></p>
             <p>Esta reserva puede estar sujeta a tasas locales o municipales que no están incluidas en el precio y pueden variar sin previo aviso, el importe de dichas tasas deberá abonarse directamente en el establecimiento.</p>
-            <p style="text-align: center">Nº cuenta Caixa Bank: <strong>'.$company->getAccount().'</strong></p>
-            <p style="font-size: 14px; font-weight: bold">En caso de que el importe de la reserva no sea abonado antes del <strong>'. $lastDayToPay .'</strong>, la reserva quedará anulada automáticamente.</p>
+            <p style="text-align: center">Nº cuenta Caixa Bank: <strong>' . $company->getAccount() . '</strong></p>
+            <p style="font-size: 14px; font-weight: bold">En caso de que el importe de la reserva no sea abonado antes del <strong>' . $lastDayToPay . '</strong>, la reserva quedará anulada automáticamente.</p>
             <p>Una vez recibido el pago, le enviaremos por esta misma vía el bono de servicios que debe presentar al hotel.</p>
             <p>Quedamos a su disposición para cualquier duda o consulta.</p>
             <p>Muchas gracias por reservar con nosotros y un cordial saludo,</p></div>'
@@ -898,6 +913,5 @@ class BookingController extends AbstractController
         return $this->json([
             'response'  => 'send'
         ]);
-    }    
-
+    }
 }

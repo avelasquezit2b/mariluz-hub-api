@@ -88,4 +88,20 @@ class EmailController extends AbstractController
             'email'  => $email
         ]);
     }
+
+    #[Route('/testEmail')]
+    public function sendTestEmail(MailerInterface $mailer): Response
+    {
+        $email = (new TemplatedEmail())
+            ->from('reservas@mariluztravel.es')
+            ->to('adriarias@it2b.es')
+            ->subject('TEST EMAIL')
+            ->htmlTemplate('email/on_request_to_client.html.twig');
+
+        $mailer->send($email);
+
+        return $this->json([
+            'email'  => $email
+        ]);
+    }
 }

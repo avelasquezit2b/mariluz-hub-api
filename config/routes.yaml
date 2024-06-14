@@ -50,3 +50,8 @@ api_import_hotels:
   path: '/import_hotels'
   methods:  [POST]
   controller: App\Controller\IntegrationController::importHotels
+
+api_test_email:
+  path: '/testEmail'
+  methods:  [POST]
+  controller: App\Controller\EmailController::sendTestEmail
