@@ -30,20 +30,20 @@ class EmailController extends AbstractController
 
         $customerEmail = (new TemplatedEmail())
             ->from($company->getBookingEmail())
-            ->to('avelasquez@it2b.es')
+            ->to($request->email)
             ->subject($customerEmailSubject)
             ->context([
-                "email" => $request->email,
+                "userEmail" => $request->email,
                 "name" => $request->name,
                 "phone" => $request->phone,
                 "message" => $request->message,
-                "productName" => $request->product
+                "product" => $request->product
             ])
             ->htmlTemplate('email/on_request_to_client.html.twig');
 
         $email = (new TemplatedEmail())
             ->from($company->getBookingEmail())
-            ->to('avelasquez@it2b.es')
+            ->to('adriarias@it2b.es')
             //->cc('cc@example.com')
             //->bcc('bcc@example.com')
             //->replyTo('fabien@example.com')
