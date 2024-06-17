@@ -571,7 +571,7 @@ class BookingController extends AbstractController
                 ->subject('Gracias por tu reserva')
                 ->context($context)
                 ->attach($pdf->getOutputFromHtml($html, $options), $fileName, 'application/pdf')
-                ->htmlTemplate('email/hotel_thank_you.html.twig');
+                ->htmlTemplate('email/hotel_new_thank_you.html.twig');
 
             if ($booking->getStatus() == 'booked') {
                 $mailer->send($email);
