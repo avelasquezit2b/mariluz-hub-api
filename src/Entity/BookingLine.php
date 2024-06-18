@@ -33,39 +33,39 @@ class BookingLine
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['booking', 'bookingReduced', 'bookingLineReduced', 'bookingLine'])]
+    #[Groups(['booking', 'bookingReduced', 'bookingLineReduced', 'bookingLine', 'tickets'])]
     private ?int $id = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
-    #[Groups(['bookingLineReduced', 'bookingLine', 'booking', 'bookingReduced', 'voucherReduced', 'voucher'])]
+    #[Groups(['bookingLineReduced', 'bookingLine', 'booking', 'bookingReduced', 'voucherReduced', 'voucher', 'tickets'])]
     private ?\DateTimeInterface $checkIn = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
-    #[Groups(['bookingLineReduced', 'bookingLine', 'booking', 'bookingReduced', 'voucherReduced', 'voucher'])]
+    #[Groups(['bookingLineReduced', 'bookingLine', 'booking', 'bookingReduced', 'voucherReduced', 'voucher', 'tickets'])]
     private ?\DateTimeInterface $checkOut = null;
 
     #[ORM\Column(length: 25)]
-    #[Groups(['bookingLineReduced', 'bookingLine', 'booking', 'voucherReduced', 'voucher'])]
+    #[Groups(['bookingLineReduced', 'bookingLine', 'booking', 'voucherReduced', 'voucher', 'tickets'])]
     private ?string $totalPrice = null;
 
     #[ORM\Column(type: Types::ARRAY, nullable: true)]
-    #[Groups(['bookingLineReduced', 'bookingLine', 'booking', 'voucherReduced', 'voucher'])]
+    #[Groups(['bookingLineReduced', 'bookingLine', 'booking', 'voucherReduced', 'voucher', 'tickets'])]
     private ?array $data = null;
 
     #[ORM\ManyToOne(inversedBy: 'bookingLines')]
-    #[Groups(['bookingLineReduced', 'bookingLine', 'booking', 'bookingReduced', 'voucherReduced', 'voucher'])]
+    #[Groups(['bookingLineReduced', 'bookingLine', 'booking', 'bookingReduced', 'voucherReduced', 'voucher', 'tickets'])]
     private ?Hotel $hotel = null;
 
     #[ORM\ManyToOne(inversedBy: 'bookingLines')]
-    #[Groups(['bookingLineReduced', 'bookingLine', 'booking', 'bookingReduced', 'voucherReduced', 'voucher'])]
+    #[Groups(['bookingLineReduced', 'bookingLine', 'booking', 'bookingReduced', 'voucherReduced', 'voucher', 'tickets'])]
     private ?Activity $activity = null;
 
     #[ORM\ManyToOne(inversedBy: 'bookingLines')]
-    #[Groups(['bookingLineReduced', 'bookingLine', 'booking', 'voucherReduced', 'voucher'])]
+    #[Groups(['bookingLineReduced', 'bookingLine', 'booking', 'voucherReduced', 'voucher', 'tickets'])]
     private ?Booking $booking = null;
 
     #[ORM\Column(length: 25, nullable: true)]
-    #[Groups(['bookingLineReduced', 'bookingLine', 'booking', 'voucherReduced', 'voucher'])]
+    #[Groups(['bookingLineReduced', 'bookingLine', 'booking', 'voucherReduced', 'voucher', 'tickets'])]
     private ?string $totalPriceCost = null;
 
     public function getId(): ?int
