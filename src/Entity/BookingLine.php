@@ -49,7 +49,7 @@ class BookingLine
     private ?string $totalPrice = null;
 
     #[ORM\Column(type: Types::ARRAY, nullable: true)]
-    #[Groups(['bookingLineReduced', 'bookingLine', 'booking', 'voucherReduced', 'voucher', 'tickets'])]
+    #[Groups(['bookingLineReduced', 'bookingLine', 'booking', 'bookingReduced', 'voucherReduced', 'voucher', 'tickets'])]
     private ?array $data = null;
 
     #[ORM\ManyToOne(inversedBy: 'bookingLines')]

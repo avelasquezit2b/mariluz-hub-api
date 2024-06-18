@@ -41,7 +41,7 @@ class ActivityPrice
     private ?string $price = null;
 
     #[ORM\Column(length: 50, nullable: true)]
-    #[Groups(['activityPriceReduced', 'activityPrice', 'activityFeeReduced'])]
+    #[Groups(['activityPriceReduced', 'activityPrice', 'activityFeeReduced', 'activityAvailability'])]
     private ?string $cost = null;
 
     #[ORM\Column(nullable: true)]

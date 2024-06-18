@@ -59,6 +59,10 @@ class Module
     #[Groups(['moduleReduced', 'module', 'page'])]
     private ?string $type = null;
 
+    #[ORM\OneToOne(mappedBy: 'module', cascade: ['persist', 'remove'])]
+    #[Groups(['moduleReduced', 'module', 'page'])]
+    private ?AboutUsModule $aboutUsModule = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -144,6 +148,28 @@ class Module
     public function setType(?string $type): static
     {
         $this->type = $type;
+
+        return $this;
+    }
+
+    public function getAboutUsModule(): ?AboutUsModule
+    {
+        return $this->aboutUsModule;
+    }
+
+    public function setAboutUsModule(?AboutUsModule $aboutUsModule): static
+    {
+        // unset the owning side of the relation if necessary
+        if ($aboutUsModule === null && $this->aboutUsModule !== null) {
+            $this->aboutUsModule->setModule(null);
+        }
+
+        // set the owning side of the relation if necessary
+        if ($aboutUsModule !== null && $aboutUsModule->getModule() !== $this) {
+            $aboutUsModule->setModule($this);
+        }
+
+        $this->aboutUsModule = $aboutUsModule;
 
         return $this;
     }

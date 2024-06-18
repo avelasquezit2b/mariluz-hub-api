@@ -30,10 +30,10 @@ class AvailabilityController extends AbstractController
 
         foreach ($requestDecode->season->ranges as $range) {
             $currentDate = strtotime($range->startDate);
-            // $currentDate = strtotime('+1 day', $currentDate);
+            $currentDate = strtotime('+1 day', $currentDate);
 
             $endDate = strtotime($range->endDate);
-            // $endDate = strtotime('+1 day', $endDate);
+            $endDate = strtotime('+1 day', $endDate);
 
             while ($currentDate <= $endDate) {
                 $currentDayOfWeek = date('N', $currentDate);
@@ -69,10 +69,10 @@ class AvailabilityController extends AbstractController
 
         foreach ($requestDecode->season->ranges as $range) {
             $currentDate = strtotime($range->startDate);
-            // $currentDate = strtotime('+1 day', $currentDate);
+            $currentDate = strtotime('+1 day', $currentDate);
 
             $endDate = strtotime($range->endDate);
-            // $endDate = strtotime('+1 day', $endDate);
+            $endDate = strtotime('+1 day', $endDate);
 
             while ($currentDate <= $endDate) {        
                 $hotelAvailability = new HotelAvailability();

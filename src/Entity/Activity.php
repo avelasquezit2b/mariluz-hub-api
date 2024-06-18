@@ -41,19 +41,19 @@ class Activity
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['activityReduced', 'activity', 'supplierReduced', 'supplier', 'activityAvailabilityReduced'])]
+    #[Groups(['activityReduced', 'activity', 'supplierReduced', 'supplier', 'activityAvailabilityReduced', 'theme'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['activityReduced', 'activity', 'supplierReduced', 'supplier', 'pack', 'page', 'productList', 'booking', 'bookingReduced'])]
+    #[Groups(['activityReduced', 'activity', 'supplierReduced', 'supplier', 'pack', 'page', 'productList', 'booking', 'bookingReduced', 'theme'])]
     private ?string $title = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['activityReduced', 'activity', 'page', 'productList'])]
+    #[Groups(['activityReduced', 'activity', 'page', 'productList', 'theme'])]
     private ?string $slug = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['activityReduced', 'activity', 'page', 'productList'])]
+    #[Groups(['activityReduced', 'activity', 'page', 'productList', 'theme'])]
     private ?string $shortDescription = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
@@ -114,7 +114,7 @@ class Activity
     private Collection $activityFees;
 
     #[ORM\OneToMany(mappedBy: 'activity', targetEntity: MediaObject::class, cascade: ['remove'])]
-    #[Groups(['activityReduced', 'activity', 'page', 'productList', 'booking'])]
+    #[Groups(['activityReduced', 'activity', 'page', 'productList', 'booking', 'theme'])]
     #[ORM\OrderBy(["position" => "ASC"])]
     #[ApiSubresource]
     private Collection $media;
@@ -160,11 +160,11 @@ class Activity
     private ?string $vennturId = null;
 
     #[ORM\ManyToOne(inversedBy: 'activities', cascade: ['persist'])]
-    #[Groups(['activityReduced', 'activity', 'page', 'productList', 'booking'])]
+    #[Groups(['activityReduced', 'activity', 'page', 'productList', 'booking', 'theme'])]
     private ?Location $location = null;
 
     #[ORM\ManyToMany(targetEntity: Zone::class, inversedBy: 'activities')]
-    #[Groups(['activityReduced', 'activity', 'page', 'productList', 'booking'])]
+    #[Groups(['activityReduced', 'activity', 'page', 'productList', 'booking', 'theme'])]
     private Collection $zones;
 
     #[ORM\ManyToMany(targetEntity: ProductListModule::class, mappedBy: 'activities')]
@@ -178,7 +178,7 @@ class Activity
     #[ORM\ManyToMany(targetEntity: ItineraryDay::class, mappedBy: 'activities')]
     private Collection $itineraryDays;
 
-    #[Groups(['activityReduced', 'activity', 'page', 'productList'])]
+    #[Groups(['activityReduced', 'activity', 'page', 'productList', 'theme'])]
     private $price;
 
     #[Groups(['activityReduced', 'activity', 'page', 'productList'])]
@@ -191,7 +191,7 @@ class Activity
     private Collection $packPrices;
 
     #[ORM\ManyToOne(inversedBy: 'activities')]
-    #[Groups(['activityReduced', 'activity', 'page', 'productList'])]
+    #[Groups(['activityReduced', 'activity', 'page', 'productList', 'theme'])]
     private ?ProductTag $productTag = null;
 
     #[ORM\OneToMany(mappedBy: 'activity', targetEntity: BookingLine::class)]
@@ -219,6 +219,14 @@ class Activity
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     #[Groups(['activityReduced', 'activity'])]
     private ?string $internalNotes = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['activity'])]
+    private ?string $bookingEmail = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['activityReduced', 'activity', 'page', 'productList', 'theme'])]
+    private ?string $promoTag = null;
 
     // #[ORM\Column(length: 25, nullable: true)]
     // private ?string $price = null;
@@ -996,6 +1004,30 @@ class Activity
     public function setInternalNotes(?string $internalNotes): static
     {
         $this->internalNotes = $internalNotes;
+
+        return $this;
+    }
+
+    public function getBookingEmail(): ?string
+    {
+        return $this->bookingEmail;
+    }
+
+    public function setBookingEmail(?string $bookingEmail): static
+    {
+        $this->bookingEmail = $bookingEmail;
+
+        return $this;
+    }
+
+    public function getPromoTag(): ?string
+    {
+        return $this->promoTag;
+    }
+
+    public function setPromoTag(?string $promoTag): static
+    {
+        $this->promoTag = $promoTag;
 
         return $this;
     }

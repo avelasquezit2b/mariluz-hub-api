@@ -43,6 +43,7 @@ class ThemeListModule
 
     #[ORM\ManyToMany(targetEntity: Theme::class, inversedBy: 'themeListModules')]
     #[Groups(['themeListModuleReduced', 'themeListModule', 'page'])]
+    #[ORM\OrderBy(["position" => "ASC"])]
     private Collection $themes;
 
     #[ORM\OneToOne(mappedBy: 'themeListModule', cascade: ['persist', 'remove'])]

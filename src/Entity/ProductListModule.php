@@ -72,6 +72,10 @@ class ProductListModule
     #[Groups(['productListReduced', 'productList', 'page'])]
     private ?string $slug = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['productListReduced', 'productList', 'page'])]
+    private ?string $icon = null;
+
     public function __construct()
     {
         $this->hotels = new ArrayCollection();
@@ -238,6 +242,18 @@ class ProductListModule
     public function setSlug(?string $slug): static
     {
         $this->slug = $slug;
+
+        return $this;
+    }
+
+    public function getIcon(): ?string
+    {
+        return $this->icon;
+    }
+
+    public function setIcon(?string $icon): static
+    {
+        $this->icon = $icon;
 
         return $this;
     }

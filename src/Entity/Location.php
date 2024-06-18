@@ -39,7 +39,7 @@ class Location
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['locationReduced', 'location', 'activityReduced', 'activity', 'hotelReduced', 'hotel', 'packReduced', 'pack', 'extra', 'page', 'productList', 'booking'])]
+    #[Groups(['locationReduced', 'location', 'activityReduced', 'activity', 'hotelReduced', 'hotel', 'packReduced', 'pack', 'extra', 'page', 'productList', 'booking', 'theme'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 50, nullable: true)]
