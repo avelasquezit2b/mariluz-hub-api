@@ -12,7 +12,7 @@
 </style>
 </head>
 <body>
-    <div class="content" style="padding-top: 50px;font-size: 16px">
+    <div class="content" style="padding-top: 50px;font-size:16px">
 		<table width="100%" style="max-width: 595px;margin: 0 auto;">
 			<tbody>
 				<tr class="spaceUnder">
@@ -37,7 +37,7 @@
 				<tr>
 					<td style="text-align:center;padding-bottom: 36px;">
 						<span style="font-family: 'Playfair Display';font-size: 20px;color: #73B499">
-                            Aquí tienes los datos más importantes de tu reserva:
+                            Aquí tienes los datos más importantes de tu actividad:
                         </span>
 					</td>
 				</tr>
@@ -57,7 +57,7 @@
                                                     <span style="font-weight: bold;color: #8B8B8B;">{{name}}</span>
                                                 </div>
                                                 <div style="padding-bottom: .5rem;">
-                                                    <span style="font-weight: bold;color: #73B499">Hotel:</span>
+                                                    <span style="font-weight: bold;color: #73B499">Actividad:</span>
                                                     <span style="font-weight: bold;color: #8B8B8B">{{product.title}}</span>
                                                 </div>
                                             </div>
@@ -88,7 +88,7 @@
                 <tr>
                     <td style="text-align:center">
                         <span style="font-family: 'Playfair Display';font-size: 20px;font-family: 'Playfair Display';color:#73b499">
-                            Tu reserva del {{startDate}} al {{endDate}}:
+                            Tu actividad del día {{startDate}} a las {{time}}
                         </span>
                     </td>
                 </tr>
@@ -99,62 +99,27 @@
                         </span>
                     </td>
                 </tr>
-                {% for room in rooms %}
                 <tr>
                     <td style="padding-bottom: 20px;">
                         <div class="table" style="height:100%;width:100%;font-family: 'Roboto'">
                             <div class="table-header" style="color: #fff;background-color: #73B499;padding: 8px 20px;">
-                                <span style="font-weight: bold;color:#fff">Habitación {{loop.index}}:</span>
+                                <span style="font-weight: bold;color:#fff">Detalles:</span>
                             </div>
                             <div style="background-color: #F4F3F2;padding: 15px 20px 24px 20px;">
                                 <div style="padding-bottom: .5rem;">
-                                    <span style="font-weight: bold;color: #73B499">Tipo de habitación:</span>
-                                    <span style="font-weight: bold;color: #8B8B8B;">{{room.roomType.name}}</span>
+                                    <span style="font-weight: bold;color: #73B499">Tipo de modalidad:</span>
+                                    <span style="font-weight: bold;color: #8B8B8B;">{{modality}}</span>
                                 </div>
-                                <div style="padding-bottom: .5rem;">
-                                    <span style="font-weight: bold;color: #73B499">Adultos</span>
-                                    <span style="font-weight: bold;color: #8B8B8B;">{{room.clientTypes.adults.quantity}}</span>
-                                </div>
-                                <div style="padding-bottom: .5rem;">
-                                    <span style="font-weight: bold;color: #73B499">Niños</span>
-                                    <span style="font-weight: bold;color: #8B8B8B;">{{room.clientTypes.kids.quantity}}</span>
-                                </div>
-                                <div>
-                                    <span style="font-weight: bold;color: #73B499">Bebés</span>
-                                    <span style="font-weight: bold;color: #8B8B8B;">{{room.clientTypes.babies.quantity}}</span>
-                                </div>
+                                {% for clientType in clientTypes %}
+                                    <div style="padding-bottom: .5rem;">
+                                        <span style="font-weight: bold;color: #73B499">{{clientType.clientType}}s:</span>
+                                        <span style="font-weight: bold;color: #8B8B8B;">{{clientType.quantity}}</span>
+                                    </div>
+                                {% endfor %}
                             </div>
                         </div>
                     </td>
                 </tr>
-                {% endfor %}
-                {# <tr>
-                    <td style="padding-bottom: 20px;">
-                        <div class="table" style="height:100%;width:100%;font-family: 'Roboto'">
-                            <div class="table-header" style="color: #fff;background-color: #73B499;padding: 8px 20px;">
-                                <span style="font-weight: bold;color:#fff">Habitación 2:</span>
-                            </div>
-                            <div style="background-color: #F4F3F2;padding: 15px 20px 24px 20px;">
-                                <div style="padding-bottom: .5rem;">
-                                    <span style="font-weight: bold;color: #73B499">Tipo de habitación:</span>
-                                    <span style="font-weight: bold;color: #8B8B8B;">Doble</span>
-                                </div>
-                                <div style="padding-bottom: .5rem;">
-                                    <span style="font-weight: bold;color: #73B499">Adultos</span>
-                                    <span style="font-weight: bold;color: #8B8B8B;">2</span>
-                                </div>
-                                <div style="padding-bottom: .5rem;">
-                                    <span style="font-weight: bold;color: #73B499">Niños</span>
-                                    <span style="font-weight: bold;color: #8B8B8B;">0</span>
-                                </div>
-                                <div>
-                                    <span style="font-weight: bold;color: #73B499">Bebés</span>
-                                    <span style="font-weight: bold;color: #8B8B8B;">0</span>
-                                </div>
-                            </div>
-                        </div>
-                    </td>
-                </tr> #}
                 <tr>
                     <td style="font-family: 'Roboto Condensed';text-align: end">
                         <span style="color: #FF926F;font-size: 14px;">Total:</span>
@@ -165,7 +130,7 @@
                         <span style="color: #FF926F;font-size: 30px;">{{totalPrice}} €</span>
                     </td>
                 </tr>
-                {# <tr>
+                <!-- <tr>
                     <td style="text-align:center;padding-bottom: 20px;font-family: 'Playfair Display'">
                         <span style="color: #73B499;font-size: 20px;">Y aquí tienes los nuestros para poder efectuar el pago:</span>
                     </td>
@@ -178,11 +143,11 @@
                             </div>
                             <div style="height: 82px;background-color: #F4F3F2;padding: 15px 20px 17px 20px;">
                                 <div style="padding-bottom: 1rem;">
-                                    <span style="color: #8B8B8B"><span style="font-weight: bold;">Nº cuenta Caixa Bank:</span> ES18 2100 8122 8313 0049 0357</span>
+                                    <span style="font-weight: bold;color: #8B8B8B">Nº cuenta Caixa Bank: ES18 2100 8122 8313 0049 0357</span>
                                 </div>
                                 <div>
-                                    <span style="color: #8B8B8B">Acuérdate de <span style="font-weight: bold">indicar tu número de reserva 34393 en el concepto del ingreso</span> y de realizar un <span style="font-weight: bold">pago único por reserva.
-                                    </span></span>
+                                    <span style="font-weight: bold;color: #8B8B8B">Acuérdate de indicar tu número de reserva 34393 en el concepto del ingreso y de realizar un pago único por reserva.
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -196,12 +161,12 @@
                             </div>
                             <div style="height: 26px;background-color: #F4F3F2;padding: 15px 20px 10px 20px;">
                                 <div style="padding-bottom: 1rem;">
-                                    <span style="color: #8B8B8B"><span style="font-weight: bold">Llamando al:</span> 971 425 110</span>
+                                    <span style="font-weight: bold;color: #8B8B8B">Llamando al: 971 425 110</span>
                                 </div>
                             </div>
                         </div>
                     </td>
-                </tr> #}
+                </tr> -->
                 <tr>
                     <td style="padding-bottom: 14px;font-family: 'Playfair Display'">
                         <span style="color: #73B499;font-size: 20px;">Algunas cosas importantes:</span>
@@ -210,14 +175,14 @@
                 <tr>
                     <td>
                         <div>
-                            <span style="font-family: 'Roboto';font-weight: bold;color: #73B499">Tasas locales:</span>
+                            <span style="font-family: 'Roboto';font-weight: bold;color: #73B499;font-size: 16px;">Tasas locales:</span>
                         </div>
                     </td>
                 </tr>
                 <tr>
                     <td style="padding-bottom: 1rem;">
                         <div>
-                            <span style="font-family: 'Roboto';color: #8B8B8B;">A veces, las reservas pueden estar sujetas a <span style="font-weight: bold">impuestos y/o tasas locales</span> que <span style="font-weight: bold">no están incluidas en el precio</span> porque no se gestionan a través de Mariluz.
+                            <span style="font-family: 'Roboto';color: #8B8B8B;font-size: 16px;">A veces, las reservas pueden estar sujetas a <span style="font-weight: bold;">impuestos y/o tasas locales</span> que <span style="font-weight: bold;">no están incluidas en el precio</span> porque no se gestionan a través de Mariluz.
                                 Estas tasas son obligatorias, pueden variar y tendrás que abonarlas directamente en el establecimiento.
                                 </span>
                         </div>
@@ -226,14 +191,14 @@
                 <tr>
                     <td>
                         <div>
-                            <span style="font-family: 'Roboto';font-weight: bold;color: #73B499">Anulación reserva:</span>
+                            <span style="font-family: 'Roboto';font-weight: bold;color: #73B499;font-size: 16px;">Anulación reserva:</span>
                         </div>
                     </td>
                 </tr>
                 <tr>
                     <td style="padding-bottom: 54px;">
                         <div>
-                            <span style="font-family: 'Roboto';color: #8B8B8B;">Nunca, nunca, nunca anularemos tu reserva sin haber hablado contigo, así que te agradecemos que, en el caso de necesitar cancelarla, nos lo comuniques lo antes posible. Así, evitarás los <span style="font-weight: bold">gastos de cancelación</span> asociados y liberarás tus plazas para que otros puedan disfrutarlas.</span>
+                            <span style="font-family: 'Roboto';color: #8B8B8B;font-size: 16px;">Nunca, nunca, nunca anularemos tu reserva sin haber hablado contigo, así que te agradecemos que, en el caso de necesitar cancelarla, nos lo comuniques lo antes posible. Así, evitarás los <span style="font-weight: bold;">gastos de cancelación</span> asociados y liberarás tus plazas para que otros puedan disfrutarlas.</span>
                         </div>
                     </td>
                 </tr>
@@ -245,20 +210,20 @@
                 <tr>
                     <td style="padding-bottom: 1rem;">
                         <div>
-                            <span style="font-family: 'Roboto';color: #8B8B8B;">Nos encantará recibir una <span style="font-weight: bold">nota de voz con tu opinión</span> sobre la estancia, el hotel, el bufé de desayuno, las almohadas de la cama, las toallas… ¡o lo que quieras contarnos!</span>
+                            <span style="font-family: 'Roboto';color: #8B8B8B;font-size: 16px;">Nos encantará recibir una <span style="font-weight: bold;">nota de voz con tu opinión</span> sobre la excursión, el bosque, los bocadillos, los kayaks, las tirolinas… ¡o lo que quieras contarnos!</span>
                         </div>
                     </td>
                 </tr>
                 <tr>
                     <td style="padding-bottom: 54px;">
                         <div>
-                            <span style="font-family: 'Roboto';color: #8B8B8B;">Puedes hacerlo al <span style="text-decoration: underline;font-weight:bold">whatsapp de Mariluz: 633 574 411</span></span>
+                            <span style="font-family: 'Roboto';color: #8B8B8B;font-size: 16px;">Puedes hacerlo al <span style="font-weight: bold;text-decoration:underline">whatsapp de Mariluz: 633 574 411</span></span>
                         </div>
                     </td>
                 </tr>
                 <tr>
                     <td style="padding-bottom: 14px;font-family: 'Playfair Display'">
-                        <span style="color: #73B499;font-size: 20px;">Gracias por <span style="font-weight: bold">no-viajar</span> con nosotros.</span>
+                        <span style="color: #73B499;font-size: 20px;">Gracias por <span style="font-weight:bold">no-viajar</span> con nosotros.</span>
                     </td>
                 </tr>
             </tbody>
