@@ -522,9 +522,9 @@ class BookingController extends AbstractController
                 "rooms" => $booking->getBookingLines()[0]->getData(),
                 "totalPrice" => $booking->getTotalPrice(),
                 "paymentMethod" => $booking->getPaymentMethod(),
-                "date" => $booking->getCreatedAt(),
-                "startDate" => $booking->getBookingLines()[0]->getCheckIn(),
-                "endDate" => $booking->getBookingLines()[0]->getCheckOut(),
+                "date" => str_replace('-', '/', $booking->getCreatedAt()),
+                "startDate" => str_replace('-', '/', $booking->getBookingLines()[0]->getCheckIn()),
+                "endDate" => str_replace('-', '/', $booking->getBookingLines()[0]->getCheckOut()),
             ];
 
             // Creating the twig for the PDF with the booking data
@@ -538,8 +538,8 @@ class BookingController extends AbstractController
                 'bookingId' => $booking->getId(),
                 'bookingDate' => $booking->getCreatedAt(),
                 'clientName' => $booking->getName(),
-                'checkIn' => $booking->getBookingLines()[0]->getCheckIn(),
-                'checkOut' => $booking->getBookingLines()[0]->getCheckOut(),
+                'checkIn' => str_replace('-', '/', $booking->getBookingLines()[0]->getCheckIn()),
+                'checkOut' => str_replace('-', '/', $booking->getBookingLines()[0]->getCheckOut()),
                 "rooms" => $booking->getBookingLines()[0]->getData(),
                 "observations" => $voucher->getObservations(),
                 'companyName' => $company->getTitle(),
@@ -597,9 +597,12 @@ class BookingController extends AbstractController
                 "product" => $booking->getBookingLines()[0]->getActivity(),
                 "totalPrice" => $booking->getTotalPrice(),
                 "paymentMethod" => $booking->getPaymentMethod(),
-                "date" => date("d-m-Y"),
-                "startDate" => $booking->getBookingLines()[0]->getCheckIn(),
-                "endDate" => $booking->getBookingLines()[0]->getCheckOut(),
+                "date" => date("d/m/Y"),
+                "time" => $booking->getBookingLines()[0]->getData()['schedule'],
+                "clientTypes" => $booking->getBookingLines()[0]->getData()['clientTypes'],
+                "modality" => $booking->getBookingLines()[0]->getData()['modality'],
+                "startDate" => str_replace('-', '/', $booking->getBookingLines()[0]->getCheckIn()),
+                "endDate" => str_replace('-', '/', $booking->getBookingLines()[0]->getCheckOut()),
             ];
             // Creating the twig for the PDF with the booking data
             $quantity = 0;
@@ -613,14 +616,14 @@ class BookingController extends AbstractController
                 'productZone' => $voucher->getBooking()->getBookingLines()[0]->getActivity()->getZones()[0]->getName(),
                 'productLocation' => $voucher->getBooking()->getBookingLines()[0]->getActivity()->getLocation()->getName(),
                 'bookingId' => $voucher->getBooking()->getId(),
-                'bookingDate' => date("d-m-Y"),
+                'bookingDate' => date("d/m/Y"),
                 'clientName' => $voucher->getBooking()->getName(),
                 'modality' => $voucher->getBooking()->getBookingLines()[0]->getData()['modality'],
                 'schedule' => $voucher->getBooking()->getBookingLines()[0]->getData()['schedule'],
                 'quantity' => $quantity,
                 "observations" => $booking->getObservations(),
-                'checkIn' => $voucher->getBooking()->getBookingLines()[0]->getCheckIn(),
-                'checkOut' => $voucher->getBooking()->getBookingLines()[0]->getCheckOut(),
+                'checkIn' => str_replace('-', '/', $voucher->getBooking()->getBookingLines()[0]->getCheckIn()),
+                'checkOut' => str_replace('-', '/', $voucher->getBooking()->getBookingLines()[0]->getCheckOut()),
                 'companyName' => $company->getTitle(),
                 'companyCif' => $company->getCif(),
                 'companyAddress' => $company->getTitle(),
@@ -634,13 +637,14 @@ class BookingController extends AbstractController
 
             // Sending the email with the voucher attachment
 
-            $footer = $this->renderView('AppBundle:documents:footer.pdf.twig');
+            $footer = $this->renderView('document/footer.pdf.twig');
 
             $options = [
-                'footer-html' => $footer
-                // 'footer-spacing' => 0
+                'margin-top' => '0mm',
+                'margin-bottom' => '0mm',
+                'margin-right' => '0mm',
+                'margin-left' => '0mm'
             ];
-
 
             $email = (new TemplatedEmail())
                 ->from($company->getBookingEmail())
@@ -648,7 +652,7 @@ class BookingController extends AbstractController
                 ->subject('Gracias por tu reserva')
                 ->context($context)
                 ->attach($pdf->getOutputFromHtml($html, $options), $fileName, 'application/pdf')
-                ->htmlTemplate('email/activity_thank_you.html.twig');
+                ->htmlTemplate('email/activity_new_thank_you.html.twig');
 
             if ($booking->getStatus() == 'booked') {
                 $mailer->send($email);
