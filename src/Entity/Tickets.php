@@ -6,6 +6,12 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\TicketsRepository;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Doctrine\ORM\Mapping as ORM;
+use ApiPlatform\Core\Annotation\ApiFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\DateFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\RangeFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter;
 
 #[ORM\Entity(repositoryClass: TicketsRepository::class)]
 #[ApiResource(
@@ -15,8 +21,15 @@ use Doctrine\ORM\Mapping as ORM;
         ],
         'put',
         'delete'
-    ]
+    ],
+    collectionOperations: [
+        "get" => ["normalization_context" => ["groups" => "tickets"]],
+        "post"
+    ],
 )]
+
+#[ApiFilter(SearchFilter::class, properties: ['booking.id' => 'exact'])]
+
 class Tickets
 {
     #[ORM\Id]

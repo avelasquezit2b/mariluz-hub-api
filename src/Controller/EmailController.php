@@ -22,13 +22,28 @@ class EmailController extends AbstractController
 
         if ($request->product) {
             $emailSubject = ($request->isDatesRequest ? 'Petición fechas en: ' : 'Dudas sobre: ') . $request->product;
+            $customerEmailSubject = $emailSubject;
         } else {
             $emailSubject = 'Hemos recibido un mensaje!';
+            $customerEmailSubject = 'Hemos recibido tu mensaje!';
         }
+
+        $customerEmail = (new TemplatedEmail())
+            ->from($company->getBookingEmail())
+            ->to($request->email)
+            ->subject($customerEmailSubject)
+            ->context([
+                "userEmail" => $request->email,
+                "name" => $request->name,
+                "phone" => $request->phone,
+                "message" => $request->message,
+                "product" => $request->product
+            ])
+            ->htmlTemplate('email/on_request_to_client.html.twig');
 
         $email = (new TemplatedEmail())
             ->from($company->getBookingEmail())
-            ->to('avelasquez@it2b.es')
+            ->to('adriarias@it2b.es')
             //->cc('cc@example.com')
             //->bcc('bcc@example.com')
             //->replyTo('fabien@example.com')
@@ -45,6 +60,7 @@ class EmailController extends AbstractController
             ->htmlTemplate('email/index.html.twig');
 
         $mailer->send($email);
+        $mailer->send($customerEmail);
 
         return $this->json([
             'email'  => $email

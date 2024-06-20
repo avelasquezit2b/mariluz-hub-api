@@ -23,7 +23,7 @@
 				<tr>
 					<td style="text-align:center">
 						<span style="font-family: 'Playfair Display';font-size: 30px;color: #73B499">
-							Hola Pepe Jiménez García,
+							Hola {{name}},
 						</span>
 					</td>
 				</tr>
@@ -54,11 +54,11 @@
                                             <div style="height: 107px;background-color: #F4F3F2;padding: 15px 20px 24px 20px;">
                                                 <div style="padding-bottom: .5rem;">
                                                     <span style="font-weight: bold;color: #73B499">Nombre:</span>
-                                                    <span style="font-weight: bold;color: #8B8B8B;">Vicenç Prueba</span>
+                                                    <span style="font-weight: bold;color: #8B8B8B;">{{name}}</span>
                                                 </div>
                                                 <div style="padding-bottom: .5rem;">
                                                     <span style="font-weight: bold;color: #73B499">Hotel:</span>
-                                                    <span style="font-weight: bold;color: #8B8B8B">Parque Nereida Suites Hotel</span>
+                                                    <span style="font-weight: bold;color: #8B8B8B">{{product.title}}</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -71,15 +71,15 @@
                                             <div style="height: 107px;background-color: #F4F3F2;padding: 15px 20px 24px 20px;">
                                                 <div style="padding-bottom: .5rem;">
                                                     <span style="font-weight: bold;color: #73B499">Cód. reserva:</span>
-                                                    <span style="font-weight: bold;color: #8B8B8B;">32</span>
+                                                    <span style="font-weight: bold;color: #8B8B8B;">{{id}}</span>
                                                 </div>
                                                 <div style="padding-bottom: .5rem;">
                                                     <span style="font-weight: bold;color: #73B499">Fecha reserva:</span>
-                                                    <span style="font-weight: bold;color: #8B8B8B">13-02-2024</span>
+                                                    <span style="font-weight: bold;color: #8B8B8B">{{date}}</span>
                                                 </div>
                                                 <div style="padding-bottom: .5rem;">
                                                     <span style="font-weight: bold;color: #73B499">Método de pago.:</span>
-                                                    <span style="font-weight: bold;color: #8B8B8B">creditCard</span>
+                                                    <span style="font-weight: bold;color: #8B8B8B">{{paymentMethod == 'creditCard' ? 'Tarjeta de crédito' : paymentMethod}}</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -92,45 +92,47 @@
                 <tr>
                     <td style="text-align:center">
                         <span style="font-family: 'Playfair Display';font-size: 20px;font-family: 'Playfair Display';color:#73b499">
-                            Tu reserva del 12/02/2024 al 13/02/2024:
+                            Tu reserva del {{startDate}} al {{endDate}}:
                         </span>
                     </td>
                 </tr>
                 <tr>
                     <td style="text-align:center;padding-bottom: 20px;">
                         <span style="font-family: 'Playfair Display';font-size: 20px;font-family: 'Playfair Display';color:#73b499">
-                            Hotel El Palace Barcelona
+                            {{product.title}}
                         </span>
                     </td>
                 </tr>
+                {% for room in rooms %}
                 <tr>
                     <td style="padding-bottom: 20px;">
                         <div class="table" style="height:100%;width:100%;font-family: 'Roboto'">
                             <div class="table-header" style="color: #fff;background-color: #73B499;padding: 8px 20px;">
-                                <span style="font-weight: bold;color:#fff">Habitación 1:</span>
+                                <span style="font-weight: bold;color:#fff">Habitación {{loop.index}}:</span>
                             </div>
                             <div style="background-color: #F4F3F2;padding: 15px 20px 24px 20px;">
                                 <div style="padding-bottom: .5rem;">
                                     <span style="font-weight: bold;color: #73B499">Tipo de habitación:</span>
-                                    <span style="font-weight: bold;color: #8B8B8B;">Suite</span>
+                                    <span style="font-weight: bold;color: #8B8B8B;">{{room.roomType.name}}</span>
                                 </div>
                                 <div style="padding-bottom: .5rem;">
                                     <span style="font-weight: bold;color: #73B499">Adultos</span>
-                                    <span style="font-weight: bold;color: #8B8B8B;">2</span>
+                                    <span style="font-weight: bold;color: #8B8B8B;">{{room.clientTypes.adults.quantity}}</span>
                                 </div>
                                 <div style="padding-bottom: .5rem;">
                                     <span style="font-weight: bold;color: #73B499">Niños</span>
-                                    <span style="font-weight: bold;color: #8B8B8B;">0</span>
+                                    <span style="font-weight: bold;color: #8B8B8B;">{{room.clientTypes.kids.quantity}}</span>
                                 </div>
                                 <div>
                                     <span style="font-weight: bold;color: #73B499">Bebés</span>
-                                    <span style="font-weight: bold;color: #8B8B8B;">0</span>
+                                    <span style="font-weight: bold;color: #8B8B8B;">{{room.clientTypes.babies.quantity}}</span>
                                 </div>
                             </div>
                         </div>
                     </td>
                 </tr>
-                <tr>
+                {% endfor %}
+                {# <tr>
                     <td style="padding-bottom: 20px;">
                         <div class="table" style="height:100%;width:100%;font-family: 'Roboto'">
                             <div class="table-header" style="color: #fff;background-color: #73B499;padding: 8px 20px;">
@@ -156,7 +158,7 @@
                             </div>
                         </div>
                     </td>
-                </tr>
+                </tr> #}
                 <tr>
                     <td style="font-family: 'Roboto Condensed';text-align: end">
                         <span style="color: #FF926F;font-size: 14px;">Total:</span>
@@ -164,7 +166,7 @@
                 </tr>
                 <tr>
                     <td style="padding-bottom: 55px;font-family: 'Roboto';font-weight: 900;text-align: end">
-                        <span style="color: #FF926F;font-size: 30px;">1.340 €</span>
+                        <span style="color: #FF926F;font-size: 30px;">{{totalPrice}} €</span>
                     </td>
                 </tr>
                 <tr>
