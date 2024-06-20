@@ -365,9 +365,17 @@ class BookingController extends AbstractController
                 foreach ($activityBooking->getData() as $data) {
                     foreach ($data['availabilities'] as $availability) {
                         $activityAvailability = $activityAvailabilityRepository->find($availability);
-                        $activityAvailability->setQuota($activityAvailability->getQuota() + 1);
-                        $activityAvailability->setTotalBookings($activityAvailability->getTotalBookings() - 1);
-                        $entityManager->persist($activityAvailability);
+                        foreach ($data['clientTypes'] as $key => $value) {
+                            $formattedActivity['clientTypes'][$key] = [
+                                'quantity' => $value['quantity'],
+                                'price' => $value['price'],
+                                'priceCost' => $value['priceCost'],
+                                'clientType' => $value['clientType']
+                            ];
+                            $activityAvailability->setQuota($activityAvailability->getQuota() + $value['quantity']);
+                            $activityAvailability->setTotalBookings($activityAvailability->getTotalBookings() - $value['quantity']);
+                            $entityManager->persist($activityAvailability);
+                        }
                     }
                 }
             }
@@ -393,17 +401,33 @@ class BookingController extends AbstractController
     }
 
     #[Route('/change_to_booked/{id}', name: 'api_change_to_booked')]
-    public function change_to_booked(EntityManagerInterface $entityManager, HotelAvailabilityRepository $hotelAvailabilityRepository, BookingRepository $bookingRepository, MailerInterface $mailer, ConfigurationRepository $configurationRepository, Pdf $pdf, VoucherRepository $voucherRepository, string $id): Response
+    public function change_to_booked(EntityManagerInterface $entityManager, HotelAvailabilityRepository $hotelAvailabilityRepository, ActivityAvailabilityRepository $activityAvailabilityRepository, BookingRepository $bookingRepository, MailerInterface $mailer, ConfigurationRepository $configurationRepository, Pdf $pdf, VoucherRepository $voucherRepository, string $id): Response
     {
         $booking = $bookingRepository->find($id);
 
         if ($booking->getStatus() == 'onRequest') {
-            foreach ($booking->getBookingLines()[0]->getData() as $room) {
-                foreach ($room['availabilities'] as $availability) {
-                    $hotelAvailability = $hotelAvailabilityRepository->find($availability);
-                    $hotelAvailability->setQuota($hotelAvailability->getQuota() - 1);
-                    $hotelAvailability->setTotalBookings($hotelAvailability->getTotalBookings() + 1);
-                    $entityManager->persist($hotelAvailability);
+            if ($booking->getBookingLines()[0]->getHotel()) {
+                foreach ($booking->getBookingLines()[0]->getData() as $room) {
+                    foreach ($room['availabilities'] as $availability) {
+                        $hotelAvailability = $hotelAvailabilityRepository->find($availability);
+                        $hotelAvailability->setQuota($hotelAvailability->getQuota() - 1);
+                        $hotelAvailability->setTotalBookings($hotelAvailability->getTotalBookings() + 1);
+                        $entityManager->persist($hotelAvailability);
+                    }
+                }
+            } else if ($booking->getBookingLines()[0]->getActivity()) {
+                $data = $booking->getBookingLines()[0]->getData();
+                $activityAvailability = $activityAvailabilityRepository->find($data['availability']);
+                foreach ($data['clientTypes'] as $key => $value) {
+                    $formattedActivity['clientTypes'][$key] = [
+                        'quantity' => $value['quantity'],
+                        'price' => $value['price'],
+                        'priceCost' => $value['priceCost'],
+                        'clientType' => $value['clientType']
+                    ];
+                    $activityAvailability->setQuota($activityAvailability->getQuota() - $value['quantity']);
+                    $activityAvailability->setTotalBookings($activityAvailability->getTotalBookings() + $value['quantity']);
+                    $entityManager->persist($activityAvailability);
                 }
             }
 
@@ -481,7 +505,7 @@ class BookingController extends AbstractController
             $company = $configurationRepository->find(1);
             $product = $booking->getBookingLines()[0]->getHotel() ? $booking->getBookingLines()[0]->getHotel() : $booking->getBookingLines()[0]->getActivity();
 
-            if ($product->isHasSendEmailSupplier()) {
+            if ($product->isHasSendEmailClient()) {
                 $this->send_client_voucher($voucher, $booking, $company, $product->getSupplier(), $mailer, $pdf, $entityManager);
             }
             if ($product->isHasSendEmailSupplier()) {
