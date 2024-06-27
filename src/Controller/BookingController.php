@@ -175,7 +175,7 @@ class BookingController extends AbstractController
 
             if ($requestDecode->paymentMethod == 'R' && !$hotel->isIsOnRequest()) {
                 $newVoucher = new Voucher();
-                $newVoucher->setToBePaidBy('A-MARILUZ TRAVEL TOUR S.L.');
+                $newVoucher->setToBePaidBy('MARILUZ TRAVEL TOUR S.L.');
                 $newVoucher->setBooking($hotelBooking);
 
                 $entityManager->persist($newVoucher);
@@ -236,7 +236,7 @@ class BookingController extends AbstractController
 
             if ($hotelBooking->getStatus() == 'booked') {
                 $newVoucher = new Voucher();
-                $newVoucher->setToBePaidBy('H-MARILUZ TRAVEL TOUR S.L.');
+                $newVoucher->setToBePaidBy('MARILUZ TRAVEL TOUR S.L.');
                 $newVoucher->setBooking($hotelBooking);
 
                 $entityManager->persist($newVoucher);
@@ -378,7 +378,7 @@ class BookingController extends AbstractController
             // Generate a Voucher based on the booking data
 
             $newVoucher = new Voucher();
-            $newVoucher->setToBePaidBy('A-MARILUZ TRAVEL TOUR S.L.');
+            $newVoucher->setToBePaidBy('MARILUZ TRAVEL TOUR S.L.');
             $newVoucher->setBooking($activityBooking);
 
             $entityManager->persist($newVoucher);
@@ -413,7 +413,7 @@ class BookingController extends AbstractController
             $entityManager->flush();
 
             $newVoucher = new Voucher();
-            $newVoucher->setToBePaidBy('A-MARILUZ TRAVEL TOUR S.L.');
+            $newVoucher->setToBePaidBy('MARILUZ TRAVEL TOUR S.L.');
             $newVoucher->setBooking($booking);
 
             $entityManager->persist($newVoucher);
