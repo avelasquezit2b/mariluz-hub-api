@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Repository\ClientRepository;
+use App\Repository\BookingRepository;
 use App\Repository\ConfigurationRepository;
 use App\Repository\SupplierRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -11,6 +12,11 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\HttpFoundation\Request;
+use Endroid\QrCode\Builder\Builder;
+use Endroid\QrCode\Writer\PngWriter;
+use Endroid\QrCode\Color\Color;
+use Endroid\QrCode\Encoding\Encoding;
+use Endroid\QrCode\ErrorCorrectionLevel\ErrorCorrectionLevelLow;
 
 class EmailController extends AbstractController
 {
@@ -105,14 +111,43 @@ class EmailController extends AbstractController
         ]);
     }
 
-    #[Route('/testEmail')]
-    public function sendTestEmail(MailerInterface $mailer): Response
+    #[Route('/qrBookingEmail/{id}')]
+    public function sendTestEmail(String $id, MailerInterface $mailer, BookingRepository $bookingRepository): Response
     {
+        $qrId = '{"id": '.$id.'}';
+        $booking = $bookingRepository->find($id);
+
+        $qrCode = Builder::create()
+            ->writer(new PngWriter())
+            ->data($qrId)
+            ->encoding(new Encoding('UTF-8'))
+            ->errorCorrectionLevel(new ErrorCorrectionLevelLow())
+            ->size(300)
+            ->margin(10)
+            ->backgroundColor(new Color(255, 255, 255))
+            ->build();
+
+        //$qrCode->saveToFile('./media/qr/qrcode-' . 144 . '.png');
+
+        $dataUri = $qrCode->getDataUri();
+
+        $tempQrFile = tempnam(sys_get_temp_dir(), 'qr_code');
+        file_put_contents($tempQrFile, base64_decode(substr($dataUri, strpos($dataUri, ',') + 1)));
+    
         $email = (new TemplatedEmail())
-            ->from('reservas@mariluztravel.es')
-            ->to('adriarias@it2b.es')
-            ->subject('TEST EMAIL')
-            ->htmlTemplate('email/on_request_to_client.html.twig');
+            ->from('dev@it2b.es')
+            ->to($booking->getEmail())
+            //->cc('cc@example.com')
+            //->bcc('bcc@example.com')
+            //->replyTo('fabien@example.com')
+            //->priority(Email::PRIORITY_HIGH)
+            ->subject('Entradas | ¡Gracias por reservar en Jardines de Alfabia!')
+            ->context([
+                "userEmail" => $booking->getEmail(),
+                "name" => $booking->getName(),
+                "message" => 'Mensaje de prueba',
+            ])
+            ->htmlTemplate('email/qr_booking_email.html.twig')->embedFromPath($tempQrFile, 'qrcode');
 
         $mailer->send($email);
 

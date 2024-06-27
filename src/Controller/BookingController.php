@@ -365,9 +365,17 @@ class BookingController extends AbstractController
                 foreach ($activityBooking->getData() as $data) {
                     foreach ($data['availabilities'] as $availability) {
                         $activityAvailability = $activityAvailabilityRepository->find($availability);
-                        $activityAvailability->setQuota($activityAvailability->getQuota() + 1);
-                        $activityAvailability->setTotalBookings($activityAvailability->getTotalBookings() - 1);
-                        $entityManager->persist($activityAvailability);
+                        foreach ($data['clientTypes'] as $key => $value) {
+                            $formattedActivity['clientTypes'][$key] = [
+                                'quantity' => $value['quantity'],
+                                'price' => $value['price'],
+                                'priceCost' => $value['priceCost'],
+                                'clientType' => $value['clientType']
+                            ];
+                            $activityAvailability->setQuota($activityAvailability->getQuota() + $value['quantity']);
+                            $activityAvailability->setTotalBookings($activityAvailability->getTotalBookings() - $value['quantity']);
+                            $entityManager->persist($activityAvailability);
+                        }
                     }
                 }
             }
@@ -393,34 +401,56 @@ class BookingController extends AbstractController
     }
 
     #[Route('/change_to_booked/{id}', name: 'api_change_to_booked')]
-    public function change_to_booked(EntityManagerInterface $entityManager, HotelAvailabilityRepository $hotelAvailabilityRepository, BookingRepository $bookingRepository, MailerInterface $mailer, ConfigurationRepository $configurationRepository, Pdf $pdf, VoucherRepository $voucherRepository, string $id): Response
+    public function change_to_booked(EntityManagerInterface $entityManager, HotelAvailabilityRepository $hotelAvailabilityRepository, ActivityAvailabilityRepository $activityAvailabilityRepository, BookingRepository $bookingRepository, MailerInterface $mailer, ConfigurationRepository $configurationRepository, Pdf $pdf, VoucherRepository $voucherRepository, string $id): Response
     {
         $booking = $bookingRepository->find($id);
 
-        if ($booking->getStatus() == 'onRequest') {
-            foreach ($booking->getBookingLines()[0]->getData() as $room) {
-                foreach ($room['availabilities'] as $availability) {
-                    $hotelAvailability = $hotelAvailabilityRepository->find($availability);
-                    $hotelAvailability->setQuota($hotelAvailability->getQuota() - 1);
-                    $hotelAvailability->setTotalBookings($hotelAvailability->getTotalBookings() + 1);
-                    $entityManager->persist($hotelAvailability);
+        if ($booking->getStatus() == 'onRequest' || count($booking->getTickets()) > 0) {
+            if ($booking->getBookingLines()[0]->getHotel()) {
+                foreach ($booking->getBookingLines()[0]->getData() as $room) {
+                    foreach ($room['availabilities'] as $availability) {
+                        $hotelAvailability = $hotelAvailabilityRepository->find($availability);
+                        $hotelAvailability->setQuota($hotelAvailability->getQuota() - 1);
+                        $hotelAvailability->setTotalBookings($hotelAvailability->getTotalBookings() + 1);
+                        $entityManager->persist($hotelAvailability);
+                    }
+                }
+            } else if ($booking->getBookingLines()[0]->getActivity()) {
+                $data = $booking->getBookingLines()[0]->getData();
+                $activityAvailability = $activityAvailabilityRepository->find($data['availability']);
+                foreach ($data['clientTypes'] as $key => $value) {
+                    $formattedActivity['clientTypes'][$key] = [
+                        'quantity' => $value['quantity'],
+                        'price' => $value['price'],
+                        'priceCost' => $value['priceCost'],
+                        'clientType' => $value['clientType']
+                    ];
+                    $activityAvailability->setQuota($activityAvailability->getQuota() - $value['quantity']);
+                    $activityAvailability->setTotalBookings($activityAvailability->getTotalBookings() + $value['quantity']);
+                    $entityManager->persist($activityAvailability);
                 }
             }
 
             $booking->setStatus('booked');
 
+            if (count($booking->getTickets()) > 0) {
+                $booking->setPaymentStatus('paid');
+            }
+
             $entityManager->persist($booking);
             $entityManager->flush();
 
-            $newVoucher = new Voucher();
-            $newVoucher->setToBePaidBy('MARILUZ TRAVEL TOUR S.L.');
-            $newVoucher->setBooking($booking);
-
-            $entityManager->persist($newVoucher);
-            $entityManager->flush();
-
-            $this->sendTransfer($booking->getId(), $mailer, $bookingRepository, $configurationRepository);
-            $this->send_voucher($booking->getId(), 'supplier', $mailer, $pdf, $voucherRepository, $configurationRepository, $entityManager);
+            if (!count($booking->getTickets()) > 0) {
+                $newVoucher = new Voucher();
+                $newVoucher->setToBePaidBy('MARILUZ TRAVEL TOUR S.L.');
+                $newVoucher->setBooking($booking);
+    
+                $entityManager->persist($newVoucher);
+                $entityManager->flush();
+    
+                $this->sendTransfer($booking->getId(), $mailer, $bookingRepository, $configurationRepository);
+                $this->send_voucher($booking->getId(), 'supplier', $mailer, $pdf, $voucherRepository, $configurationRepository, $entityManager);
+            }
         }
 
         return $this->json([
@@ -481,7 +511,7 @@ class BookingController extends AbstractController
             $company = $configurationRepository->find(1);
             $product = $booking->getBookingLines()[0]->getHotel() ? $booking->getBookingLines()[0]->getHotel() : $booking->getBookingLines()[0]->getActivity();
 
-            if ($product->isHasSendEmailSupplier()) {
+            if ($product->isHasSendEmailClient()) {
                 $this->send_client_voucher($voucher, $booking, $company, $product->getSupplier(), $mailer, $pdf, $entityManager);
             }
             if ($product->isHasSendEmailSupplier()) {
@@ -917,5 +947,101 @@ class BookingController extends AbstractController
         return $this->json([
             'response'  => 'send'
         ]);
+    }
+
+    #[Route('/booking_connect', name: 'api_booking_connect')]
+    public function booking_connect(Request $request, EntityManagerInterface $entityManager, BookingRepository $bookingRepository, ActivityAvailabilityRepository $activityAvailabilityRepository, ActivityRepository $activityRepository): Response
+    {
+        $requestDecode = json_decode($request->getContent());
+
+        try {
+            // $formattedRooms = [];
+            // $activityAvailabilities = [];
+            $activity = $activityRepository->find(1);
+
+            // foreach ($requestDecode->data as $data) {
+                $formattedActivity = [
+                    // 'availability' => $data->availableSchedule->id,
+                    'schedule' => $requestDecode->startTime,
+                    'modality' => $requestDecode->title,
+                    'clientTypes' => []
+                ];
+                // $activityAvailability = $activityAvailabilityRepository->find($data->availableSchedule->id);
+                // array_push($activityAvailabilities, $activityAvailability);
+                if ($requestDecode->adults) {
+                    $formattedActivity['clientTypes']['ad'] = [
+                        'quantity' => $requestDecode->adults,
+                        'price' => $requestDecode->adultsPrice,
+                        'priceCost' => $requestDecode->adultsPriceCost,
+                        'clientType' => 'Adultos'
+                    ];
+                }
+                if ($requestDecode->kids) {
+                    $formattedActivity['clientTypes']['ni'] = [
+                        'quantity' => $requestDecode->kids,
+                        'price' => $requestDecode->kidsPrice,
+                        'priceCost' => $requestDecode->kidsPriceCost,
+                        'clientType' => 'Niños'
+                    ];
+                }
+                // foreach ($data->clientTypes as $key => $value) {
+                    // $formattedActivity['clientTypes'][$key] = [
+                    //     'quantity' => $value->quantity,
+                    //     'price' => $value->price,
+                    //     'priceCost' => $value->priceCost,
+                    //     'clientType' => $value->clientType
+                    // ];
+                    // if (!$activity->isIsOnRequest()) {
+                    //     if ($value->quantity <= $activityAvailability->getQuota()) {
+                    //         $activityAvailability->setQuota($activityAvailability->getQuota() - $value->quantity);
+                    //         $activityAvailability->setTotalBookings($activityAvailability->getTotalBookings() + $value->quantity);
+                    //         $entityManager->persist($activityAvailability);
+                    //     } else {
+                    //         throw new BadRequestHttpException('No hay disponibilidad para las fechas seleccionadas');
+                    //     }
+                    // }
+                // }
+            // }
+
+            $activityBooking = new Booking();
+            $activityBookingLine = new BookingLine();
+
+            $activityBooking->setEmail($requestDecode->email);
+            $activityBooking->setHasAcceptance(true);
+            $activityBooking->setName($requestDecode->name);
+            $activityBooking->setObservations($requestDecode->observations);
+            $activityBooking->setPaymentMethod('creditCard');
+            $activityBooking->setPhone($requestDecode->phone);
+            // $activityBooking->setPromoCode($requestDecode->promoCode);
+            $activityBooking->setStatus('booked');
+            $activityBooking->setPaymentStatus('paid');
+            $activityBooking->setTotalPrice($requestDecode->totalPrice);
+            $activityBooking->setTotalPriceCost($requestDecode->totalPriceCost);
+            $entityManager->persist($activityBooking);
+
+            $activityBookingLine->setCheckIn(new \DateTime($requestDecode->date));
+            $activityBookingLine->setCheckOut(new \DateTime($requestDecode->date));
+            $activityBookingLine->setData($formattedActivity);
+            $activityBookingLine->setTotalPrice($requestDecode->totalPrice);
+            $activityBookingLine->setTotalPriceCost($requestDecode->totalPriceCost);
+            $activityBookingLine->setActivity($activity);
+            $activityBookingLine->setBooking($activityBooking);
+            $entityManager->persist($activityBookingLine);
+
+            $entityManager->flush();
+
+            // foreach ($activityAvailabilities as $activityAvailability) {
+            //     $activityAvailability->addActivityBooking($activityBooking);
+            //     $entityManager->persist($activityAvailability);
+            // }
+
+            return $this->json([
+                'response'  => $activityBooking
+            ]);
+        } catch (SoapFault $e) {
+            return $this->json([
+                'response'  => $e
+            ]);
+        }
     }
 }
