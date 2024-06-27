@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Repository\ClientRepository;
+use App\Repository\BookingRepository;
 use App\Repository\ConfigurationRepository;
 use App\Repository\SupplierRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -11,8 +12,6 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\HttpFoundation\Request;
-
-
 use Endroid\QrCode\Builder\Builder;
 use Endroid\QrCode\Writer\PngWriter;
 use Endroid\QrCode\Color\Color;
@@ -112,15 +111,11 @@ class EmailController extends AbstractController
         ]);
     }
 
-    #[Route('/qrBookingEmail')]
-    public function sendTestEmail(MailerInterface $mailer, Request $request): Response
+    #[Route('/qrBookingEmail/{id}')]
+    public function sendTestEmail(String $id, MailerInterface $mailer, BookingRepository $bookingRepository): Response
     {
-
-        $request = json_decode($request->getContent());
-
-        dd($request);
-
-        $qrId = '{"id": 180}';
+        $qrId = '{"id": '.$id.'}';
+        $booking = $bookingRepository->find($id);
 
         $qrCode = Builder::create()
             ->writer(new PngWriter())
@@ -139,22 +134,17 @@ class EmailController extends AbstractController
         $tempQrFile = tempnam(sys_get_temp_dir(), 'qr_code');
         file_put_contents($tempQrFile, base64_decode(substr($dataUri, strpos($dataUri, ',') + 1)));
     
-
-
-
-
-
         $email = (new TemplatedEmail())
             ->from('dev@it2b.es')
-            ->to('bpenya@it2b.es')
+            ->to($booking->getEmail())
             //->cc('cc@example.com')
             //->bcc('bcc@example.com')
             //->replyTo('fabien@example.com')
             //->priority(Email::PRIORITY_HIGH)
             ->subject('Entradas | ¡Gracias por reservar en Jardines de Alfabia!')
             ->context([
-                "userEmail" => 'test@it2b.es',
-                "name" => 'Usuario prueba',
+                "userEmail" => $booking->getEmail(),
+                "name" => $booking->getName(),
                 "message" => 'Mensaje de prueba',
             ])
             ->htmlTemplate('email/qr_booking_email.html.twig')->embedFromPath($tempQrFile, 'qrcode');
