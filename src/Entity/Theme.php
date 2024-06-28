@@ -55,6 +55,7 @@ class Theme
 
     #[ORM\OneToMany(mappedBy: 'theme', targetEntity: MediaObject::class)]
     #[Groups(['themeReduced', 'theme', 'page'])]
+    #[ORM\OrderBy(["position" => "ASC"])]
     private Collection $media;
 
     #[ORM\Column(length: 255, nullable: true)]
