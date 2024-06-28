@@ -8,6 +8,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use App\Repository\ProductListModuleRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -75,6 +76,10 @@ class ProductListModule
     #[ORM\Column(length: 255, nullable: true)]
     #[Groups(['productListReduced', 'productList', 'page'])]
     private ?string $icon = null;
+
+    #[ORM\Column(type: Types::ARRAY, nullable: true)]
+    #[Groups(['productListReduced', 'productList', 'page'])]
+    private ?array $positions = null;
 
     public function __construct()
     {
@@ -254,6 +259,18 @@ class ProductListModule
     public function setIcon(?string $icon): static
     {
         $this->icon = $icon;
+
+        return $this;
+    }
+
+    public function getPositions(): ?array
+    {
+        return $this->positions;
+    }
+
+    public function setPositions(?array $positions): static
+    {
+        $this->positions = $positions;
 
         return $this;
     }

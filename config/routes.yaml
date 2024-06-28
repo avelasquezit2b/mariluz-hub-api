@@ -55,3 +55,8 @@ api_test_email:
   path: '/testEmail'
   methods:  [POST]
   controller: App\Controller\EmailController::sendTestEmail
+
+api_calculate_totals:
+  path: '/calculate_totals'
+  methods:  [POST]
+  controller: App\Controller\CalculateController::calculateTotals

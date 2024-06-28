@@ -43,7 +43,7 @@ class ActivitySchedule
     private ?string $startTime = null;
 
     #[ORM\Column(length: 25, nullable: true)]
-    #[Groups(['activityScheduleReduced', 'activitySchedule', 'activityFeeReduced'])]
+    #[Groups(['activityScheduleReduced', 'activitySchedule', 'activityFeeReduced', 'activityAvailabilityReduced', 'activityAvailability'])]
     private ?string $endTime = null;
 
     #[ORM\Column(length: 25, nullable: true)]
