@@ -183,6 +183,38 @@ class BookingController extends AbstractController
 
                 $this->send_voucher($hotelBooking->getId(), 'supplier', $mailer, $pdf, $voucherRepository, $configurationRepository, $entityManager);
                 $this->sendTransfer($hotelBooking->getId(), $mailer, $bookingRepository, $configurationRepository);
+            } else if ($hotel->isIsOnRequest()) {
+                $company = $configurationRepository->find(1);
+                $context = [
+                    "name" => $hotelBooking->getName(),
+                    "bookingEmail" => $hotelBooking->getEmail(),
+                    "phone" => $hotelBooking->getPhone(),
+                    "id" => $hotelBooking->getId(),
+                    "product" => $hotelBooking->getBookingLines()[0]->getHotel(),
+                    "totalPrice" => $hotelBooking->getTotalPrice(),
+                    "date" => date("d-m-Y"),
+                    "startDate" => $hotelBooking->getBookingLines()[0]->getCheckIn(),
+                    "endDate" => $hotelBooking->getBookingLines()[0]->getCheckOut(),
+                    'companyName' => $company->getTitle(),
+                    'companyCif' => $company->getCif(),
+                    'companyAddress' => $company->getAddress(),
+                    'companyPostalCode' => $company->getPostalCode(),
+                    'companyCity' => $company->getCity(),
+                    'companyProvince' => $company->getProvince(),
+                    'companyCountry' => $company->getCountry(),
+                    'companyPhone' => $company->getPhone(),
+                ];
+
+                // Sending the email
+
+                $email = (new TemplatedEmail())
+                    ->from($company->getBookingEmail())
+                    ->to($company->getBookingEmail())
+                    ->subject('Nueva petición On Request')
+                    ->context($context)
+                    ->htmlTemplate('communications/on_request_to_supplier.html.twig');
+
+                $mailer->send($email);
             }
 
             // foreach ($hotelAvailabilities as $hotelAvailability) {
@@ -444,10 +476,10 @@ class BookingController extends AbstractController
                 $newVoucher = new Voucher();
                 $newVoucher->setToBePaidBy('MARILUZ TRAVEL TOUR S.L.');
                 $newVoucher->setBooking($booking);
-    
+
                 $entityManager->persist($newVoucher);
                 $entityManager->flush();
-    
+
                 $this->sendTransfer($booking->getId(), $mailer, $bookingRepository, $configurationRepository);
                 $this->send_voucher($booking->getId(), 'supplier', $mailer, $pdf, $voucherRepository, $configurationRepository, $entityManager);
             }
@@ -960,47 +992,47 @@ class BookingController extends AbstractController
             $activity = $activityRepository->find(1);
 
             // foreach ($requestDecode->data as $data) {
-                $formattedActivity = [
-                    // 'availability' => $data->availableSchedule->id,
-                    'schedule' => $requestDecode->startTime,
-                    'modality' => $requestDecode->title,
-                    'clientTypes' => []
+            $formattedActivity = [
+                // 'availability' => $data->availableSchedule->id,
+                'schedule' => $requestDecode->startTime,
+                'modality' => $requestDecode->title,
+                'clientTypes' => []
+            ];
+            // $activityAvailability = $activityAvailabilityRepository->find($data->availableSchedule->id);
+            // array_push($activityAvailabilities, $activityAvailability);
+            if ($requestDecode->adults) {
+                $formattedActivity['clientTypes']['ad'] = [
+                    'quantity' => $requestDecode->adults,
+                    'price' => $requestDecode->adultsPrice,
+                    'priceCost' => $requestDecode->adultsPriceCost,
+                    'clientType' => 'Adultos'
                 ];
-                // $activityAvailability = $activityAvailabilityRepository->find($data->availableSchedule->id);
-                // array_push($activityAvailabilities, $activityAvailability);
-                if ($requestDecode->adults) {
-                    $formattedActivity['clientTypes']['ad'] = [
-                        'quantity' => $requestDecode->adults,
-                        'price' => $requestDecode->adultsPrice,
-                        'priceCost' => $requestDecode->adultsPriceCost,
-                        'clientType' => 'Adultos'
-                    ];
-                }
-                if ($requestDecode->kids) {
-                    $formattedActivity['clientTypes']['ni'] = [
-                        'quantity' => $requestDecode->kids,
-                        'price' => $requestDecode->kidsPrice,
-                        'priceCost' => $requestDecode->kidsPriceCost,
-                        'clientType' => 'Niños'
-                    ];
-                }
-                // foreach ($data->clientTypes as $key => $value) {
-                    // $formattedActivity['clientTypes'][$key] = [
-                    //     'quantity' => $value->quantity,
-                    //     'price' => $value->price,
-                    //     'priceCost' => $value->priceCost,
-                    //     'clientType' => $value->clientType
-                    // ];
-                    // if (!$activity->isIsOnRequest()) {
-                    //     if ($value->quantity <= $activityAvailability->getQuota()) {
-                    //         $activityAvailability->setQuota($activityAvailability->getQuota() - $value->quantity);
-                    //         $activityAvailability->setTotalBookings($activityAvailability->getTotalBookings() + $value->quantity);
-                    //         $entityManager->persist($activityAvailability);
-                    //     } else {
-                    //         throw new BadRequestHttpException('No hay disponibilidad para las fechas seleccionadas');
-                    //     }
-                    // }
-                // }
+            }
+            if ($requestDecode->kids) {
+                $formattedActivity['clientTypes']['ni'] = [
+                    'quantity' => $requestDecode->kids,
+                    'price' => $requestDecode->kidsPrice,
+                    'priceCost' => $requestDecode->kidsPriceCost,
+                    'clientType' => 'Niños'
+                ];
+            }
+            // foreach ($data->clientTypes as $key => $value) {
+            // $formattedActivity['clientTypes'][$key] = [
+            //     'quantity' => $value->quantity,
+            //     'price' => $value->price,
+            //     'priceCost' => $value->priceCost,
+            //     'clientType' => $value->clientType
+            // ];
+            // if (!$activity->isIsOnRequest()) {
+            //     if ($value->quantity <= $activityAvailability->getQuota()) {
+            //         $activityAvailability->setQuota($activityAvailability->getQuota() - $value->quantity);
+            //         $activityAvailability->setTotalBookings($activityAvailability->getTotalBookings() + $value->quantity);
+            //         $entityManager->persist($activityAvailability);
+            //     } else {
+            //         throw new BadRequestHttpException('No hay disponibilidad para las fechas seleccionadas');
+            //     }
+            // }
+            // }
             // }
 
             $activityBooking = new Booking();
