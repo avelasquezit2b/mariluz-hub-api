@@ -780,11 +780,13 @@ class IntegrationController extends AbstractController
 
             curl_close($curl);
             $response = json_decode($response, true);
-            foreach ($response['data']['hotelX']['search']['options'] as $availability) {
-                if (!in_array($availability['hotelCode'], $hotelsIds)) {
-                    array_push($hotelsIds, $availability['hotelCode']);
-                }
-            } ;
+            if ($response['data']['hotelX']['search']['options']) {
+                foreach ($response['data']['hotelX']['search']['options'] as $availability) {
+                    if (!in_array($availability['hotelCode'], $hotelsIds)) {
+                        array_push($hotelsIds, $availability['hotelCode']);
+                    }
+                };
+            }
         }
 
         return $this->json([
