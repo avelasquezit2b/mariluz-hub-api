@@ -8,6 +8,7 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\DateFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\RangeFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter;
 use App\Repository\ActivityAvailabilityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -39,6 +40,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ApiFilter(SearchFilter::class, properties: ['activitySchedule.activitySeason.activityFee.activity' => 'exact', 'activitySchedule.activitySeason.activityFee.activity.zones.name' => 'exact', 'activitySchedule.activitySeason.activityFee.activity.location.name' => 'exact'])]
 #[ApiFilter(RangeFilter::class, properties: ['quota'])]
 #[ApiFilter(OrderFilter::class, properties: ['activitySchedule.startTime' => 'ASC'])]
+#[ApiFilter(BooleanFilter::class, properties: ['isAvailable', 'activitySchedule.activitySeason.activityFee.activity.isActive'])]
 #[ORM\HasLifecycleCallbacks]
 class ActivityAvailability
 {

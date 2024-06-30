@@ -38,6 +38,7 @@ class BookingController extends AbstractController
             $formattedRooms = [];
             $hotelAvailabilities = [];
             $hotel = $hotelRepository->find($requestDecode->hotel);
+            $seasonIsOnRequest = false;
 
             foreach ($requestDecode->data as $room) {
                 $formattedRoom = [
@@ -70,6 +71,10 @@ class BookingController extends AbstractController
                     'clientName' => $room->clientName,
                     'availabilities' => $room->roomType->availabilities
                 ];
+
+                if ($room->roomType->roomCondition->hotelSeason->isOnRequest) {
+                    $seasonIsOnRequest = true;
+                }
 
                 if (isset($requestDecode->refId)) {
                     $formattedRoom['refId'] = $requestDecode->refId;
@@ -130,7 +135,7 @@ class BookingController extends AbstractController
                 foreach ($room->roomType->availabilities as $availability) {
                     $hotelAvailability = $hotelAvailabilityRepository->find($availability);
                     array_push($hotelAvailabilities, $hotelAvailability);
-                    if (!$hotel->isIsOnRequest()) {
+                    if (!$hotel->isIsOnRequest() && !$seasonIsOnRequest) {
                         if ($hotelAvailability->quota > 0) {
                             $hotelAvailability->setQuota($hotelAvailability->getQuota() - 1);
                             $hotelAvailability->setTotalBookings($hotelAvailability->getTotalBookings() + 1);
@@ -152,10 +157,10 @@ class BookingController extends AbstractController
             $hotelBooking->setPaymentMethod($requestDecode->paymentMethod);
             $hotelBooking->setPhone($requestDecode->phone);
             $hotelBooking->setPromoCode($requestDecode->promoCode);
-            if ($requestDecode->paymentMethod == 'R' && !$hotel->isIsOnRequest()) {
+            if ($requestDecode->paymentMethod == 'R' && (!$hotel->isIsOnRequest() && !$seasonIsOnRequest)) {
                 $hotelBooking->setStatus('booked');
             } else {
-                $hotelBooking->setStatus($hotel->isIsOnRequest() ? 'onRequest' : 'preBooked');
+                $hotelBooking->setStatus(($hotel->isIsOnRequest() || $seasonIsOnRequest) ? 'onRequest' : 'preBooked');
             }
             $hotelBooking->setPaymentStatus('pending');
             $hotelBooking->setTotalPrice($requestDecode->totalPrice);
@@ -173,7 +178,7 @@ class BookingController extends AbstractController
             $hotelBooking->addBookingLine($hotelBookingLine);
             $entityManager->flush();
 
-            if ($requestDecode->paymentMethod == 'R' && !$hotel->isIsOnRequest()) {
+            if ($requestDecode->paymentMethod == 'R' && (!$hotel->isIsOnRequest() && !$seasonIsOnRequest)) {
                 $newVoucher = new Voucher();
                 $newVoucher->setToBePaidBy('MARILUZ TRAVEL TOUR S.L.');
                 $newVoucher->setBooking($hotelBooking);
@@ -183,7 +188,7 @@ class BookingController extends AbstractController
 
                 $this->send_voucher($hotelBooking->getId(), 'supplier', $mailer, $pdf, $voucherRepository, $configurationRepository, $entityManager);
                 $this->sendTransfer($hotelBooking->getId(), $mailer, $bookingRepository, $configurationRepository);
-            } else if ($hotel->isIsOnRequest()) {
+            } else if ($hotel->isIsOnRequest() || $seasonIsOnRequest) {
                 $company = $configurationRepository->find(1);
                 $context = [
                     "name" => $hotelBooking->getName(),
@@ -289,7 +294,7 @@ class BookingController extends AbstractController
     }
 
     #[Route('/activity_prebooking', name: 'api_activity_prebooking')]
-    public function activity_prebooking(Request $request, EntityManagerInterface $entityManager, BookingRepository $bookingRepository, ActivityAvailabilityRepository $activityAvailabilityRepository, ActivityRepository $activityRepository): Response
+    public function activity_prebooking(Request $request, EntityManagerInterface $entityManager, BookingRepository $bookingRepository, MailerInterface $mailer, ActivityAvailabilityRepository $activityAvailabilityRepository, VoucherRepository $voucherRepository, ActivityRepository $activityRepository, ConfigurationRepository $configurationRepository, Pdf $pdf): Response
     {
         $requestDecode = json_decode($request->getContent());
 
@@ -297,6 +302,7 @@ class BookingController extends AbstractController
             $formattedRooms = [];
             $activityAvailabilities = [];
             $activity = $activityRepository->find($requestDecode->activity);
+            $seasonIsOnRequest = false;
 
             foreach ($requestDecode->data as $data) {
                 $formattedActivity = [
@@ -308,6 +314,10 @@ class BookingController extends AbstractController
                 $activityAvailability = $activityAvailabilityRepository->find($data->availableSchedule->id);
                 array_push($activityAvailabilities, $activityAvailability);
 
+                if ($data->availableSchedule->activitySchedule->activitySeason->isOnRequest) {
+                    $seasonIsOnRequest =  true;
+                }
+
                 foreach ($data->clientTypes as $key => $value) {
                     $formattedActivity['clientTypes'][$key] = [
                         'quantity' => $value->quantity,
@@ -315,7 +325,7 @@ class BookingController extends AbstractController
                         'priceCost' => $value->priceCost,
                         'clientType' => $value->clientType
                     ];
-                    if (!$activity->isIsOnRequest()) {
+                    if (!$activity->isIsOnRequest() && !$seasonIsOnRequest) {
                         if ($value->quantity <= $activityAvailability->getQuota()) {
                             $activityAvailability->setQuota($activityAvailability->getQuota() - $value->quantity);
                             $activityAvailability->setTotalBookings($activityAvailability->getTotalBookings() + $value->quantity);
@@ -342,7 +352,11 @@ class BookingController extends AbstractController
             $activityBooking->setPaymentMethod($requestDecode->paymentMethod);
             $activityBooking->setPhone($requestDecode->phone);
             $activityBooking->setPromoCode($requestDecode->promoCode);
-            $activityBooking->setStatus($activity->isIsOnRequest() ? 'onRequest' : 'preBooked');
+            if ($requestDecode->paymentMethod == 'R' && (!$activity->isIsOnRequest() && !$seasonIsOnRequest)) {
+                $activityBooking->setStatus('booked');
+            } else {
+                $activityBooking->setStatus(($activity->isIsOnRequest() || $seasonIsOnRequest) ? 'onRequest' : 'preBooked');
+            } 
             $activityBooking->setPaymentStatus('pending');
             $activityBooking->setTotalPrice($requestDecode->totalPrice);
             $activityBooking->setTotalPriceCost($requestDecode->totalPriceCost);
@@ -354,10 +368,55 @@ class BookingController extends AbstractController
             $activityBookingLine->setTotalPrice($requestDecode->totalPrice);
             $activityBookingLine->setTotalPriceCost($requestDecode->totalPriceCost);
             $activityBookingLine->setActivity($activity);
-            $activityBookingLine->setBooking($activityBooking);
+            // $activityBookingLine->setBooking($activityBooking);
             $entityManager->persist($activityBookingLine);
+            $activityBooking->addBookingLine($activityBookingLine);
 
             $entityManager->flush();
+
+            if ($requestDecode->paymentMethod == 'R' && (!$activity->isIsOnRequest() && !$seasonIsOnRequest)) {
+                $newVoucher = new Voucher();
+                $newVoucher->setToBePaidBy('MARILUZ TRAVEL TOUR S.L.');
+                $newVoucher->setBooking($activityBooking);
+
+                $entityManager->persist($newVoucher);
+                $entityManager->flush();
+
+                $this->send_voucher($activityBooking->getId(), 'supplier', $mailer, $pdf, $voucherRepository, $configurationRepository, $entityManager);
+                $this->sendTransfer($activityBooking->getId(), $mailer, $bookingRepository, $configurationRepository);
+            } else if ($activity->isIsOnRequest() || $seasonIsOnRequest) {
+                $company = $configurationRepository->find(1);
+                $context = [
+                    "name" => $activityBooking->getName(),
+                    "bookingEmail" => $activityBooking->getEmail(),
+                    "phone" => $activityBooking->getPhone(),
+                    "id" => $activityBooking->getId(),
+                    "product" => $activityBooking->getBookingLines()[0]->getActivity(),
+                    "totalPrice" => $activityBooking->getTotalPrice(),
+                    "date" => date("d-m-Y"),
+                    "startDate" => $activityBooking->getBookingLines()[0]->getCheckIn(),
+                    "endDate" => $activityBooking->getBookingLines()[0]->getCheckOut(),
+                    'companyName' => $company->getTitle(),
+                    'companyCif' => $company->getCif(),
+                    'companyAddress' => $company->getAddress(),
+                    'companyPostalCode' => $company->getPostalCode(),
+                    'companyCity' => $company->getCity(),
+                    'companyProvince' => $company->getProvince(),
+                    'companyCountry' => $company->getCountry(),
+                    'companyPhone' => $company->getPhone(),
+                ];
+
+                // Sending the email
+
+                $email = (new TemplatedEmail())
+                    ->from($company->getBookingEmail())
+                    ->to($company->getBookingEmail())
+                    ->subject('Nueva petición On Request')
+                    ->context($context)
+                    ->htmlTemplate('communications/on_request_to_supplier.html.twig');
+
+                $mailer->send($email);
+            }
 
             // foreach ($activityAvailabilities as $activityAvailability) {
             //     $activityAvailability->addActivityBooking($activityBooking);
@@ -491,17 +550,33 @@ class BookingController extends AbstractController
     }
 
     #[Route('/change_to_cancelled/{id}', name: 'api_change_to_cancelled')]
-    public function change_to_cancelled(EntityManagerInterface $entityManager, HotelAvailabilityRepository $hotelAvailabilityRepository, BookingRepository $bookingRepository, string $id): Response
+    public function change_to_cancelled(EntityManagerInterface $entityManager, HotelAvailabilityRepository $hotelAvailabilityRepository, ActivityAvailabilityRepository $activityAvailabilityRepository, BookingRepository $bookingRepository, string $id): Response
     {
         $booking = $bookingRepository->find($id);
 
         if ($booking->getStatus() == 'preBooked' || $booking->getStatus() == 'booked') {
-            foreach ($booking->getBookingLines()[0]->getData() as $room) {
-                foreach ($room['availabilities'] as $availability) {
-                    $hotelAvailability = $hotelAvailabilityRepository->find($availability);
-                    $hotelAvailability->setQuota($hotelAvailability->getQuota() + 1);
-                    $hotelAvailability->setTotalBookings($hotelAvailability->getTotalBookings() - 1);
-                    $entityManager->persist($hotelAvailability);
+            if ($booking->getBookingLines()[0]->getHotel()) {
+                foreach ($booking->getBookingLines()[0]->getData() as $room) {
+                    foreach ($room['availabilities'] as $availability) {
+                        $hotelAvailability = $hotelAvailabilityRepository->find($availability);
+                        $hotelAvailability->setQuota($hotelAvailability->getQuota() + 1);
+                        $hotelAvailability->setTotalBookings($hotelAvailability->getTotalBookings() - 1);
+                        $entityManager->persist($hotelAvailability);
+                    }
+                }
+            } else if ($booking->getBookingLines()[0]->getActivity()) {
+                $data = $booking->getBookingLines()[0]->getData();
+                $activityAvailability = $activityAvailabilityRepository->find($data['availability']);
+                foreach ($data['clientTypes'] as $key => $value) {
+                    $formattedActivity['clientTypes'][$key] = [
+                        'quantity' => $value['quantity'],
+                        'price' => $value['price'],
+                        'priceCost' => $value['priceCost'],
+                        'clientType' => $value['clientType']
+                    ];
+                    $activityAvailability->setQuota($activityAvailability->getQuota() + $value['quantity']);
+                    $activityAvailability->setTotalBookings($activityAvailability->getTotalBookings() - $value['quantity']);
+                    $entityManager->persist($activityAvailability);
                 }
             }
 
@@ -524,6 +599,24 @@ class BookingController extends AbstractController
         if ($booking->getStatus() == 'booked') {
             $booking->setPaymentStatus('paid');
             $this->send_voucher($booking->getId(), 'client', $mailer, $pdf, $voucherRepository, $configurationRepository, $entityManager);
+        }
+
+        $entityManager->persist($booking);
+        $entityManager->flush();
+
+        return $this->json([
+            'response'  => $booking
+        ]);
+    }
+
+    #[Route('/change_to_refunded/{id}', name: 'api_change_to_refunded')]
+    public function change_to_refunded(EntityManagerInterface $entityManager, MailerInterface $mailer, Pdf $pdf, VoucherRepository $voucherRepository, ConfigurationRepository $configurationRepository, BookingRepository $bookingRepository, string $id): Response
+    {
+        $booking = $bookingRepository->find($id);
+
+        if ($booking->getStatus() == 'cancelled') {
+            $booking->setPaymentStatus('refunded');
+            // $this->send_voucher($booking->getId(), 'client', $mailer, $pdf, $voucherRepository, $configurationRepository, $entityManager);
         }
 
         $entityManager->persist($booking);

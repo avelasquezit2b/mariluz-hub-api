@@ -226,6 +226,10 @@ class Hotel
     #[Groups(['hotel', 'hotelReduced', 'page', 'productList', 'theme'])]
     private ?string $promoTag = null;
 
+    #[ORM\Column(nullable: true)]
+    #[Groups(['hotel'])]
+    private ?int $releaseDays = null;
+
     public function __construct()
     {
         $this->zones = new ArrayCollection();
@@ -1005,6 +1009,18 @@ class Hotel
     public function setPromoTag(?string $promoTag): static
     {
         $this->promoTag = $promoTag;
+
+        return $this;
+    }
+
+    public function getReleaseDays(): ?int
+    {
+        return $this->releaseDays;
+    }
+
+    public function setReleaseDays(?int $releaseDays): static
+    {
+        $this->releaseDays = $releaseDays;
 
         return $this;
     }

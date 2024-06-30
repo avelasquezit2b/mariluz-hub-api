@@ -53,6 +53,10 @@ class HotelSeason
     #[Groups(['hotelSeasonReduced', 'hotelSeason', 'hotelFeeReduced'])]
     private Collection $roomConditions;
 
+    #[ORM\Column(nullable: true)]
+    #[Groups(['hotelSeasonReduced', 'hotelSeason', 'hotelFeeReduced', 'hotelAvailability'])]
+    private ?bool $isOnRequest = null;
+
     public function __construct()
     {
         $this->roomConditions = new ArrayCollection();
@@ -125,6 +129,18 @@ class HotelSeason
                 $roomCondition->setHotelSeason(null);
             }
         }
+
+        return $this;
+    }
+
+    public function isIsOnRequest(): ?bool
+    {
+        return $this->isOnRequest;
+    }
+
+    public function setIsOnRequest(?bool $isOnRequest): static
+    {
+        $this->isOnRequest = $isOnRequest;
 
         return $this;
     }

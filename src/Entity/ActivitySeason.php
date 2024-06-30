@@ -63,6 +63,10 @@ class ActivitySeason
     #[ApiSubresource]
     private Collection $activitySchedules;
 
+    #[ORM\Column(nullable: true)]
+    #[Groups(['activitySeasonReduced', 'activitySeason', 'activityFeeReduced', 'activityAvailability'])]
+    private ?bool $isOnRequest = null;
+
     public function __construct()
     {
         $this->activitySchedules = new ArrayCollection();
@@ -159,6 +163,18 @@ class ActivitySeason
                 $activitySchedule->setActivitySeason(null);
             }
         }
+
+        return $this;
+    }
+
+    public function isIsOnRequest(): ?bool
+    {
+        return $this->isOnRequest;
+    }
+
+    public function setIsOnRequest(?bool $isOnRequest): static
+    {
+        $this->isOnRequest = $isOnRequest;
 
         return $this;
     }

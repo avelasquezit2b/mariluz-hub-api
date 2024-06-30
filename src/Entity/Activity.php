@@ -228,6 +228,18 @@ class Activity
     #[Groups(['activityReduced', 'activity', 'page', 'productList', 'theme'])]
     private ?string $promoTag = null;
 
+    #[ORM\Column(nullable: true)]
+    #[Groups(['activity'])]
+    private ?int $daysToPay = null;
+
+    #[ORM\Column(nullable: true)]
+    #[Groups(['activity'])]
+    private ?int $daysToPayBeforeStay = null;
+
+    #[ORM\Column(nullable: true)]
+    #[Groups(['activity'])]
+    private ?bool $isCredit = null;
+
     // #[ORM\Column(length: 25, nullable: true)]
     // private ?string $price = null;
 
@@ -1028,6 +1040,42 @@ class Activity
     public function setPromoTag(?string $promoTag): static
     {
         $this->promoTag = $promoTag;
+
+        return $this;
+    }
+
+    public function getDaysToPay(): ?int
+    {
+        return $this->daysToPay;
+    }
+
+    public function setDaysToPay(?int $daysToPay): static
+    {
+        $this->daysToPay = $daysToPay;
+
+        return $this;
+    }
+
+    public function getDaysToPayBeforeStay(): ?int
+    {
+        return $this->daysToPayBeforeStay;
+    }
+
+    public function setDaysToPayBeforeStay(?int $daysToPayBeforeStay): static
+    {
+        $this->daysToPayBeforeStay = $daysToPayBeforeStay;
+
+        return $this;
+    }
+
+    public function isIsCredit(): ?bool
+    {
+        return $this->isCredit;
+    }
+
+    public function setIsCredit(?bool $isCredit): static
+    {
+        $this->isCredit = $isCredit;
 
         return $this;
     }
