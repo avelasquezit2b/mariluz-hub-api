@@ -24,8 +24,8 @@
                 </tr>
                 <tr>
                     <td style="text-align:center;padding-bottom: 40px">
-                        <img class="logo" src="http://api.mariluz.hub2b.travel/media/hats.png" alt="logo"
-                        style="width: 545px;">
+                        <img class="logo" src="http://api.mariluz.hub2b.travel/media/oks.png" alt="logo"
+                            style="width: 545px;">
                     </td>
                 </tr>
                 <tr>
@@ -37,15 +37,70 @@
                 </tr>
                 <tr>
                     <td style="text-align:center;padding-bottom: 63px">
-						<span style="font-family: 'Playfair Display';font-size: 30px;color: #73B499">
-							Aunque suene a <span style="font-weight: bold;">magia,</span> es trabajo: hemos podido <span style="font-weight: bold;">confirmar tu reserva</span> y estamos entusiasmados de que puedas disfrutar de un tiempo de descanso para ti.
-						</span>
+                        <span style="font-family: 'Playfair Display';font-size: 30px;color: #73B499">
+                            ésta es la confirmación de la recepción de tu reserva del {{startDate}} al {{endDate}}:
+                        </span>
                     </td>
                 </tr>
                 <tr>
                     <td style="text-align:center;padding-bottom: 20px;">
-                        <span style="font-family: 'Playfair Display';font-size: 20px;color: #B8965B">
-                            Solo te falta un paso para hacerlo efectivo:
+                        <span style="font-size: 30px;font-weight: bold;font-family: 'Playfair Display';color:#73B499">
+                            {{product.title}}
+                        </span>
+                    </td>
+                </tr>
+                {% for room in rooms %}
+                <tr>
+                    <td style="padding-bottom: 20px;">
+                        <div class="table" style="height:100%;width:100%;font-family: 'Roboto'">
+                            <div class="table-header" style="color: #fff;background-color: #73B499;padding: 8px 20px;">
+                                <span style="font-weight: bold;color:#fff">Habitación {{loop.index}}:</span>
+                            </div>
+                            <div style="border:1px solid #E5D8BE;padding: 15px 20px 24px 20px;">
+                                <div style="padding-bottom: .5rem;">
+                                    <span style="font-weight: bold;color: #B8965B">Tipo de habitación:</span>
+                                    <span style="color: #B8965B;">{{room.roomType.name}}</span>
+                                </div>
+                                <div style="padding-bottom: .5rem;">
+                                    <span style="font-weight: bold;color: #B8965B">Adultos</span>
+                                    <span style="color: #B8965B;">{{room.clientTypes.adults.quantity}}</span>
+                                </div>
+                                <div style="padding-bottom: .5rem;">
+                                    <span style="font-weight: bold;color: #B8965B">Niños</span>
+                                    <span style="color: #B8965B;">{{room.clientTypes.kids.quantity}}</span>
+                                </div>
+                                <div>
+                                    <span style="font-weight: bold;color: #B8965B">Bebés</span>
+                                    <span style="color: #B8965B;">{{room.clientTypes.babies.quantity}}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+                <tr>
+                    <td style="font-family: 'Roboto Condensed';text-align: end">
+                        <span style="color: #FF926F;font-size: 14px;">Total:</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding-bottom: 55px;font-family: 'Roboto';font-weight: 900;text-align: end">
+                        <span style="color: #FF926F;font-size: 30px;">{{totalPrice}} €</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align:center">
+                        <span style="font-family: 'Playfair Display';font-size: 30px;color: #73B499">
+                            y la confirmación de que dentro de nada vas a disfrutar de tiempo para ti, haciendo lo que
+                            te gusta cerca o un-poco-menos-<br>cerca.
+                        </span>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align:center;padding-bottom: 72px">
+                        <span
+                            style="font-family: 'Playfair Display';font-size: 30px;font-weight: bold;color: #73B499;text-decoration: underline;">
+                            Para hacer tus planes realidad, solo tienes que abonar el importe a través de:
                         </span>
                     </td>
                 </tr>
@@ -86,73 +141,9 @@
                     </td>
                 </tr>
                 <tr>
-                    <td style="text-align:center;padding-bottom: 50px">
-                        <img class="logo" src="http://api.mariluz.hub2b.travel/media/stars.png" alt="logo"
-                        style="width: 545px;">
-                    </td>
-                </tr>
-                <tr>
-                    <td style="padding-bottom: 70px;">
-                        <table width="100%">
-                            <tbody>
-                                <tr>
-                                    <td style="padding-bottom: 14px;font-family: 'Playfair Display';display: block">
-                                        <span style="color: #B8965B;font-size: 20px;font-weight: bold;">Algunas cosas importantes:</span>
-                                    </td>
-                                    <td style="width: 355px">
-                                        <span style="font-family: 'Roboto';font-weight: bold;color: #B8965B">Tasas locales:</span>
-                                        <br>
-                                        <span style="font-family: 'Roboto';color: #B8965B;">A veces, las reservas pueden estar
-                                            sujetas a <span style="font-weight: bold">impuestos y/o tasas locales</span> que <span
-                                                style="font-weight: bold">no están incluidas en el precio</span> porque no se
-                                            gestionan a través de Mariluz.
-                                            Estas tasas son obligatorias, pueden variar y tendrás que abonarlas directamente en el
-                                            establecimiento.
-                                        </span>
-                                        <br>
-                                        <br>
-                                        <span style="font-family: 'Roboto';font-weight: bold;color: #B8965B">Anulación
-                                            reserva:</span>
-                                        <br>
-                                        <span style="font-family: 'Roboto';color: #B8965B;">Nunca, nunca, nunca anularemos tu
-                                            reserva sin haber hablado contigo, así que te agradecemos que, en el caso de necesitar
-                                            cancelarla, nos lo comuniques lo antes posible. Así, evitarás los <span
-                                                style="font-weight: bold">gastos de cancelación</span> asociados y liberarás tus
-                                            plazas para que otros puedan disfrutarlas.</span>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </td>
-                </tr>
-                <tr>
-                    <td style="padding-bottom: 118px;">
-                        <table width="100%">
-                            <tbody>
-                                <tr>
-                                    <td style="padding-bottom: 14px;font-family: 'Playfair Display';display: block">
-                                        <span style="color: #B8965B;font-size: 20px;font-weight: bold;">¡Recuerda llevar protección solar y… llama al
-                                            llegar!</span>
-                                    </td>
-                                    <td style="width: 355px;">
-                                        <span style="font-family: 'Roboto';color: #B8965B;">Nos encantará recibir una <span
-                                            style="font-weight: bold">nota de voz con tu opinión</span> sobre la estancia, el
-                                        hotel, el bufé de desayuno, las almohadas de la cama, las toallas… ¡o lo que quieras
-                                        contarnos!</span>
-                                        <br>
-                                        <br>
-                                        <span style="font-family: 'Roboto';color: #B8965B;">Puedes hacerlo al <span
-                                            style="text-decoration: underline;font-weight:bold">whatsapp de Mariluz: 633 574
-                                            411</span></span>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </td>
-                </tr>
-                <tr>
                     <td style="padding-bottom: 21px;">
-                        <hr style="width: 240px;border-top: 0;border-left: 0;border-right: 0;border-color: #73B499;margin: 0 auto;">
+                        <hr
+                            style="width: 240px;border-top: 0;border-left: 0;border-right: 0;border-color: #73B499;margin: 0 auto;">
                     </td>
                 </tr>
                 <tr>
@@ -162,8 +153,20 @@
                     </td>
                 </tr>
                 <tr>
-                    <td style="padding-bottom: 90px;">
-                        <hr style="width: 240px;border-top: 0;border-left: 0;border-right: 0;border-color: #73B499;margin: 0 auto;">
+                    <td style="padding-bottom: 30px;">
+                        <hr
+                            style="width: 240px;border-top: 0;border-left: 0;border-right: 0;border-color: #73B499;margin: 0 auto;">
+                    </td>
+                </tr>
+                <tr>
+                    <td
+                        style="padding-bottom: 86px;font-family: 'Roboto';text-align: center;color: #B8965B;font-size: 16px;">
+                        <span>Dpto. Reservas</span><br>
+                        <span>Mariluz Travel</span><br>
+                        <span>Parc Bit</span><br>
+                        <span>Edificio U, Local 11</span><br>
+                        <span>07121 Palma de Mallorca</span><br>
+                        <span>Tel. 971 42 51 10</span>
                     </td>
                 </tr>
             </tbody>
@@ -251,7 +254,50 @@
                         </td>
                     </tr>
                     <tr>
-                        <td style="border-width:0px;max-width:700px;height:auto;text-align:center;"></td>
+                        <td
+                            style="padding-bottom: 23px;border-width:0px;max-width:700px;height:auto;text-align:center;color: #FAF4E8;">
+                            <span
+                                style="font-weight: bold;text-decoration: underline;font-size: 12px;font-family: 'Roboto';">Términos
+                                y condiciones</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding-bottom: 16px;">
+                            <span style="font-size: 12px;font-family: 'Roboto';color: #FAF4E8">La información que
+                                contiene este mensaje y/o sus archivo(s) adjunto(s), enviada desde
+                                MARILUZ TRAVEL TOUR SL, es confidencial/privilegiada y está destinada a ser leída sólo
+                                por la(s) persona(s) a la(s) que va dirigida: tú y solo tú.</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding-bottom: 16px;">
+                            <span style="font-size: 12px;font-family: 'Roboto';color: #FAF4E8">Para facilitar la
+                                comunicación contigo, te recordamos que tus datos han sido incorporados en el sistema de
+                                tratamiento de MARILUZ TRAVEL TOUR SL y que siempre y cuando se cumplan los requisitos
+                                exigidos por la normativa, podrás ejercer tus derechos de acceso, rectificación,
+                                limitación de tratamiento, supresión, portabilidad y oposición/revocación, en los
+                                términos que establece la normativa vigente en materia de protección de datos,
+                                dirigiendo tu petición a la dirección postal Parc Bit Edificio U, Local 11 07121, PALMA
+                                DE MALLORCA (ILLES BALEARS) o bien a través de nuestro correo electrónico
+                                reservas@mariluztravel.es </span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding-bottom: 16px;">
+                            <span style="font-size: 12px;font-family: 'Roboto';color: #FAF4E8">La experiencia de 15 años
+                                creando y vendiendo escapadas nos dice que, igual que te has interesado ya por alguna de
+                                nuestras ofertas, pueden interesarte otras, así que siempre que tengamos algo que pueda
+                                encajarte (escapadas, promociones, ofertas, day pass…), te lo enviaremos.</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <span style="font-size: 12px;font-family: 'Roboto';color: #FAF4E8">Si has recibido este
+                                mensaje y no eres su destinatario, un empleado o un agente responsable de reenviarlo,
+                                sin duda lo has recibido por error, así que divulgarlo, distribuirlo o reproducirlo es
+                                ilegal. Avísanos devolviendo el mensaje al correo de envío y nosotros lo
+                                solucionaremos.</span>
+                        </td>
                     </tr>
                 </tbody>
             </table>
