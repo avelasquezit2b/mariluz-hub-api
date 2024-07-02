@@ -78,6 +78,29 @@
                     </td>
                 </tr>
                 {% endfor %}
+                {% if clientTypes|length > 0 %}
+                <tr>
+                    <td style="padding-bottom: 20px;">
+                        <div class="table" style="height:100%;width:100%;font-family: 'Roboto'">
+                            <div class="table-header" style="color: #fff;background-color: #73B499;padding: 8px 20px;">
+                                <span style="font-weight: bold;color:#fff">Actividad:</span>
+                            </div>
+                            <div style="border:1px solid #E5D8BE;padding: 15px 20px 24px 20px;">
+                                <div style="padding-bottom: .5rem;">
+                                    <span style="font-weight: bold;color: #B8965B">Modalidad:</span>
+                                    <span style="color: #B8965B;">{{modality}}</span>
+                                </div>
+                                {% for clientType in clientTypes %}
+                                    <div style="padding-bottom: .5rem;">
+                                        <span style="font-weight: bold;color: #B8965B">{{clientType.clientType}}s:</span>
+                                        <span style="color: #B8965B;">{{clientType.quantity}}</span>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                {% endif %}
                 <tr>
                     <td style="font-family: 'Roboto Condensed';text-align: end">
                         <span style="color: #FF926F;font-size: 14px;">Total:</span>
@@ -117,7 +140,7 @@
                                 </div>
                                 <div>
                                     <span style="color: #B8965B">Acuérdate de <span style="font-weight: bold">indicar tu
-                                            número de reserva 34393 en el concepto del ingreso</span> y de realizar un
+                                            número de reserva {{id}} en el concepto del ingreso</span> y de realizar un
                                         <span style="font-weight: bold">pago único por reserva.
                                         </span></span>
                                 </div>

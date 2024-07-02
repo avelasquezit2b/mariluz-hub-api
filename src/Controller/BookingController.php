@@ -187,7 +187,8 @@ class BookingController extends AbstractController
                 $entityManager->flush();
 
                 $this->send_voucher($hotelBooking->getId(), 'supplier', $mailer, $pdf, $voucherRepository, $configurationRepository, $entityManager);
-                $this->sendTransfer($hotelBooking->getId(), $mailer, $bookingRepository, $configurationRepository);
+                // $this->sendTransfer($hotelBooking->getId(), $mailer, $bookingRepository, $configurationRepository);
+                $this->send_on_request_payment($hotelBooking->getId(), $mailer, $bookingRepository, $configurationRepository);
             } else if ($hotel->isIsOnRequest() || $seasonIsOnRequest) {
                 $company = $configurationRepository->find(1);
                 $context = [
@@ -220,6 +221,20 @@ class BookingController extends AbstractController
                     ->htmlTemplate('communications/on_request_to_supplier.html.twig');
 
                 $mailer->send($email);
+
+                $context = [
+                    "name" => $hotelBooking->getName()
+                ];
+
+                // Sending the email
+
+                $email = (new TemplatedEmail())
+                    ->from($company->getBookingEmail())
+                    ->to($hotelBooking->getEmail())
+                    ->subject('Solicitud de reserva')
+                    ->context($context)
+                    ->htmlTemplate('email/on_request_to_client.html.twig');
+                $mailer->send($email);   
             }
 
             // foreach ($hotelAvailabilities as $hotelAvailability) {
@@ -383,7 +398,8 @@ class BookingController extends AbstractController
                 $entityManager->flush();
 
                 $this->send_voucher($activityBooking->getId(), 'supplier', $mailer, $pdf, $voucherRepository, $configurationRepository, $entityManager);
-                $this->sendTransfer($activityBooking->getId(), $mailer, $bookingRepository, $configurationRepository);
+                $this->send_on_request_payment($activityBooking->getId(), $mailer, $bookingRepository, $configurationRepository);
+                // $this->sendTransfer($activityBooking->getId(), $mailer, $bookingRepository, $configurationRepository);
             } else if ($activity->isIsOnRequest() || $seasonIsOnRequest) {
                 $company = $configurationRepository->find(1);
                 $context = [
@@ -416,6 +432,20 @@ class BookingController extends AbstractController
                     ->htmlTemplate('communications/on_request_to_supplier.html.twig');
 
                 $mailer->send($email);
+
+                $context = [
+                    "name" => $activityBooking->getName()
+                ];
+
+                // Sending the email
+
+                $email = (new TemplatedEmail())
+                    ->from($company->getBookingEmail())
+                    ->to($activityBooking->getEmail())
+                    ->subject('Solicitud de reserva')
+                    ->context($context)
+                    ->htmlTemplate('email/on_request_to_client.html.twig');
+                $mailer->send($email);   
             }
 
             // foreach ($activityAvailabilities as $activityAvailability) {
@@ -539,7 +569,8 @@ class BookingController extends AbstractController
                 $entityManager->persist($newVoucher);
                 $entityManager->flush();
 
-                $this->sendTransfer($booking->getId(), $mailer, $bookingRepository, $configurationRepository);
+                // $this->sendTransfer($booking->getId(), $mailer, $bookingRepository, $configurationRepository);
+                $this->send_on_request_payment($booking->getId(), $mailer, $bookingRepository, $configurationRepository);
                 $this->send_voucher($booking->getId(), 'supplier', $mailer, $pdf, $voucherRepository, $configurationRepository, $entityManager);
             }
         }
@@ -550,9 +581,10 @@ class BookingController extends AbstractController
     }
 
     #[Route('/change_to_cancelled/{id}', name: 'api_change_to_cancelled')]
-    public function change_to_cancelled(EntityManagerInterface $entityManager, HotelAvailabilityRepository $hotelAvailabilityRepository, ActivityAvailabilityRepository $activityAvailabilityRepository, BookingRepository $bookingRepository, string $id): Response
+    public function change_to_cancelled(EntityManagerInterface $entityManager, MailerInterface $mailer, HotelAvailabilityRepository $hotelAvailabilityRepository, ActivityAvailabilityRepository $activityAvailabilityRepository, ConfigurationRepository $configurationRepository, BookingRepository $bookingRepository, string $id): Response
     {
         $booking = $bookingRepository->find($id);
+        $company = $configurationRepository->find(1);
 
         if ($booking->getStatus() == 'preBooked' || $booking->getStatus() == 'booked') {
             if ($booking->getBookingLines()[0]->getHotel()) {
@@ -585,6 +617,21 @@ class BookingController extends AbstractController
 
         $entityManager->persist($booking);
         $entityManager->flush();
+
+        $context = [
+            "name" => $booking->getName()
+        ];
+
+        $email = (new TemplatedEmail())
+            ->from($company->getBookingEmail())
+            ->to($booking->getEmail())
+            ->subject('Cancelación de reserva')
+            ->context($context)
+            ->htmlTemplate('email/booking_canceled.html.twig');
+
+        if ($booking->getStatus() == 'cancelled') {
+            $mailer->send($email);
+        }
 
         return $this->json([
             'response'  => $booking
@@ -722,7 +769,7 @@ class BookingController extends AbstractController
 
             $email = (new TemplatedEmail())
                 ->from($company->getBookingEmail())
-                ->to($booking->getClient()->getEmail())
+                ->to($booking->getEmail())
                 ->subject('Gracias por tu reserva')
                 ->context($context)
                 ->attach($pdf->getOutputFromHtml($html, $options), $fileName, 'application/pdf')
@@ -803,7 +850,7 @@ class BookingController extends AbstractController
 
             $email = (new TemplatedEmail())
                 ->from($company->getBookingEmail())
-                ->to($booking->getClient()->getEmail())
+                ->to($booking->getEmail())
                 ->subject('Gracias por tu reserva')
                 ->context($context)
                 ->attach($pdf->getOutputFromHtml($html, $options), $fileName, 'application/pdf')
@@ -1065,6 +1112,74 @@ class BookingController extends AbstractController
             ->subject('Recordatorio Pago por Transferencia')
             ->context($context)
             ->htmlTemplate('communications/supplier_booking_confirmed.html.twig');
+
+        $mailer->send($email);
+
+
+        return $this->json([
+            'response'  => 'send'
+        ]);
+    }
+
+    #[Route('/send_on_request_payment/{id}', name: 'api_send_on_request_payment')]
+    public function send_on_request_payment(int $id, MailerInterface $mailer, BookingRepository $bookingRepository, ConfigurationRepository $configurationRepository): Response
+    {
+        $booking = $bookingRepository->find($id);
+        $company = $configurationRepository->find(1);
+        $product = $booking->getBookingLines()[0]->getHotel() ? $booking->getBookingLines()[0]->getHotel() : $booking->getBookingLines()[0]->getActivity();
+
+        $context = [
+            "name" => $booking->getName(),
+            "id" => $booking->getId(),
+            "product" => $product,
+            "clientTypes" => [],
+            "rooms" => [],
+            "totalPrice" => $booking->getTotalPrice(),
+            "startDate" => $booking->getBookingLines()[0]->getCheckIn(),
+            "endDate" => $booking->getBookingLines()[0]->getCheckOut()
+        ];
+
+        if ($booking->getBookingLines()[0]->getHotel()) {
+            $context['rooms'] = $booking->getBookingLines()[0]->getData();
+        } else if ($booking->getBookingLines()[0]->getActivity()) {
+            $context['clientTypes'] = $booking->getBookingLines()[0]->getData()['clientTypes'];
+            $context['modality'] = $booking->getBookingLines()[0]->getData()['modality'];
+        }
+
+        $email = (new TemplatedEmail())
+            ->from($company->getBookingEmail())
+            ->to($booking->getEmail())
+            ->subject('Confirmación solicitud de reserva')
+            ->context($context)
+            ->htmlTemplate('email/on_request_confirmed_notification.html.twig');
+
+        $mailer->send($email);
+
+
+        return $this->json([
+            'response'  => 'send'
+        ]);
+    }
+
+    #[Route('/send_payment_reminder/{id}', name: 'api_send_payment_reminder')]
+    public function send_payment_reminder(int $id, MailerInterface $mailer, BookingRepository $bookingRepository, ConfigurationRepository $configurationRepository): Response
+    {
+        $booking = $bookingRepository->find($id);
+        $company = $configurationRepository->find(1);
+        $product = $booking->getBookingLines()[0]->getHotel() ? $booking->getBookingLines()[0]->getHotel() : $booking->getBookingLines()[0]->getActivity();
+
+        $context = [
+            "name" => $booking->getName(),
+            "id" => $booking->getId(),
+            "daysToPay" => $product->getDaysToPay() ? $product->getDaysToPay() : 8
+        ];
+
+        $email = (new TemplatedEmail())
+            ->from($company->getBookingEmail())
+            ->to($booking->getEmail())
+            ->subject('Recordatorio de pago')
+            ->context($context)
+            ->htmlTemplate('email/payment_reminder.html.twig');
 
         $mailer->send($email);
 
